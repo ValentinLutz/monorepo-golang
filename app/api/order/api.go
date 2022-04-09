@@ -1,15 +1,13 @@
 package order
 
 import (
+	request2 "app/api/order/request"
 	"app/api/order/response"
-	"app/internal/order/entity"
-	"app/internal/order/model"
 	"app/internal/order/repository"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"time"
 )
 
 type API struct {
@@ -41,11 +39,11 @@ func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http
 }
 
 func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	order := entity.Order{
-		OrderId:      "9999-EU-9999",
-		CreationDate: time.Now().String(),
-		Status:       model.OrderPlaced,
-		Items:        nil,
+	orderRequest, err := request2.FromJSON(request.Body)
+	if err != nil {
+		http.Error(responseWriter, "Failed to parse request", http.StatusBadRequest)
+		return
 	}
-	repository.Save(&order)
+	orderEntity := orderRequest.ToOrderEntity()
+	repository.Save(&orderEntity)
 }

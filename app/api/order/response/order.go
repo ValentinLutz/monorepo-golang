@@ -14,35 +14,21 @@ type Order struct {
 	Items        []OrderItem       `json:"items"`
 }
 
-func (orderResponse *Order) ToJSON(writer io.Writer) error {
+func (order *Order) ToJSON(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
-	return encoder.Encode(orderResponse)
+	return encoder.Encode(order)
 }
 
-func (orderResponse *Order) ToOrderEntity() entity.Order {
-	var orderItems []entity.OrderItem
-	for _, item := range orderResponse.Items {
-		orderItems = append(orderItems, item.ToOrderItemEntity())
-	}
-
-	return entity.Order{
-		OrderId:      orderResponse.OrderId,
-		CreationDate: orderResponse.CreationDate,
-		Status:       orderResponse.Status,
-		Items:        orderItems,
-	}
-}
-
-func FromOrderEntity(orderEntity *entity.Order) Order {
+func FromOrderEntity(order *entity.Order) Order {
 	var orderItems []OrderItem
-	for _, item := range orderEntity.Items {
+	for _, item := range order.Items {
 		orderItems = append(orderItems, FromOrderItemEntity(&item))
 	}
 
 	return Order{
-		OrderId:      orderEntity.OrderId,
-		CreationDate: orderEntity.CreationDate,
-		Status:       orderEntity.Status,
+		OrderId:      order.OrderId,
+		CreationDate: order.CreationDate,
+		Status:       order.Status,
 		Items:        orderItems,
 	}
 }

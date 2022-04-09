@@ -3,6 +3,7 @@ package repository
 import (
 	"app/internal/order/entity"
 	"app/internal/order/model"
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -11,6 +12,8 @@ func FindAll() []*entity.Order {
 }
 
 func Save(orderEntity *entity.Order) {
+	newUUID, _ := uuid.NewUUID()
+	orderEntity.OrderId = model.OrderId(newUUID.String())
 	orders = append(orders, orderEntity)
 }
 

@@ -10,19 +10,13 @@ type OrderItem struct {
 	Name string `json:"name"`
 }
 
-func (orderItemResponse *OrderItem) ToJSON(writer io.Writer) error {
+func (orderItem *OrderItem) ToJSON(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
-	return encoder.Encode(orderItemResponse)
+	return encoder.Encode(orderItem)
 }
 
-func (orderItemResponse *OrderItem) ToOrderItemEntity() entity.OrderItem {
-	return entity.OrderItem{
-		Name: orderItemResponse.Name,
-	}
-}
-
-func FromOrderItemEntity(orderItemEntity *entity.OrderItem) OrderItem {
+func FromOrderItemEntity(orderItem *entity.OrderItem) OrderItem {
 	return OrderItem{
-		Name: orderItemEntity.Name,
+		Name: orderItem.Name,
 	}
 }
