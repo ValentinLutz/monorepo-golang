@@ -1,5 +1,5 @@
 package entity
 
-type OrderItemEntity struct {
+type OrderItem struct {
 	Name string
 }

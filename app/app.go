@@ -11,10 +11,11 @@ import (
 func main() {
 	logger := log.New(os.Stdout, "golang-reference-project", log.LstdFlags)
 
-	productsHandler := api.NewOrderApi(logger)
+	orderAPI := order.NewAPI(logger)
 
 	router := httprouter.New()
-	productsHandler.RegisterHandlers(router)
+	orderAPI.RegisterHandlers(router)
 
+	log.Println("Starting server on port :8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

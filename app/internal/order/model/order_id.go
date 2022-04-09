@@ -1,3 +1,3 @@
-package data
+package model
 
 type OrderId string
