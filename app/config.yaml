@@ -1,0 +1,16 @@
+# Server config
+server:
+  host: "localhost"
+  port: 8080
+  timeout:
+    read: 10
+    write: 10
+    idle: 10
+
+# Database config
+database:
+  host: localhost
+  port: 5432
+  user: "test"
+  pass: "test"
+  database: "dev_db"

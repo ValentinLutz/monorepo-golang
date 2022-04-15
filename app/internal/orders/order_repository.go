@@ -1,28 +1,26 @@
-package repository
+package orders
 
 import (
-	"app/internal/order/entity"
-	"app/internal/order/model"
 	"github.com/google/uuid"
 	"time"
 )
 
-func FindAll() []*entity.Order {
+func FindAll() []*OrderEntity {
 	return orders
 }
 
-func Save(orderEntity *entity.Order) {
+func Save(orderEntity *OrderEntity) {
 	newUUID, _ := uuid.NewUUID()
-	orderEntity.OrderId = model.OrderId(newUUID.String())
+	orderEntity.OrderId = OrderId(newUUID.String())
 	orders = append(orders, orderEntity)
 }
 
-var orders = []*entity.Order{
+var orders = []*OrderEntity{
 	{
 		OrderId:      "1234-EU-4321",
 		CreationDate: time.Now().String(),
-		Status:       model.OrderPlaced,
-		Items: []entity.OrderItem{
+		Status:       OrderPlaced,
+		Items: []OrderItemEntity{
 			{Name: "apple"},
 			{Name: "chocolate"},
 		},
@@ -30,8 +28,8 @@ var orders = []*entity.Order{
 	{
 		OrderId:      "5678-EU-8765",
 		CreationDate: time.Now().String(),
-		Status:       model.OrderCompleted,
-		Items: []entity.OrderItem{
+		Status:       OrderCompleted,
+		Items: []OrderItemEntity{
 			{Name: "toast"},
 		},
 	},
