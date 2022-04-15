@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Orders API
+  version: 0.0.1
+paths:
+  /api/orders:
+    get:
+      summary: Returns a list of orders.
+      responses:
+        "200":
+          description: A JSON array of orders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orders"
+    post:
+      summary: Create a new order.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Items"
+      responses:
+        "200":
+          description: Empty body
+components:
+  schemas:
+    Orders:
+      type: array
+      properties:
+        order_id:
+          type: string
+          description: Id of the order
+          example: "FCnMkQ*INCu-EU-hXDO*dY2j1A"
+        creation_date:
+          type: string
+          format: date-time
+          description: Creation date of the order
+          example: "2021-01-30T08:30:00Z"
+        status:
+          type: string
+          enum:
+            [order_completed, order_canceled, order_in_progress, order_placed]
+          description: Status of the order
+        items:
+          $ref: "#/components/schemas/Items"
+    Items:
+      type: array
+      properties:
+        name:
+          type: string
+          description: Name of the order item
+          example: banana

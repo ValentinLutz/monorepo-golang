@@ -4,6 +4,7 @@ import (
 	"app/api/orders"
 	"app/internal/config"
 	"app/internal/database"
+	"app/serve"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -39,6 +40,10 @@ func NewServer(logger *log.Logger, serverConfig *config.ServerConfig) *http.Serv
 
 	orderAPI := orders.NewAPI(logger)
 	orderAPI.RegisterHandlers(router)
+
+	swaggerUI := serve.NewUI(logger)
+	swaggerUI.RegisterUI(router)
+	swaggerUI.RegisterOpenAPISchemas(router)
 
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", serverConfig.Port),
