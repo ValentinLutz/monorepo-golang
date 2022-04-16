@@ -1,54 +1,115 @@
-openapi: 3.0.3
+openapi: "3.0.3"
 info:
+  version: 0.1.2
   title: Orders API
-  version: 0.0.1
 paths:
   /api/orders:
     get:
-      summary: Returns a list of orders.
+      summary: Get all orders
+      tags:
+        - orders
       responses:
-        "200":
-          description: A JSON array of orders
+        200:
+          description: A array of orders
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Orders"
+                $ref: "#/components/schemas/orders"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
     post:
-      summary: Create a new order.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Items"
+      summary: Create a order
+      tags:
+        - orders
       responses:
-        "200":
-          description: Empty body
+        201:
+          description: Null Response
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /api/orders/{orderId}:
+    get:
+      summary: Info for a specific order
+      tags:
+        - orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: The id of the order to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/order"
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
 components:
   schemas:
-    Orders:
-      type: array
+    order:
+      type: object
+      required:
+        - order_id
+        - creation_date
+        - status
+        - items
       properties:
         order_id:
           type: string
-          description: Id of the order
-          example: "FCnMkQ*INCu-EU-hXDO*dY2j1A"
+          example: I3xXiIqbP92-NONE-DEV-Ui*8i0kFHcA
         creation_date:
-          type: string
+          type: string    
           format: date-time
-          description: Creation date of the order
-          example: "2021-01-30T08:30:00Z"
         status:
-          type: string
-          enum:
-            [order_completed, order_canceled, order_in_progress, order_placed]
-          description: Status of the order
+          $ref: "#/components/schemas/status"
         items:
-          $ref: "#/components/schemas/Items"
-    Items:
+          type: array
+          items:
+            $ref: "#/components/schemas/item"
+    status: 
+      type: string
+      enum:
+        - order_completed
+        - order_canceled
+        - order_in_progress
+        - order_placed
+    orders:
       type: array
+      items:
+        $ref: "#/components/schemas/order"
+    item: 
+      type: object
+      required:
+        - name
       properties:
         name:
           type: string
-          description: Name of the order item
-          example: banana
+          example: "banana"
+    error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 9001
+        message:
+          type: string
+          example: panic it's over 9000
