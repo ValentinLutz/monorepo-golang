@@ -22,6 +22,7 @@ func (orderApi *API) RegisterHandlers(router *httprouter.Router) {
 }
 
 func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http.Request, _ httprouter.Params) {
+	responseWriter.Header().Set("Content-Type", "application/json")
 	orderEntities := orders.FindAll()
 
 	var ResponseBody []OrderResponse
@@ -37,6 +38,7 @@ func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http
 }
 
 func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http.Request, _ httprouter.Params) {
+	responseWriter.Header().Set("Content-Type", "application/json")
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
 		http.Error(responseWriter, "Failed to parse request", http.StatusBadRequest)
