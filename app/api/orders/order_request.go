@@ -4,6 +4,8 @@ import (
 	"app/internal/orders"
 	"encoding/json"
 	"io"
+	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -28,7 +30,8 @@ func (order *OrderRequest) ToOrderEntity() orders.OrderEntity {
 	}
 
 	return orders.OrderEntity{
-		CreationDate: time.Now().String(),
+		Id:           orders.OrderId(strconv.Itoa(rand.Int())),
+		CreationDate: time.Now(),
 		Status:       orders.OrderPlaced,
 		Items:        orderItems,
 	}

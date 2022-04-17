@@ -1,36 +1,58 @@
 package orders
 
 import (
-	"github.com/google/uuid"
-	"time"
+	"database/sql"
+	"log"
 )
 
-func FindAll() []*OrderEntity {
-	return orders
+type OrderRepository struct {
+	logger *log.Logger
+	db     *sql.DB
 }
 
-func Save(orderEntity *OrderEntity) {
-	newUUID, _ := uuid.NewUUID()
-	orderEntity.OrderId = OrderId(newUUID.String())
-	orders = append(orders, orderEntity)
+func NewRepository(logger *log.Logger, db *sql.DB) *OrderRepository {
+	return &OrderRepository{logger: logger, db: db}
 }
 
-var orders = []*OrderEntity{
-	{
-		OrderId:      "1234-EU-4321",
-		CreationDate: time.Now().String(),
-		Status:       OrderPlaced,
-		Items: []OrderItemEntity{
-			{Name: "apple"},
-			{Name: "chocolate"},
-		},
-	},
-	{
-		OrderId:      "5678-EU-8765",
-		CreationDate: time.Now().String(),
-		Status:       OrderCompleted,
-		Items: []OrderItemEntity{
-			{Name: "toast"},
-		},
-	},
+func (orderRepository *OrderRepository) FindAll() ([]OrderEntity, error) {
+	rows, err := orderRepository.db.Query("SELECT id, creation_date, order_status FROM golang_reference_project.order")
+	if err != nil {
+		return nil, err
+	}
+
+	var orderEntities []OrderEntity
+	for rows.Next() {
+		var orderEntity OrderEntity
+
+		err := rows.Scan(&orderEntity.Id, &orderEntity.CreationDate, &orderEntity.Status)
+		if err != nil {
+			return nil, err
+		}
+
+		orderEntities = append(orderEntities, orderEntity)
+	}
+
+	return orderEntities, nil
+}
+
+func (orderRepository *OrderRepository) FindById(id OrderId) (OrderEntity, error) {
+	row := orderRepository.db.QueryRow("SELECT id, creation_date, order_status FROM golang_reference_project.order WHERE id = $1", id)
+
+	var orderEntity OrderEntity
+	err := row.Scan(&orderEntity.Id, &orderEntity.CreationDate, &orderEntity.Status)
+	if err != nil {
+		return OrderEntity{}, err
+	}
+
+	return orderEntity, nil
+}
+
+func (orderRepository *OrderRepository) Save(orderEntity *OrderEntity) {
+	_, err := orderRepository.db.Exec(
+		"INSERT INTO golang_reference_project.order (id, creation_date, order_status, workflow) VALUES ($1, $2, $3, $4)",
+		orderEntity.Id, orderEntity.CreationDate, orderEntity.Status, "default_workflow",
+	)
+	if err != nil {
+		log.Fatal("Failed to save into database")
+	}
 }

@@ -14,17 +14,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/orders"
+                $ref: "#/components/schemas/orders_response"
         500:
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error"
+                $ref: "#/components/schemas/error_response"
     post:
+
       summary: Create a order
       tags:
         - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/order_request"
       responses:
         201:
           description: Null Response
@@ -33,7 +39,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error"
+                $ref: "#/components/schemas/error_response"
   /api/orders/{orderId}:
     get:
       summary: Info for a specific order
@@ -52,16 +58,33 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/order"
+                $ref: "#/components/schemas/order_response"
         default:
           description: Unexpected Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error"
+                $ref: "#/components/schemas/error_response"
 components:
   schemas:
-    order:
+    order_request:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/order_item_request"
+    order_item_request:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: marshmallow
+    order_response:
       type: object
       required:
         - order_id
@@ -76,36 +99,43 @@ components:
           type: string    
           format: date-time
         status:
-          $ref: "#/components/schemas/status"
+          $ref: "#/components/schemas/order_status"
         items:
           type: array
           items:
-            $ref: "#/components/schemas/item"
-    status: 
+            $ref: "#/components/schemas/order_item_response"
+    order_status:
       type: string
       enum:
         - order_completed
         - order_canceled
         - order_in_progress
         - order_placed
-    orders:
+    orders_response:
       type: array
       items:
-        $ref: "#/components/schemas/order"
-    item: 
+        $ref: "#/components/schemas/order_response"
+    order_item_response:
       type: object
       required:
         - name
       properties:
         name:
           type: string
-          example: "banana"
-    error:
+          example: banana
+    error_response:
       type: object
       required:
+        - path
+        - timestamp
         - code
-        - message
       properties:
+        path:
+          type: string
+          example: /api/status
+        timestamp:
+          type: string
+          format: date-time
         code:
           type: integer
           format: int32

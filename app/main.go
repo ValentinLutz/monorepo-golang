@@ -5,6 +5,7 @@ import (
 	"app/internal/config"
 	"app/internal/database"
 	"app/serve"
+	"database/sql"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -24,9 +25,9 @@ func main() {
 	}
 
 	newDatabase := database.NewDatabase(logger)
-	_ = newDatabase.Connect(&newConfig.Database)
+	db := newDatabase.Connect(&newConfig.Database)
 
-	server := NewServer(logger, &newConfig.Server)
+	server := NewServer(logger, &newConfig.Server, db)
 
 	logger.Printf("Starting server on %s", server.Addr)
 	err = server.ListenAndServe()
@@ -35,10 +36,10 @@ func main() {
 	}
 }
 
-func NewServer(logger *log.Logger, serverConfig *config.ServerConfig) *http.Server {
+func NewServer(logger *log.Logger, serverConfig *config.ServerConfig, db *sql.DB) *http.Server {
 	router := httprouter.New()
 
-	orderAPI := orders.NewAPI(logger)
+	orderAPI := orders.NewAPI(logger, db)
 	orderAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewUI(logger)

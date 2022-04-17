@@ -4,6 +4,7 @@ import (
 	"app/internal/orders"
 	"encoding/json"
 	"io"
+	"time"
 )
 
 type OrderResponse struct {
@@ -25,8 +26,8 @@ func FromOrderEntity(order *orders.OrderEntity) OrderResponse {
 	}
 
 	return OrderResponse{
-		OrderId:      order.OrderId,
-		CreationDate: order.CreationDate,
+		OrderId:      order.Id,
+		CreationDate: order.CreationDate.Format(time.RFC3339),
 		Status:       order.Status,
 		Items:        orderItems,
 	}

@@ -1,8 +1,10 @@
 package orders
 
+import "time"
+
 type OrderEntity struct {
-	OrderId      OrderId
-	CreationDate string
+	Id           OrderId
+	CreationDate time.Time
 	Status       OrderStatus
 	Items        []OrderItemEntity
 }
