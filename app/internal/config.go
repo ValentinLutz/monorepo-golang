@@ -1,7 +1,7 @@
-package config
+package internal
 
 import (
-	"app/internal/database"
+	"app/external/database"
 	"gopkg.in/yaml.v2"
 	"os"
 )
@@ -23,18 +23,23 @@ type TimeoutConfig struct {
 	Idle  int `yaml:"idle"`
 }
 
-func NewConfig(path string) (*Config, error) {
+func NewConfig(path string) (Config, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return Config{}, err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		closeErr := file.Close()
+		if closeErr != nil {
+			err = closeErr
+		}
+	}(file)
 
 	decoder := yaml.NewDecoder(file)
-	config := &Config{}
+	config := Config{}
 	err = decoder.Decode(&config)
 	if err != nil {
-		return nil, err
+		return Config{}, err
 	}
 
 	return config, nil

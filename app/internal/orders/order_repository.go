@@ -6,16 +6,16 @@ import (
 )
 
 type OrderRepository struct {
-	logger *log.Logger
-	db     *sql.DB
+	logger   *log.Logger
+	database *sql.DB
 }
 
-func NewRepository(logger *log.Logger, db *sql.DB) *OrderRepository {
-	return &OrderRepository{logger: logger, db: db}
+func NewRepository(logger *log.Logger, database *sql.DB) *OrderRepository {
+	return &OrderRepository{logger: logger, database: database}
 }
 
 func (orderRepository *OrderRepository) FindAll() ([]OrderEntity, error) {
-	rows, err := orderRepository.db.Query("SELECT id, creation_date, order_status FROM golang_reference_project.order")
+	rows, err := orderRepository.database.Query("SELECT id, creation_date, order_status FROM golang_reference_project.order")
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (orderRepository *OrderRepository) FindAll() ([]OrderEntity, error) {
 }
 
 func (orderRepository *OrderRepository) FindById(id OrderId) (OrderEntity, error) {
-	row := orderRepository.db.QueryRow("SELECT id, creation_date, order_status FROM golang_reference_project.order WHERE id = $1", id)
+	row := orderRepository.database.QueryRow("SELECT id, creation_date, order_status FROM golang_reference_project.order WHERE id = $1", id)
 
 	var orderEntity OrderEntity
 	err := row.Scan(&orderEntity.Id, &orderEntity.CreationDate, &orderEntity.Status)
@@ -48,7 +48,7 @@ func (orderRepository *OrderRepository) FindById(id OrderId) (OrderEntity, error
 }
 
 func (orderRepository *OrderRepository) Save(orderEntity *OrderEntity) {
-	_, err := orderRepository.db.Exec(
+	_, err := orderRepository.database.Exec(
 		"INSERT INTO golang_reference_project.order (id, creation_date, order_status, workflow) VALUES ($1, $2, $3, $4)",
 		orderEntity.Id, orderEntity.CreationDate, orderEntity.Status, "default_workflow",
 	)

@@ -2,8 +2,8 @@ package main
 
 import (
 	"app/api/orders"
-	"app/internal/config"
-	"app/internal/database"
+	"app/external/database"
+	"app/internal"
 	"app/serve"
 	"database/sql"
 	"fmt"
@@ -19,7 +19,7 @@ const ConfigPath = "config.yaml"
 func main() {
 	logger := log.New(os.Stdout, "", log.LstdFlags)
 
-	newConfig, err := config.NewConfig(ConfigPath)
+	newConfig, err := internal.NewConfig(ConfigPath)
 	if err != nil {
 		logger.Fatal("Failed to load config file %s", ConfigPath)
 	}
@@ -36,7 +36,7 @@ func main() {
 	}
 }
 
-func NewServer(logger *log.Logger, serverConfig *config.ServerConfig, db *sql.DB) *http.Server {
+func NewServer(logger *log.Logger, serverConfig *internal.ServerConfig, db *sql.DB) *http.Server {
 	router := httprouter.New()
 
 	orderAPI := orders.NewAPI(logger, db)

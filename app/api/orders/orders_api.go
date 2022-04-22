@@ -1,23 +1,22 @@
 package orders
 
 import (
-	"app/api"
+	"app/api/responses"
 	"app/internal/orders"
 	"database/sql"
-	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 )
 
 type API struct {
-	logger          *log.Logger
+	log             *log.Logger
 	db              *sql.DB
 	orderRepository *orders.OrderRepository
 }
 
 func NewAPI(logger *log.Logger, db *sql.DB) *API {
-	return &API{logger: logger, db: db, orderRepository: orders.NewRepository(logger, db)}
+	return &API{log: logger, db: db, orderRepository: orders.NewRepository(logger, db)}
 }
 
 func (orderApi *API) RegisterHandlers(router *httprouter.Router) {
@@ -26,56 +25,40 @@ func (orderApi *API) RegisterHandlers(router *httprouter.Router) {
 	router.GET("/api/orders/:orderId", orderApi.getOrder)
 }
 
-func (orderApi *API) getOrders(responseWriter http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	api.DefaultResponseHeader(responseWriter)
-	//orderEntities := orders.FindAll()
-
+func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	orderEntities, err := orderApi.orderRepository.FindAll()
 	if err != nil {
-		http.Error(responseWriter, "Failed to get order entities", http.StatusInternalServerError)
+		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
 	}
-	var ResponseBody []OrderResponse
+	var orderResponses OrderResponses
 	for _, order := range orderEntities {
-		ResponseBody = append(ResponseBody, FromOrderEntity(&order))
+		orderResponses.orders = append(orderResponses.orders, FromOrderEntity(&order))
 	}
 
-	encoder := json.NewEncoder(responseWriter)
-	err = encoder.Encode(ResponseBody)
-	if err != nil {
-		http.Error(responseWriter, "Failed to get order entities", http.StatusInternalServerError)
-	}
-	responseWriter.WriteHeader(http.StatusOK)
+	responses.StatusOK(responseWriter, request, &orderResponses)
 }
 
 func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http.Request, _ httprouter.Params) {
-	api.DefaultResponseHeader(responseWriter)
-
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
-		http.Error(responseWriter, "Failed to parse request", http.StatusBadRequest)
+		responses.Error(responseWriter, request, http.StatusBadRequest, 200, err.Error())
 		return
 	}
 	orderEntity := orderRequest.ToOrderEntity()
 	orderApi.orderRepository.Save(&orderEntity)
 
-	responseWriter.WriteHeader(http.StatusCreated)
+	responses.StatusCreated(responseWriter, request, nil)
 }
 
-func (orderApi *API) getOrder(responseWriter http.ResponseWriter, _ *http.Request, params httprouter.Params) {
-	api.DefaultResponseHeader(responseWriter)
+func (orderApi *API) getOrder(responseWriter http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	orderId := params.ByName("orderId")
 	orderEntity, err := orderApi.orderRepository.FindById(orders.OrderId(orderId))
 
 	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusNotFound)
+		responses.Error(responseWriter, request, http.StatusNotFound, 300, err.Error())
 		return
 	}
 
 	entity := FromOrderEntity(&orderEntity)
-	err = entity.ToJSON(responseWriter)
-	if err != nil {
-		http.Error(responseWriter, "Failed to parse order entity", http.StatusInternalServerError)
-		return
-	}
-	responseWriter.WriteHeader(http.StatusOK)
+	responses.StatusOK(responseWriter, request, &entity)
 }
