@@ -3,8 +3,9 @@ package orders
 import "time"
 
 type OrderEntity struct {
-	Id           OrderId
-	CreationDate time.Time
-	Status       OrderStatus
+	Id           OrderId     `db:"id"`
+	CreationDate time.Time   `db:"creation_date"`
+	Status       OrderStatus `db:"order_status"`
+	Workflow     string      `db:"workflow"`
 	Items        []OrderItemEntity
 }

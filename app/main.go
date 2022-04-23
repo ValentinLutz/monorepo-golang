@@ -5,8 +5,8 @@ import (
 	"app/external/database"
 	"app/internal"
 	"app/serve"
-	"database/sql"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
@@ -36,7 +36,7 @@ func main() {
 	}
 }
 
-func NewServer(logger *log.Logger, serverConfig *internal.ServerConfig, db *sql.DB) *http.Server {
+func NewServer(logger *log.Logger, serverConfig *internal.ServerConfig, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
 	orderAPI := orders.NewAPI(logger, db)

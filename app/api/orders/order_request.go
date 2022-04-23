@@ -3,9 +3,8 @@ package orders
 import (
 	"app/internal/orders"
 	"encoding/json"
+	"github.com/google/uuid"
 	"io"
-	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -24,14 +23,18 @@ func FromJSON(reader io.Reader) (OrderRequest, error) {
 }
 
 func (order *OrderRequest) ToOrderEntity() orders.OrderEntity {
+	creationDate := time.Now()
+	orderId := orders.OrderId(uuid.NewString())
+
 	var orderItems []orders.OrderItemEntity
 	for _, item := range order.Items {
-		orderItems = append(orderItems, item.ToOrderItemEntity())
+		orderItems = append(orderItems, item.ToOrderItemEntity(orderId, creationDate))
 	}
 
 	return orders.OrderEntity{
-		Id:           orders.OrderId(strconv.Itoa(rand.Int())),
-		CreationDate: time.Now(),
+		Id:           orderId,
+		Workflow:     "default_workflow",
+		CreationDate: creationDate,
 		Status:       orders.OrderPlaced,
 		Items:        orderItems,
 	}

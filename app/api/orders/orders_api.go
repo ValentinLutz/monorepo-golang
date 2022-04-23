@@ -3,20 +3,26 @@ package orders
 import (
 	"app/api/responses"
 	"app/internal/orders"
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 )
 
 type API struct {
-	log             *log.Logger
-	db              *sql.DB
-	orderRepository *orders.OrderRepository
+	logger              *log.Logger
+	db                  *sqlx.DB
+	orderRepository     *orders.OrderRepository
+	orderItemRepository *orders.OrderItemRepository
 }
 
-func NewAPI(logger *log.Logger, db *sql.DB) *API {
-	return &API{log: logger, db: db, orderRepository: orders.NewRepository(logger, db)}
+func NewAPI(logger *log.Logger, db *sqlx.DB) *API {
+	return &API{
+		logger:              logger,
+		db:                  db,
+		orderRepository:     orders.NewOrderRepository(logger, db),
+		orderItemRepository: orders.NewOrderItemRepository(logger, db),
+	}
 }
 
 func (orderApi *API) RegisterHandlers(router *httprouter.Router) {
@@ -30,8 +36,20 @@ func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http
 	if err != nil {
 		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
 	}
+	orderItemEntities, err := orderApi.orderItemRepository.FindAll()
+	if err != nil {
+		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
+	}
 	var orderResponses OrderResponses
 	for _, order := range orderEntities {
+		for _, orderItem := range orderItemEntities {
+			if order.Id == orderItem.OrderId {
+				order.Items = append(order.Items, orderItem)
+				//sliceLen := len(orderItemEntities) - 1
+				//orderItemEntities[i] = orderItemEntities[sliceLen]
+				//orderItemEntities = orderItemEntities[:sliceLen]
+			}
+		}
 		orderResponses.orders = append(orderResponses.orders, FromOrderEntity(&order))
 	}
 
@@ -46,6 +64,7 @@ func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http
 	}
 	orderEntity := orderRequest.ToOrderEntity()
 	orderApi.orderRepository.Save(&orderEntity)
+	orderApi.orderItemRepository.SaveAll(orderEntity.Items)
 
 	responses.StatusCreated(responseWriter, request, nil)
 }

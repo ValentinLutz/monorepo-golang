@@ -1,5 +1,10 @@
 package orders
 
+import "time"
+
 type OrderItemEntity struct {
-	Name string
+	Id           int       `db:"id"`
+	OrderId      OrderId   `db:"order_id"`
+	Name         string    `db:"item_name"`
+	CreationDate time.Time `db:"creation_date"`
 }

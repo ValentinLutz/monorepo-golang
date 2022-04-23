@@ -1,16 +1,16 @@
 package orders
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"log"
 )
 
 type OrderRepository struct {
 	logger   *log.Logger
-	database *sql.DB
+	database *sqlx.DB
 }
 
-func NewRepository(logger *log.Logger, database *sql.DB) *OrderRepository {
+func NewOrderRepository(logger *log.Logger, database *sqlx.DB) *OrderRepository {
 	return &OrderRepository{logger: logger, database: database}
 }
 
@@ -48,11 +48,11 @@ func (orderRepository *OrderRepository) FindById(id OrderId) (OrderEntity, error
 }
 
 func (orderRepository *OrderRepository) Save(orderEntity *OrderEntity) {
-	_, err := orderRepository.database.Exec(
-		"INSERT INTO golang_reference_project.order (id, creation_date, order_status, workflow) VALUES ($1, $2, $3, $4)",
-		orderEntity.Id, orderEntity.CreationDate, orderEntity.Status, "default_workflow",
+	_, err := orderRepository.database.NamedExec(
+		`INSERT INTO golang_reference_project.order (id, creation_date, order_status, workflow) VALUES (:id, :creation_date, :order_status, :workflow)`,
+		orderEntity,
 	)
 	if err != nil {
-		log.Fatal("Failed to save into database")
+		orderRepository.logger.Printf("Failed to save order entity into order table: %s", err)
 	}
 }
