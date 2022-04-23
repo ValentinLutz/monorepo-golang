@@ -8,35 +8,41 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
-	"log"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"net/http"
-	"os"
 	"time"
 )
 
 const ConfigPath = "config.yaml"
 
 func main() {
-	logger := log.New(os.Stdout, "", log.LstdFlags)
-
 	newConfig, err := internal.NewConfig(ConfigPath)
 	if err != nil {
-		logger.Fatal("Failed to load config file %s", ConfigPath)
+		log.Fatal().
+			Str("path", ConfigPath).
+			Msg("Failed to load config file")
 	}
 
-	newDatabase := database.NewDatabase(logger)
+	logger := internal.NewLogger(zerolog.InfoLevel, true)
+
+	newDatabase := database.NewDatabase(&logger)
 	db := newDatabase.Connect(&newConfig.Database)
 
-	server := NewServer(logger, &newConfig.Server, db)
+	server := NewServer(&logger, &newConfig.Server, db)
 
-	logger.Printf("Starting server on %s", server.Addr)
+	logger.Info().
+		Str("address", server.Addr).
+		Msg("Starting server")
 	err = server.ListenAndServe()
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal().
+			Err(err).
+			Msg("Failed to start server")
 	}
 }
 
-func NewServer(logger *log.Logger, serverConfig *internal.ServerConfig, db *sqlx.DB) *http.Server {
+func NewServer(logger *zerolog.Logger, serverConfig *internal.ServerConfig, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
 	orderAPI := orders.NewAPI(logger, db)
@@ -47,9 +53,9 @@ func NewServer(logger *log.Logger, serverConfig *internal.ServerConfig, db *sqlx
 	swaggerUI.RegisterOpenAPISchemas(router)
 
 	return &http.Server{
-		Addr:         fmt.Sprintf(":%d", serverConfig.Port),
-		Handler:      router,
-		ErrorLog:     logger,
+		Addr:    fmt.Sprintf(":%d", serverConfig.Port),
+		Handler: router,
+		//ErrorLog:     logger,
 		ReadTimeout:  time.Second * time.Duration(serverConfig.Timeout.Read),
 		WriteTimeout: time.Second * time.Duration(serverConfig.Timeout.Write),
 		IdleTimeout:  time.Second * time.Duration(serverConfig.Timeout.Idle),

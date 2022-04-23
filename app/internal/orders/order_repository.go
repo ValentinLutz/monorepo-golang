@@ -2,15 +2,15 @@ package orders
 
 import (
 	"github.com/jmoiron/sqlx"
-	"log"
+	"github.com/rs/zerolog"
 )
 
 type OrderRepository struct {
-	logger   *log.Logger
+	logger   *zerolog.Logger
 	database *sqlx.DB
 }
 
-func NewOrderRepository(logger *log.Logger, database *sqlx.DB) *OrderRepository {
+func NewOrderRepository(logger *zerolog.Logger, database *sqlx.DB) *OrderRepository {
 	return &OrderRepository{logger: logger, database: database}
 }
 
@@ -53,6 +53,8 @@ func (orderRepository *OrderRepository) Save(orderEntity *OrderEntity) {
 		orderEntity,
 	)
 	if err != nil {
-		orderRepository.logger.Printf("Failed to save order entity into order table: %s", err)
+		orderRepository.logger.Error().
+			Err(err).
+			Msg("Failed to save order entity into order table")
 	}
 }

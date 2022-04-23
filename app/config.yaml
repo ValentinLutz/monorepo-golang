@@ -7,6 +7,11 @@ server:
     write: 10
     idle: 10
 
+# Logger config
+logger:
+  level: info
+  pretty: true
+
 # Database config
 database:
   host: localhost

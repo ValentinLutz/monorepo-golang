@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"log"
+	"github.com/rs/zerolog"
 )
 
 type Database struct {
-	logger *log.Logger
+	logger *zerolog.Logger
 }
 
-func NewDatabase(logger *log.Logger) *Database {
+func NewDatabase(logger *zerolog.Logger) *Database {
 	return &Database{logger: logger}
 }
 
@@ -23,14 +23,18 @@ func (database *Database) Connect(config *Config) *sqlx.DB {
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-		database.logger.Fatalln(err)
+		database.logger.Fatal().
+			Err(err).
+			Msg("Failed to connect to database")
 	}
 
 	db.SetMaxIdleConns(10)
 
 	err = db.Ping()
 	if err != nil {
-		database.logger.Fatalln(err)
+		database.logger.Fatal().
+			Err(err).
+			Msg("Failed to ping database")
 	}
 
 	return db

@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Server   ServerConfig    `yaml:"server"`
+	Logger   LoggerConfig    `yaml:"logger"`
 	Database database.Config `yaml:"database"`
 }
 

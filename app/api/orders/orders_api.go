@@ -5,18 +5,18 @@ import (
 	"app/internal/orders"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
-	"log"
+	"github.com/rs/zerolog"
 	"net/http"
 )
 
 type API struct {
-	logger              *log.Logger
+	logger              *zerolog.Logger
 	db                  *sqlx.DB
 	orderRepository     *orders.OrderRepository
 	orderItemRepository *orders.OrderItemRepository
 }
 
-func NewAPI(logger *log.Logger, db *sqlx.DB) *API {
+func NewAPI(logger *zerolog.Logger, db *sqlx.DB) *API {
 	return &API{
 		logger:              logger,
 		db:                  db,
