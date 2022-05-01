@@ -2,6 +2,7 @@ package orders
 
 import (
 	"app/api/responses"
+	"app/internal"
 	"app/internal/orders"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
@@ -14,14 +15,16 @@ type API struct {
 	db                  *sqlx.DB
 	orderRepository     *orders.OrderRepository
 	orderItemRepository *orders.OrderItemRepository
+	config              *internal.Config
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB) *API {
+func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *internal.Config) *API {
 	return &API{
 		logger:              logger,
 		db:                  db,
 		orderRepository:     orders.NewOrderRepository(logger, db),
 		orderItemRepository: orders.NewOrderItemRepository(logger, db),
+		config:              config,
 	}
 }
 
@@ -62,7 +65,7 @@ func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http
 		responses.Error(responseWriter, request, http.StatusBadRequest, 200, err.Error())
 		return
 	}
-	orderEntity := orderRequest.ToOrderEntity()
+	orderEntity := orderRequest.ToOrderEntity(orderApi.config.Region, orderApi.config.Environment)
 	orderApi.orderRepository.Save(&orderEntity)
 	orderApi.orderItemRepository.SaveAll(orderEntity.Items)
 

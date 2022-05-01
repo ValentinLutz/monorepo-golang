@@ -1,10 +1,12 @@
 package orders
 
 import (
+	"app/internal/config"
 	"app/internal/orders"
 	"encoding/json"
-	"github.com/google/uuid"
 	"io"
+	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -22,9 +24,9 @@ func FromJSON(reader io.Reader) (OrderRequest, error) {
 	return order, nil
 }
 
-func (order *OrderRequest) ToOrderEntity() orders.OrderEntity {
+func (order *OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) orders.OrderEntity {
 	creationDate := time.Now()
-	orderId := orders.OrderId(uuid.NewString())
+	orderId := orders.GenerateOrderId(region, environment, creationDate.String()+strconv.Itoa(rand.Int()))
 
 	var orderItems []orders.OrderItemEntity
 	for _, item := range order.Items {

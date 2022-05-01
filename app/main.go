@@ -9,7 +9,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"time"
 )
@@ -17,19 +16,20 @@ import (
 const ConfigPath = "config.yaml"
 
 func main() {
+	logger := internal.NewLogger(zerolog.InfoLevel, true)
+
 	newConfig, err := internal.NewConfig(ConfigPath)
 	if err != nil {
-		log.Fatal().
+		logger.Fatal().
+			Err(err).
 			Str("path", ConfigPath).
 			Msg("Failed to load config file")
 	}
 
-	logger := internal.NewLogger(zerolog.InfoLevel, true)
-
 	newDatabase := database.NewDatabase(&logger)
 	db := newDatabase.Connect(&newConfig.Database)
 
-	server := NewServer(&logger, &newConfig.Server, db)
+	server := NewServer(&logger, &newConfig, db)
 
 	logger.Info().
 		Str("address", server.Addr).
@@ -42,15 +42,17 @@ func main() {
 	}
 }
 
-func NewServer(logger *zerolog.Logger, serverConfig *internal.ServerConfig, db *sqlx.DB) *http.Server {
+func NewServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
-	orderAPI := orders.NewAPI(logger, db)
+	orderAPI := orders.NewAPI(logger, db, config)
 	orderAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewUI(logger)
 	swaggerUI.RegisterUI(router)
 	swaggerUI.RegisterOpenAPISchemas(router)
+
+	serverConfig := config.Server
 
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", serverConfig.Port),

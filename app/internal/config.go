@@ -2,14 +2,17 @@ package internal
 
 import (
 	"app/external/database"
+	"app/internal/config"
 	"gopkg.in/yaml.v2"
 	"os"
 )
 
 type Config struct {
-	Server   ServerConfig    `yaml:"server"`
-	Logger   LoggerConfig    `yaml:"logger"`
-	Database database.Config `yaml:"database"`
+	Region      config.Region      `yaml:"region"`
+	Environment config.Environment `yaml:"environment"`
+	Server      ServerConfig       `yaml:"server"`
+	Logger      LoggerConfig       `yaml:"logger"`
+	Database    database.Config    `yaml:"database"`
 }
 
 type ServerConfig struct {
@@ -37,11 +40,11 @@ func NewConfig(path string) (Config, error) {
 	}(file)
 
 	decoder := yaml.NewDecoder(file)
-	config := Config{}
-	err = decoder.Decode(&config)
+	var decodedConfig Config
+	err = decoder.Decode(&decodedConfig)
 	if err != nil {
 		return Config{}, err
 	}
 
-	return config, nil
+	return decodedConfig, nil
 }

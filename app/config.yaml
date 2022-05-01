@@ -1,3 +1,6 @@
+region: NONE
+environment: DEV
+
 # Server config
 server:
   host: "localhost"
