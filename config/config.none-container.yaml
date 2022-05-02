@@ -1,9 +1,9 @@
+# Global config
 region: NONE
 environment: DEV
 
 # Server config
 server:
-  host: "localhost"
   port: 8080
   timeout:
     read: 10
@@ -17,7 +17,7 @@ logger:
 
 # Database config
 database:
-  host: localhost
+  host: postgresql
   port: 5432
   user: "test"
   pass: "test"

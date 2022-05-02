@@ -1,0 +1,24 @@
+# Global config
+region: NONE
+environment: DEV
+
+# Server config
+server:
+  port: 8080
+  timeout:
+    read: 10
+    write: 10
+    idle: 10
+
+# Logger config
+logger:
+  level: info
+  pretty: true
+
+# Database config
+database:
+  host: localhost
+  port: 5432
+  user: "test"
+  pass: "test"
+  database: "dev_db"

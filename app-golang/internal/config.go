@@ -16,7 +16,6 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Host    string        `yaml:"host"`
 	Port    int           `yaml:"port"`
 	Timeout TimeoutConfig `yaml:"timeout"`
 }

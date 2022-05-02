@@ -1,0 +1,15 @@
+version: '3.9'
+
+networks:
+  default:
+    name: golang-reference-project
+
+services:
+  app:
+    image: golang-reference-project:latest
+    container_name: app-golang
+    hostname: app-golang
+    volumes:
+      - "../../config/config.none-container.yaml:/app/config.yaml:ro"
+    ports:
+      - '9090:8080'

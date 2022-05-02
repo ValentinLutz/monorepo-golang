@@ -1,0 +1,5 @@
+# Ignore config for local development
+app-golang/config.yaml
+
+# JetBrains IDEs
+.idea
