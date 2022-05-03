@@ -16,7 +16,7 @@ import (
 const ConfigPath = "config.yaml"
 
 func main() {
-	logger := internal.NewLogger(zerolog.InfoLevel, true)
+	logger := internal.NewLogger()
 
 	newConfig, err := internal.NewConfig(ConfigPath)
 	if err != nil {
@@ -25,6 +25,8 @@ func main() {
 			Str("path", ConfigPath).
 			Msg("Failed to load config file")
 	}
+
+	internal.SetLogLevel(newConfig.Logger.Level)
 
 	newDatabase := database.NewDatabase(&logger)
 	db := newDatabase.Connect(&newConfig.Database)

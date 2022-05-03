@@ -12,8 +12,7 @@ server:
 
 # Logger config
 logger:
-  level: info
-  pretty: true
+  level: DEBUG
 
 # Database config
 database:
