@@ -1,7 +1,7 @@
 docker.build:: ## Build the app docker image | PROJECT_NAME
 	docker build \
 		-t ${PROJECT_NAME}:latest \
-		app-golang
+		app
 
 docker.up:: ## Start docker containers | PROJECT_NAME
 	docker-compose -p ${PROJECT_NAME} \

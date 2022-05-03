@@ -7,9 +7,9 @@ networks:
 services:
   app:
     image: golang-reference-project:latest
-    container_name: app-golang
-    hostname: app-golang
+    container_name: app
+    hostname: app
     volumes:
-      - "../../config/config.none-container.yaml:/app/config.yaml:ro"
+      - ../../config/config.none-container.yaml:/app/config.yaml:ro
     ports:
       - '9090:8080'

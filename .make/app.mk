@@ -1,10 +1,10 @@
-app-golang/config.yaml: ./config/config.none-dev.yaml ## Copy none-dev config to app directory
-	cp config/config.none-dev.yaml app-golang/config.yaml
+app/config.yaml: ./config/config.none-dev.yaml ## Copy none-dev config to app directory
+	cp config/config.none-dev.yaml app/config.yaml
 
-app.run:: app-golang/config.yaml ## Run the app
-	cd app-golang && \
+app.run:: app/config.yaml ## Run the app
+	cd app && \
 		go run main.go
 
 app.build:: ## Build the app into an executable
-	cd app-golang && \
+	cd app && \
 		go build
