@@ -73,13 +73,17 @@ func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http
 }
 
 func (orderApi *API) getOrder(responseWriter http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	orderId := params.ByName("orderId")
-	orderEntity, err := orderApi.orderRepository.FindById(orders.OrderId(orderId))
-
+	orderId := orders.OrderId(params.ByName("orderId"))
+	orderEntity, err := orderApi.orderRepository.FindById(orderId)
 	if err != nil {
 		responses.Error(responseWriter, request, http.StatusNotFound, 300, err.Error())
 		return
 	}
+	orderItemEntities, err := orderApi.orderItemRepository.FindAllByOrderId(orderId)
+	if err != nil {
+		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
+	}
+	orderEntity.Items = orderItemEntities
 
 	entity := FromOrderEntity(&orderEntity)
 	responses.StatusOK(responseWriter, request, &entity)

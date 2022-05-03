@@ -1,6 +1,7 @@
 package orders
 
 import (
+	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/zerolog"
 )
@@ -20,6 +21,29 @@ func (orderItemRepository *OrderItemRepository) FindAll() ([]OrderItemEntity, er
 		return nil, err
 	}
 
+	return extractOrderItemEntities(rows)
+}
+
+func (orderItemRepository *OrderItemRepository) FindAllByOrderId(orderId OrderId) ([]OrderItemEntity, error) {
+	rows, err := orderItemRepository.db.Query("SELECT id, order_id, creation_date, item_name FROM golang_reference_project.order_item WHERE order_id = $1", orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	return extractOrderItemEntities(rows)
+}
+
+func (orderItemRepository *OrderItemRepository) SaveAll(orderItemEntities []OrderItemEntity) {
+	_, err := orderItemRepository.db.NamedExec(
+		`INSERT INTO golang_reference_project.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
+	if err != nil {
+		orderItemRepository.logger.Error().
+			Err(err).
+			Msg("Failed to save order item entities into order item table")
+	}
+}
+
+func extractOrderItemEntities(rows *sql.Rows) ([]OrderItemEntity, error) {
 	var orderItemEntities []OrderItemEntity
 	for rows.Next() {
 		var orderItemEntity OrderItemEntity
@@ -31,16 +55,5 @@ func (orderItemRepository *OrderItemRepository) FindAll() ([]OrderItemEntity, er
 
 		orderItemEntities = append(orderItemEntities, orderItemEntity)
 	}
-
 	return orderItemEntities, nil
-}
-
-func (orderItemRepository *OrderItemRepository) SaveAll(orderItemEntities []OrderItemEntity) {
-	_, err := orderItemRepository.db.NamedExec(
-		`INSERT INTO golang_reference_project.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
-	if err != nil {
-		orderItemRepository.logger.Error().
-			Err(err).
-			Msg("Failed to save order item entities into order item table")
-	}
 }
