@@ -62,9 +62,9 @@ func NewServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *ht
 	serverConfig := config.Server
 
 	return &http.Server{
-		Addr:    fmt.Sprintf(":%d", serverConfig.Port),
-		Handler: router,
-		//ErrorLog:     logger,
+		Addr:         fmt.Sprintf(":%d", serverConfig.Port),
+		Handler:      router,
+		ErrorLog:     internal.NewLoggerWrapper(logger),
 		ReadTimeout:  time.Second * time.Duration(serverConfig.Timeout.Read),
 		WriteTimeout: time.Second * time.Duration(serverConfig.Timeout.Write),
 		IdleTimeout:  time.Second * time.Duration(serverConfig.Timeout.Idle),

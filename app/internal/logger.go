@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"github.com/rs/zerolog"
+	"log"
 	"os"
 	"time"
 )
@@ -77,4 +78,17 @@ func (ll LogLevel) toZeroLogLevel() zerolog.Level {
 		return zerolog.PanicLevel
 	}
 	return zerolog.NoLevel
+}
+
+type LoggerWrapper struct {
+	logger *zerolog.Logger
+}
+
+func (l *LoggerWrapper) Write(p []byte) (n int, err error) {
+	l.logger.Error().Msg(string(p))
+	return len(p), nil
+}
+
+func NewLoggerWrapper(logger *zerolog.Logger) *log.Logger {
+	return log.New(&LoggerWrapper{logger}, "", 0)
 }
