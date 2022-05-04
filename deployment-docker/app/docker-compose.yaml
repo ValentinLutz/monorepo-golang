@@ -10,6 +10,8 @@ services:
     container_name: app
     hostname: app
     volumes:
-      - ../../config/config.none-container.yaml:/app/config.yaml:ro
+      - ../../config/config.none-container.yaml:/app/config/config.yaml:ro
+      - ../../config/none-dev.crt:/app/config/cert.crt:ro
+      - ../../config/none-dev.key:/app/config/cert.key:ro
     ports:
       - '9090:8080'

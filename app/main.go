@@ -5,6 +5,7 @@ import (
 	"app/external/database"
 	"app/internal"
 	"app/serve"
+	"flag"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
@@ -13,16 +14,20 @@ import (
 	"time"
 )
 
-const ConfigPath = "config.yaml"
+var (
+	configFile = *flag.String("config", "config/config.yaml", "config file")
+	certFile   = *flag.String("cert", "config/cert.crt", "tls certificate file")
+	keyFile    = *flag.String("key", "config/cert.key", "tls key file")
+)
 
 func main() {
 	logger := internal.NewLogger()
 
-	newConfig, err := internal.NewConfig(ConfigPath)
+	newConfig, err := internal.NewConfig(configFile)
 	if err != nil {
 		logger.Fatal().
 			Err(err).
-			Str("path", ConfigPath).
+			Str("path", configFile).
 			Msg("Failed to load config file")
 	}
 
@@ -36,7 +41,7 @@ func main() {
 	logger.Info().
 		Str("address", server.Addr).
 		Msg("Starting server")
-	err = server.ListenAndServe()
+	err = server.ListenAndServeTLS(certFile, keyFile)
 	if err != nil {
 		logger.Fatal().
 			Err(err).
