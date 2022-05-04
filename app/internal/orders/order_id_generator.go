@@ -6,10 +6,11 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strings"
+	"time"
 )
 
-func GenerateOrderId(region config.Region, environment config.Environment, salt string) OrderId {
-	valueToHash := string(region) + string(environment) + salt
+func GenerateOrderId(region config.Region, environment config.Environment, timestamp time.Time, salt string) OrderId {
+	valueToHash := string(region) + string(environment) + timestamp.String() + salt
 	md5Sum := md5.Sum([]byte(valueToHash))
 
 	base64String := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(md5Sum[:])

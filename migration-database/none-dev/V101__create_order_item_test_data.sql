@@ -1,10 +1,10 @@
 INSERT INTO golang_reference_project.order_item
     (order_id, creation_date, item_name)
-VALUES ('Y2FvghhpMxG-NONE-DEV-qzefk8Ziv0A', '1980-01-01 00:00:00 +00:00', 'orange'),
-       ('Y2FvghhpMxG-NONE-DEV-qzefk8Ziv0A', '1980-01-01 00:00:00 +00:00', 'banana'),
+VALUES ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
+       ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'banana'),
 
-       ('I3xXiIqbP92-NONE-DEV-Ui*8i0kFHcA', '1980-01-01 00:00:00 +00:00', 'chocolate'),
+       ('Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA', '1980-01-01 00:00:00 +00:00', 'chocolate'),
 
-       ('FCnMkQ*INCu-NONE-DEV-hXDO*dY2j1A', '1980-01-01 00:00:00 +00:00', 'marshmallow'),
+       ('sgy1K3*SXcv-NONE-DEV-eVbldUAYXnA', '1980-01-01 00:00:00 +00:00', 'marshmallow'),
 
-       ('FvzXLb6hMHe-NONE-DEV-u7ADbncFaTw', '1980-01-01 00:00:00 +00:00', 'apple');
+       ('F2P!criGu2L-NONE-DEV-fJ7bBFx1vHg', '1980-01-01 00:00:00 +00:00', 'apple');

@@ -1,9 +1,9 @@
 INSERT INTO golang_reference_project.order
     (id, workflow, creation_date, order_status)
-VALUES ('Y2FvghhpMxG-NONE-DEV-qzefk8Ziv0A', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed'),
+VALUES ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed'),
 
-       ('I3xXiIqbP92-NONE-DEV-Ui*8i0kFHcA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_in_progress'),
+       ('Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_in_progress'),
 
-       ('FCnMkQ*INCu-NONE-DEV-hXDO*dY2j1A', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_canceled'),
+       ('sgy1K3*SXcv-NONE-DEV-eVbldUAYXnA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_canceled'),
 
-       ('FvzXLb6hMHe-NONE-DEV-u7ADbncFaTw', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_completed');
+       ('F2P!criGu2L-NONE-DEV-fJ7bBFx1vHg', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_completed');
