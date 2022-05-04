@@ -5,6 +5,7 @@ import (
 	"github.com/rs/zerolog"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -85,7 +86,7 @@ type LoggerWrapper struct {
 }
 
 func (l *LoggerWrapper) Write(p []byte) (n int, err error) {
-	l.logger.Error().Msg(string(p))
+	l.logger.Error().Msg(strings.TrimSpace(string(p)))
 	return len(p), nil
 }
 
