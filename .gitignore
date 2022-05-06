@@ -1,5 +1,9 @@
-# Ignore config for local development
+# Config for local development
 app/config
+app/serve/openapi/**
+
+# Generated GO clients
+*.gen.go
 
 # JetBrains IDEs
 .idea
