@@ -37,6 +37,26 @@ func TestGetOrder(t *testing.T) {
 	var expectedResponse orders.OrderResponse
 	readToObject(t, readFile(t, "orderResponse.json"), &expectedResponse)
 
+	assert.Equal(t, 200, apiOrder.StatusCode)
+	assert.Equal(t, expectedResponse, actualResponse)
+}
+
+func TestGetOrderNotFound(t *testing.T) {
+	// GIVEN
+	client := initClient()
+
+	// WHEN
+	apiOrder, _ := client.GetApiOrdersOrderId(context.Background(), "NOPE")
+	defer apiOrder.Body.Close()
+
+	// THEN
+	var actualResponse orders.ErrorResponse
+	readToObject(t, apiOrder.Body, &actualResponse)
+	var expectedResponse orders.ErrorResponse
+	readToObject(t, readFile(t, "orderNotFoundResponse.json"), &expectedResponse)
+	expectedResponse.Timestamp = actualResponse.Timestamp
+
+	assert.Equal(t, 404, apiOrder.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
 }
 
@@ -54,6 +74,7 @@ func TestGetOrders(t *testing.T) {
 	var expectedResponse orders.OrdersResponse
 	readToObject(t, readFile(t, "ordersResponse.json"), &expectedResponse)
 
+	assert.Equal(t, 200, apiOrder.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
 }
 
