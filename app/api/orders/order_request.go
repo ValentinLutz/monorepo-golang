@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-type OrderRequest struct {
-	Items []OrderItemRequest `json:"items"`
-}
-
 func FromJSON(reader io.Reader) (OrderRequest, error) {
 	decoder := json.NewDecoder(reader)
 	var order OrderRequest

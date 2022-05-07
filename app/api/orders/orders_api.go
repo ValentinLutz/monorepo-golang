@@ -43,7 +43,7 @@ func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http
 	if err != nil {
 		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
 	}
-	var orderResponses OrderResponses
+	var ordersResponse OrdersResponse
 	for _, order := range orderEntities {
 		for _, orderItem := range orderItemEntities {
 			if order.Id == orderItem.OrderId {
@@ -53,10 +53,10 @@ func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http
 				//orderItemEntities = orderItemEntities[:sliceLen]
 			}
 		}
-		orderResponses.orders = append(orderResponses.orders, FromOrderEntity(&order))
+		ordersResponse = append(ordersResponse, FromOrderEntity(&order))
 	}
 
-	responses.StatusOK(responseWriter, request, &orderResponses)
+	responses.StatusOK(responseWriter, request, &ordersResponse)
 }
 
 func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http.Request, _ httprouter.Params) {

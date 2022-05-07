@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-type OrderItemRequest struct {
-	Name string `json:"name"`
-}
-
 func (orderItem *OrderItemRequest) ToOrderItemEntity(orderId orders.OrderId, creationDate time.Time) orders.OrderItemEntity {
 	return orders.OrderItemEntity{
 		OrderId:      orderId,

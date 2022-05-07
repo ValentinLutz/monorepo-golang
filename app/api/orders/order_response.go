@@ -4,15 +4,7 @@ import (
 	"app/internal/orders"
 	"encoding/json"
 	"io"
-	"time"
 )
-
-type OrderResponse struct {
-	OrderId      orders.OrderId      `json:"order_id"`
-	CreationDate string              `json:"creation_date"`
-	Status       orders.OrderStatus  `json:"status"`
-	Items        []OrderItemResponse `json:"items"`
-}
 
 func (order *OrderResponse) ToJSON(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
@@ -26,9 +18,9 @@ func FromOrderEntity(order *orders.OrderEntity) OrderResponse {
 	}
 
 	return OrderResponse{
-		OrderId:      order.Id,
-		CreationDate: order.CreationDate.Format(time.RFC3339),
-		Status:       order.Status,
+		OrderId:      string(order.Id),
+		CreationDate: order.CreationDate,
+		Status:       OrderStatus(order.Status),
 		Items:        orderItems,
 	}
 }
