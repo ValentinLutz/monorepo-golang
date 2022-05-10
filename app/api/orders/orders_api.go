@@ -29,12 +29,12 @@ func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *internal.Config) *API {
 }
 
 func (orderApi *API) RegisterHandlers(router *httprouter.Router) {
-	router.GET("/api/orders", orderApi.getOrders)
-	router.POST("/api/orders", orderApi.postOrder)
-	router.GET("/api/orders/:orderId", orderApi.getOrder)
+	router.HandlerFunc(http.MethodGet, "/api/orders", orderApi.getOrders)
+	router.HandlerFunc(http.MethodPost, "/api/orders", orderApi.postOrder)
+	router.HandlerFunc(http.MethodGet, "/api/orders/:orderId", orderApi.getOrder)
 }
 
-func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http.Request, _ httprouter.Params) {
+func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http.Request) {
 	orderEntities, err := orderApi.orderRepository.FindAll()
 	if err != nil {
 		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
@@ -59,7 +59,7 @@ func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http
 	responses.StatusOK(responseWriter, request, &ordersResponse)
 }
 
-func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http.Request, _ httprouter.Params) {
+func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
 		responses.Error(responseWriter, request, http.StatusBadRequest, 200, err.Error())
@@ -72,7 +72,8 @@ func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http
 	responses.StatusCreated(responseWriter, request, nil)
 }
 
-func (orderApi *API) getOrder(responseWriter http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (orderApi *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
+	params := httprouter.ParamsFromContext(request.Context())
 	orderId := orders.OrderId(params.ByName("orderId"))
 	orderEntity, err := orderApi.orderRepository.FindById(orderId)
 	if err != nil {
