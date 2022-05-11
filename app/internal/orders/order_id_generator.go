@@ -10,7 +10,7 @@ import (
 )
 
 func GenerateOrderId(region config.Region, environment config.Environment, timestamp time.Time, salt string) OrderId {
-	valueToHash := string(region) + string(environment) + timestamp.String() + salt
+	valueToHash := string(region) + string(environment) + timestamp.Format(time.RFC3339) + salt
 	md5Sum := md5.Sum([]byte(valueToHash))
 
 	base64String := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(md5Sum[:])
