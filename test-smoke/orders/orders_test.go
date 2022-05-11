@@ -14,6 +14,21 @@ func initClient() http.Client {
 	return http.Client{Transport: tr}
 }
 
+func TestStatus(t *testing.T) {
+	// GIVEN
+	client := initClient()
+
+	// WHEN
+	response, err := client.Get("https://localhost:8080/api/status")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer response.Body.Close()
+
+	// THEN
+	assert.Equal(t, 200, response.StatusCode)
+}
+
 func TestSwaggerUI(t *testing.T) {
 	// GIVEN
 	client := initClient()

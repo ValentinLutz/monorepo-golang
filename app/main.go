@@ -2,6 +2,7 @@ package main
 
 import (
 	"app/api/orders"
+	"app/api/status"
 	"app/external/database"
 	"app/internal"
 	"app/serve"
@@ -89,6 +90,9 @@ func NewServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *ht
 	swaggerUI := serve.NewUI(logger)
 	swaggerUI.RegisterUI(router)
 	swaggerUI.RegisterOpenAPISchemas(router)
+
+	statusAPI := status.NewAPI(logger, db, &config.Database)
+	statusAPI.RegisterHandlers(router)
 
 	serverConfig := config.Server
 
