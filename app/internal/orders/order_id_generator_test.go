@@ -3,22 +3,26 @@ package orders_test
 import (
 	"app/internal/config"
 	"app/internal/orders"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
 var generatorOrderId = func(region config.Region, environment config.Environment, timestamp time.Time, salt string, expected orders.OrderId) func(t *testing.T) {
 	return func(t *testing.T) {
+		t.Logf("Region: %v", region)
+		t.Logf("Environment: %v", environment)
+		t.Logf("timestamp: %v", timestamp)
+		t.Logf("Salt: %v", salt)
 		// WHEN
 		actual := orders.GenerateOrderId(region, environment, timestamp, salt)
 		// THEN
-		if expected != actual {
-			t.Fatalf("OrderId \n Expected: %s \n Actual: %s", expected, actual)
-		}
+		assert.Equal(t, expected, actual)
 	}
 }
 
 func Test_GenerateOrderId(t *testing.T) {
+	// GIVEN
 	timestamp, err := time.Parse(time.RFC3339, "1980-01-01T00:00:00+00:00")
 	if err != nil {
 		t.Fatal(err)
