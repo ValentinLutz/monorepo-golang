@@ -3,7 +3,7 @@ test-integration/orders/orders.gen.go: api-definition/orders.yaml ## Generate in
 		-package orders \
 		./api-definition/orders.yaml  > test-integration/orders/orders.gen.go
 
-test.unit::  ## Run the unit tests
+test.unit::  app/serve/openapi/orders.yaml app/api/orders/orders.gen.go ## Run the unit tests
 	cd app && \
 		go test ./...
 
