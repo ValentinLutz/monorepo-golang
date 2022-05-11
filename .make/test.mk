@@ -3,6 +3,10 @@ test-integration/orders/orders.gen.go: api-definition/orders.yaml ## Generate in
 		-package orders \
 		./api-definition/orders.yaml  > test-integration/orders/orders.gen.go
 
+test.smoke:: ## Run the smoke tests
+	cd test-smoke && \
+		go test -count=1 ./...
+
 test.integration:: test-integration/orders/orders.gen.go ## Run the integration tests
 	cd test-integration && \
 		go test -count=1 ./...

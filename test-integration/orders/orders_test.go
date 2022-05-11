@@ -28,7 +28,10 @@ func TestGetOrder(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	apiOrder, _ := client.GetApiOrdersOrderId(context.Background(), "IsQah2TkaqS-NONE-DEV-JewgL0Ye73g")
+	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "IsQah2TkaqS-NONE-DEV-JewgL0Ye73g")
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer apiOrder.Body.Close()
 
 	// THEN
@@ -46,7 +49,10 @@ func TestGetOrderNotFound(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	apiOrder, _ := client.GetApiOrdersOrderId(context.Background(), "NOPE")
+	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "NOPE")
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer apiOrder.Body.Close()
 
 	// THEN
@@ -65,7 +71,10 @@ func TestGetOrders(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	apiOrder, _ := client.GetApiOrders(context.Background())
+	apiOrder, err := client.GetApiOrders(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer apiOrder.Body.Close()
 
 	// THEN
