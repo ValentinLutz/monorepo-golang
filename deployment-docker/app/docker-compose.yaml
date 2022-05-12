@@ -6,7 +6,7 @@ networks:
 
 services:
   app:
-    image: golang-reference-project:latest
+    image: ghcr.io/valentinlutz/golang-reference-project:latest
     container_name: app
     hostname: app
     volumes:

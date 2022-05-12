@@ -8,3 +8,6 @@ PROJECT_NAME ?= golang-reference-project
 PROFILE ?= none-dev
 FLYWAY_USER ?= test
 FLYWAY_PASSWORD ?= test
+VERSION ?= 0.1.2
+DOCKER_REGISTRY ?= ghcr.io
+DOCKER_REPOSITORY ?= valentinlutz
