@@ -13,12 +13,12 @@ type LogLevel string
 
 const (
 	TRACE LogLevel = "TRACE"
-	DEBUG          = "DEBUG"
-	INFO           = "INFO"
-	WARN           = "WARN"
-	ERROR          = "ERROR"
-	FATAL          = "FATAL"
-	PANIC          = "PANIC"
+	DEBUG LogLevel = "DEBUG"
+	INFO  LogLevel = "INFO"
+	WARN  LogLevel = "WARN"
+	ERROR LogLevel = "ERROR"
+	FATAL LogLevel = "FATAL"
+	PANIC LogLevel = "PANIC"
 )
 
 type LoggerConfig struct {

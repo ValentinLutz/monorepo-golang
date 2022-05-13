@@ -6,8 +6,8 @@ type Environment string
 
 const (
 	DEV  Environment = "DEV"
-	TEST             = "TEST"
-	PROD             = "PROD"
+	TEST Environment = "TEST"
+	PROD Environment = "PROD"
 )
 
 func (env *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {

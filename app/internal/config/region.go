@@ -6,7 +6,7 @@ type Region string
 
 const (
 	NONE Region = "NONE"
-	EU          = "EU"
+	EU   Region = "EU"
 )
 
 func (r *Region) UnmarshalYAML(unmarshal func(interface{}) error) error {

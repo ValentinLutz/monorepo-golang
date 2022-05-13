@@ -22,3 +22,7 @@ app.run:: app/config/config.yaml app/config/cert.crt app/config/cert.key app/ser
 app.build:: app/serve/openapi/orders.yaml app/api/orders/orders.gen.go ## Build the app into an executable
 	cd app && \
 		go build
+
+app.lint:: ## Runs linters against go code
+	cd app && \
+		golangci-lint run
