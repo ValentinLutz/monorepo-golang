@@ -11,81 +11,64 @@ import (
 )
 
 type API struct {
-	logger              *zerolog.Logger
-	db                  *sqlx.DB
-	orderRepository     *orders.OrderRepository
-	orderItemRepository *orders.OrderItemRepository
-	config              *internal.Config
+	logger  *zerolog.Logger
+	db      *sqlx.DB
+	config  *internal.Config
+	service *orders.Service
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *internal.Config) *API {
+func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *internal.Config, service *orders.Service) *API {
 	return &API{
-		logger:              logger,
-		db:                  db,
-		orderRepository:     orders.NewOrderRepository(logger, db),
-		orderItemRepository: orders.NewOrderItemRepository(logger, db),
-		config:              config,
+		logger:  logger,
+		db:      db,
+		config:  config,
+		service: service,
 	}
 }
 
-func (orderApi *API) RegisterHandlers(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, "/api/orders", orderApi.getOrders)
-	router.HandlerFunc(http.MethodPost, "/api/orders", orderApi.postOrder)
-	router.HandlerFunc(http.MethodGet, "/api/orders/:orderId", orderApi.getOrder)
+func (api *API) RegisterHandlers(router *httprouter.Router) {
+	router.HandlerFunc(http.MethodGet, "/api/orders", api.getOrders)
+	router.HandlerFunc(http.MethodPost, "/api/orders", api.postOrder)
+	router.HandlerFunc(http.MethodGet, "/api/orders/:orderId", api.getOrder)
 }
 
-func (orderApi *API) getOrders(responseWriter http.ResponseWriter, request *http.Request) {
-	orderEntities, err := orderApi.orderRepository.FindAll()
+func (api *API) getOrders(responseWriter http.ResponseWriter, request *http.Request) {
+	orderEntities, err := api.service.GetOrders()
 	if err != nil {
-		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
+		responses.Error(responseWriter, request, http.StatusInternalServerError, 9009, err.Error())
 	}
-	orderItemEntities, err := orderApi.orderItemRepository.FindAll()
-	if err != nil {
-		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
-	}
+
 	var ordersResponse OrdersResponse
 	for _, order := range orderEntities {
-		for _, orderItem := range orderItemEntities {
-			if order.Id == orderItem.OrderId {
-				order.Items = append(order.Items, orderItem)
-				//sliceLen := len(orderItemEntities) - 1
-				//orderItemEntities[i] = orderItemEntities[sliceLen]
-				//orderItemEntities = orderItemEntities[:sliceLen]
-			}
-		}
 		ordersResponse = append(ordersResponse, FromOrderEntity(&order))
 	}
 
 	responses.StatusOK(responseWriter, request, &ordersResponse)
 }
 
-func (orderApi *API) postOrder(responseWriter http.ResponseWriter, request *http.Request) {
+func (api *API) postOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
 		responses.Error(responseWriter, request, http.StatusBadRequest, 200, err.Error())
 		return
 	}
-	orderEntity := orderRequest.ToOrderEntity(orderApi.config.Region, orderApi.config.Environment)
-	orderApi.orderRepository.Save(&orderEntity)
-	orderApi.orderItemRepository.SaveAll(orderEntity.Items)
+	err = api.service.SaveOrder(orderRequest.ToOrderEntity(api.config.Region, api.config.Environment))
+	if err != nil {
+		responses.Error(responseWriter, request, http.StatusInternalServerError, 9009, err.Error())
+	}
 
 	responses.StatusCreated(responseWriter, request, nil)
 }
 
-func (orderApi *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
+func (api *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	params := httprouter.ParamsFromContext(request.Context())
 	orderId := orders.OrderId(params.ByName("orderId"))
-	orderEntity, err := orderApi.orderRepository.FindById(orderId)
+
+	orderEntity, err := api.service.GetOrder(orderId)
 	if err != nil {
 		responses.Error(responseWriter, request, http.StatusNotFound, 300, err.Error())
-		return
 	}
-	orderItemEntities, err := orderApi.orderItemRepository.FindAllByOrderId(orderId)
-	if err != nil {
-		responses.Error(responseWriter, request, http.StatusInternalServerError, 100, err.Error())
-	}
-	orderEntity.Items = orderItemEntities
 
-	entity := FromOrderEntity(&orderEntity)
-	responses.StatusOK(responseWriter, request, &entity)
+	response := FromOrderEntity(&orderEntity)
+	responses.StatusOK(responseWriter, request, &response)
 }

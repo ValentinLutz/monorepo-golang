@@ -47,7 +47,7 @@ func (orderRepository *OrderRepository) FindById(id OrderId) (OrderEntity, error
 	return orderEntity, nil
 }
 
-func (orderRepository *OrderRepository) Save(orderEntity *OrderEntity) {
+func (orderRepository *OrderRepository) Save(orderEntity OrderEntity) {
 	_, err := orderRepository.database.NamedExec(
 		`INSERT INTO golang_reference_project.order (id, creation_date, order_status, workflow) VALUES (:id, :creation_date, :order_status, :workflow)`,
 		orderEntity,

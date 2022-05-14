@@ -33,7 +33,7 @@ func (orderItemRepository *OrderItemRepository) FindAllByOrderId(orderId OrderId
 	return extractOrderItemEntities(rows)
 }
 
-func (orderItemRepository *OrderItemRepository) SaveAll(orderItemEntities []OrderItemEntity) {
+func (orderItemRepository *OrderItemRepository) SaveAll(orderItemEntities []OrderItemEntity) error {
 	_, err := orderItemRepository.db.NamedExec(
 		`INSERT INTO golang_reference_project.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
 	if err != nil {
@@ -41,6 +41,7 @@ func (orderItemRepository *OrderItemRepository) SaveAll(orderItemEntities []Orde
 			Err(err).
 			Msg("Failed to save order item entities into order item table")
 	}
+	return err
 }
 
 func extractOrderItemEntities(rows *sql.Rows) ([]OrderItemEntity, error) {
