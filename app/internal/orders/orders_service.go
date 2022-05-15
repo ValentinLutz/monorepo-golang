@@ -9,17 +9,17 @@ import (
 type Service struct {
 	logger              *zerolog.Logger
 	db                  *sqlx.DB
-	config              *internal.Config
-	orderRepository     *OrderRepository
-	orderItemRepository *OrderItemRepository
+	config              internal.Config
+	orderRepository     OrderRepository
+	orderItemRepository OrderItemRepository
 }
 
 func NewService(
 	logger *zerolog.Logger,
 	db *sqlx.DB,
-	config *internal.Config,
-	orderRepository *OrderRepository,
-	orderItemRepository *OrderItemRepository,
+	config internal.Config,
+	orderRepository OrderRepository,
+	orderItemRepository OrderItemRepository,
 ) *Service {
 	return &Service{
 		logger:              logger,
@@ -30,12 +30,12 @@ func NewService(
 	}
 }
 
-func (s *Service) GetOrders() ([]OrderEntity, error) {
-	orderEntities, err := s.orderRepository.FindAll()
+func (service *Service) GetOrders() ([]OrderEntity, error) {
+	orderEntities, err := service.orderRepository.FindAll()
 	if err != nil {
 		return nil, err
 	}
-	orderItemEntities, err := s.orderItemRepository.FindAll()
+	orderItemEntities, err := service.orderItemRepository.FindAll()
 	if err != nil {
 		return nil, err
 	}
@@ -53,18 +53,18 @@ func (s *Service) GetOrders() ([]OrderEntity, error) {
 	return orderEntities, nil
 }
 
-func (s *Service) SaveOrder(orderEntity OrderEntity) error {
-	s.orderRepository.Save(orderEntity)
-	err := s.orderItemRepository.SaveAll(orderEntity.Items)
+func (service *Service) SaveOrder(orderEntity OrderEntity) error {
+	service.orderRepository.Save(orderEntity)
+	err := service.orderItemRepository.SaveAll(orderEntity.Items)
 	return err
 }
 
-func (s *Service) GetOrder(orderId OrderId) (OrderEntity, error) {
-	orderEntity, err := s.orderRepository.FindById(orderId)
+func (service *Service) GetOrder(orderId OrderId) (OrderEntity, error) {
+	orderEntity, err := service.orderRepository.FindById(orderId)
 	if err != nil {
 		return OrderEntity{}, err
 	}
-	orderItemEntities, err := s.orderItemRepository.FindAllByOrderId(orderId)
+	orderItemEntities, err := service.orderItemRepository.FindAllByOrderId(orderId)
 	if err != nil {
 		return OrderEntity{}, err
 	}

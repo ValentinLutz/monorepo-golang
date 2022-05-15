@@ -40,13 +40,13 @@ func main() {
 
 	internal.SetLogLevel(newConfig.Logger.Level)
 
-	newDatabase := database.NewDatabase(&logger)
+	newDatabase := database.NewDatabase(logger)
 	db := newDatabase.Connect(&newConfig.Database)
 
-	server := NewServer(&logger, &newConfig, db)
+	server := NewServer(logger, newConfig, db)
 
-	go StartServer(server, &logger)
-	GracefulServerShutdown(server, &logger)
+	go StartServer(server, logger)
+	GracefulServerShutdown(server, logger)
 }
 
 func StartServer(server *http.Server, logger *zerolog.Logger) {
@@ -82,21 +82,21 @@ func GracefulServerShutdown(server *http.Server, logger *zerolog.Logger) {
 	}
 }
 
-func NewServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
+func NewServer(logger *zerolog.Logger, config internal.Config, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
 	orderRepository := internalOrders.NewOrderRepository(logger, db)
 	orderItemRepository := internalOrders.NewOrderItemRepository(logger, db)
-	ordersService := internalOrders.NewService(logger, db, config, orderRepository, orderItemRepository)
+	ordersService := internalOrders.NewService(logger, db, config, &orderRepository, &orderItemRepository)
 
 	orderAPI := orders.NewAPI(logger, db, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
-	swaggerUI := serve.NewUI(logger)
-	swaggerUI.RegisterUI(router)
+	swaggerUI := serve.NewSwaggerUI(logger)
+	swaggerUI.RegisterSwaggerUI(router)
 	swaggerUI.RegisterOpenAPISchemas(router)
 
-	statusAPI := status.NewAPI(logger, db, &config.Database)
+	statusAPI := status.NewAPI(logger, db, config.Database)
 	statusAPI.RegisterHandlers(router)
 
 	serverConfig := config.Server
@@ -104,7 +104,7 @@ func NewServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *ht
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", serverConfig.Port),
 		Handler:      router,
-		ErrorLog:     internal.NewLoggerWrapper(logger),
+		ErrorLog:     internal.NewLoggerWrapper(logger).ToLogger(),
 		ReadTimeout:  time.Second * time.Duration(serverConfig.Timeout.Read),
 		WriteTimeout: time.Second * time.Duration(serverConfig.Timeout.Write),
 		IdleTimeout:  time.Second * time.Duration(serverConfig.Timeout.Idle),

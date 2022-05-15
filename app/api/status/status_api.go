@@ -15,10 +15,10 @@ import (
 type API struct {
 	logger *zerolog.Logger
 	db     *sqlx.DB
-	config *database.Config
+	config database.Config
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *database.Config) *API {
+func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config database.Config) *API {
 	return &API{
 		logger: logger,
 		db:     db,
@@ -26,19 +26,19 @@ func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *database.Config) *API {
 	}
 }
 
-func (statusAPI *API) RegisterHandlers(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, "/api/status", statusAPI.registerHealthChecks())
+func (api *API) RegisterHandlers(router *httprouter.Router) {
+	router.HandlerFunc(http.MethodGet, "/api/status", api.registerHealthChecks())
 }
 
-func (statusAPI *API) registerHealthChecks() http.HandlerFunc {
+func (api *API) registerHealthChecks() http.HandlerFunc {
 	healthStatus, err := health.New()
 	if err != nil {
-		statusAPI.logger.Fatal().Err(err).Msg("Failed to create health container")
+		api.logger.Fatal().Err(err).Msg("Failed to create health container")
 	}
 
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		statusAPI.config.Host, statusAPI.config.Port, statusAPI.config.Username, statusAPI.config.Password, statusAPI.config.Database,
+		api.config.Host, api.config.Port, api.config.Username, api.config.Password, api.config.Database,
 	)
 	err = healthStatus.Register(health.Config{
 		Name:      "postgresql",
@@ -49,7 +49,7 @@ func (statusAPI *API) registerHealthChecks() http.HandlerFunc {
 		}),
 	})
 	if err != nil {
-		statusAPI.logger.Fatal().Err(err).Msg("Failed to create postgres health check")
+		api.logger.Fatal().Err(err).Msg("Failed to create postgres health check")
 	}
 
 	return healthStatus.HandlerFunc

@@ -20,12 +20,12 @@ func FromJSON(reader io.Reader) (OrderRequest, error) {
 	return order, nil
 }
 
-func (order *OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) orders.OrderEntity {
+func (orderRequest *OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) orders.OrderEntity {
 	creationDate := time.Now()
 	orderId := orders.GenerateOrderId(region, environment, creationDate, strconv.Itoa(rand.Int()))
 
 	var orderItems []orders.OrderItemEntity
-	for _, item := range order.Items {
+	for _, item := range orderRequest.Items {
 		orderItems = append(orderItems, item.ToOrderItemEntity(orderId, creationDate))
 	}
 

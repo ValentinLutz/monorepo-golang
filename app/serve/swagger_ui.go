@@ -14,21 +14,21 @@ var swaggerUIFiles embed.FS
 //go:embed openapi
 var openAPISchemaFiles embed.FS
 
-type UI struct {
+type SwaggerUI struct {
 	logger *zerolog.Logger
 }
 
-func NewUI(logger *zerolog.Logger) *UI {
-	return &UI{logger: logger}
+func NewSwaggerUI(logger *zerolog.Logger) *SwaggerUI {
+	return &SwaggerUI{logger: logger}
 }
 
-func (swaggerUI *UI) RegisterUI(router *httprouter.Router) {
+func (swaggerUI *SwaggerUI) RegisterSwaggerUI(router *httprouter.Router) {
 	subtree, _ := fs.Sub(swaggerUIFiles, "swagger-ui")
 
 	router.ServeFiles("/swagger/*filepath", http.FS(subtree))
 }
 
-func (swaggerUI *UI) RegisterOpenAPISchemas(router *httprouter.Router) {
+func (swaggerUI *SwaggerUI) RegisterOpenAPISchemas(router *httprouter.Router) {
 	subtree, _ := fs.Sub(openAPISchemaFiles, "openapi")
 
 	router.ServeFiles("/openapi/*filepath", http.FS(subtree))

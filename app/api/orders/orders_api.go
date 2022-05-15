@@ -13,11 +13,11 @@ import (
 type API struct {
 	logger  *zerolog.Logger
 	db      *sqlx.DB
-	config  *internal.Config
+	config  internal.Config
 	service *orders.Service
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *internal.Config, service *orders.Service) *API {
+func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config internal.Config, service *orders.Service) *API {
 	return &API{
 		logger:  logger,
 		db:      db,

@@ -26,7 +26,7 @@ type LoggerConfig struct {
 	Level  LogLevel `yaml:"level"`
 }
 
-func NewLogger() zerolog.Logger {
+func NewLogger() *zerolog.Logger {
 	consoleWriter := zerolog.ConsoleWriter{
 		Out:        os.Stdout,
 		TimeFormat: time.RFC3339,
@@ -37,32 +37,32 @@ func NewLogger() zerolog.Logger {
 		Timestamp().
 		Logger()
 
-	return logger
+	return &logger
 }
 
 func SetLogLevel(logLevel LogLevel) {
 	zerolog.SetGlobalLevel(logLevel.toZeroLogLevel())
 }
 
-func (ll *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (logLevel *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var logLevelString string
 	err := unmarshal(&logLevelString)
 	if err != nil {
 		return err
 	}
 
-	logLevel := LogLevel(logLevelString)
+	parsedLogLevel := LogLevel(logLevelString)
 
-	switch logLevel {
+	switch parsedLogLevel {
 	case TRACE, DEBUG, INFO, WARN, ERROR, FATAL, PANIC:
-		*ll = logLevel
+		*logLevel = parsedLogLevel
 		return nil
 	}
-	return fmt.Errorf("log level is invalid: %s", logLevel)
+	return fmt.Errorf("log level is invalid: %s", parsedLogLevel)
 }
 
-func (ll LogLevel) toZeroLogLevel() zerolog.Level {
-	switch ll {
+func (logLevel LogLevel) toZeroLogLevel() zerolog.Level {
+	switch logLevel {
 	case TRACE:
 		return zerolog.TraceLevel
 	case DEBUG:
@@ -85,11 +85,15 @@ type LoggerWrapper struct {
 	logger *zerolog.Logger
 }
 
-func (l *LoggerWrapper) Write(p []byte) (n int, err error) {
-	l.logger.Error().Msg(strings.TrimSpace(string(p)))
+func NewLoggerWrapper(logger *zerolog.Logger) *LoggerWrapper {
+	return &LoggerWrapper{logger: logger}
+}
+
+func (lw *LoggerWrapper) Write(p []byte) (n int, err error) {
+	lw.logger.Error().Msg(strings.TrimSpace(string(p)))
 	return len(p), nil
 }
 
-func NewLoggerWrapper(logger *zerolog.Logger) *log.Logger {
-	return log.New(&LoggerWrapper{logger}, "", 0)
+func (lw *LoggerWrapper) ToLogger() *log.Logger {
+	return log.New(lw, "", 0)
 }

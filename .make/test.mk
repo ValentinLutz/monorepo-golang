@@ -14,3 +14,5 @@ test.smoke:: ## Run the smoke tests
 test.integration:: test-integration/orders/orders.gen.go ## Run the integration tests
 	cd test-integration && \
 		go test -count=1 ./...
+
+test:: test.unit test.smoke test.integration ## Run all tests

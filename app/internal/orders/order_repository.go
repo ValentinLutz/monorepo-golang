@@ -5,17 +5,25 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type OrderRepository struct {
+type OrderRepository interface {
+	FindAll() ([]OrderEntity, error)
+	FindById(orderId OrderId) (OrderEntity, error)
+	Save(orderEntity OrderEntity)
+}
+
+type PostgresqlOrderRepository struct {
 	logger   *zerolog.Logger
 	database *sqlx.DB
 }
 
-func NewOrderRepository(logger *zerolog.Logger, database *sqlx.DB) *OrderRepository {
-	return &OrderRepository{logger: logger, database: database}
+func NewOrderRepository(logger *zerolog.Logger, database *sqlx.DB) PostgresqlOrderRepository {
+	return PostgresqlOrderRepository{logger: logger, database: database}
 }
 
-func (orderRepository *OrderRepository) FindAll() ([]OrderEntity, error) {
-	rows, err := orderRepository.database.Query("SELECT id, creation_date, order_status FROM golang_reference_project.order")
+func (orderRepository *PostgresqlOrderRepository) FindAll() ([]OrderEntity, error) {
+	rows, err := orderRepository.database.Query(
+		"SELECT id, creation_date, order_status FROM golang_reference_project.order",
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -35,8 +43,11 @@ func (orderRepository *OrderRepository) FindAll() ([]OrderEntity, error) {
 	return orderEntities, nil
 }
 
-func (orderRepository *OrderRepository) FindById(id OrderId) (OrderEntity, error) {
-	row := orderRepository.database.QueryRow("SELECT id, creation_date, order_status FROM golang_reference_project.order WHERE id = $1", id)
+func (orderRepository *PostgresqlOrderRepository) FindById(orderId OrderId) (OrderEntity, error) {
+	row := orderRepository.database.QueryRow(
+		"SELECT id, creation_date, order_status FROM golang_reference_project.order WHERE id = $1",
+		orderId,
+	)
 
 	var orderEntity OrderEntity
 	err := row.Scan(&orderEntity.Id, &orderEntity.CreationDate, &orderEntity.Status)
@@ -47,7 +58,7 @@ func (orderRepository *OrderRepository) FindById(id OrderId) (OrderEntity, error
 	return orderEntity, nil
 }
 
-func (orderRepository *OrderRepository) Save(orderEntity OrderEntity) {
+func (orderRepository *PostgresqlOrderRepository) Save(orderEntity OrderEntity) {
 	_, err := orderRepository.database.NamedExec(
 		`INSERT INTO golang_reference_project.order (id, creation_date, order_status, workflow) VALUES (:id, :creation_date, :order_status, :workflow)`,
 		orderEntity,

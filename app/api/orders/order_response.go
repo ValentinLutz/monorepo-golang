@@ -6,9 +6,9 @@ import (
 	"io"
 )
 
-func (order *OrderResponse) ToJSON(writer io.Writer) error {
+func (orderResponse *OrderResponse) ToJSON(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
-	return encoder.Encode(order)
+	return encoder.Encode(orderResponse)
 }
 
 func FromOrderEntity(order *orders.OrderEntity) OrderResponse {
