@@ -40,7 +40,7 @@ func (api *API) getOrders(responseWriter http.ResponseWriter, request *http.Requ
 
 	var ordersResponse OrdersResponse
 	for _, order := range orderEntities {
-		ordersResponse = append(ordersResponse, FromOrderEntity(&order))
+		ordersResponse = append(ordersResponse, FromOrderEntity(order))
 	}
 
 	responses.StatusOK(responseWriter, request, &ordersResponse)
@@ -69,6 +69,6 @@ func (api *API) getOrder(responseWriter http.ResponseWriter, request *http.Reque
 		responses.Error(responseWriter, request, http.StatusNotFound, 300, err.Error())
 	}
 
-	response := FromOrderEntity(&orderEntity)
+	response := FromOrderEntity(orderEntity)
 	responses.StatusOK(responseWriter, request, &response)
 }

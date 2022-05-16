@@ -20,7 +20,7 @@ func FromJSON(reader io.Reader) (OrderRequest, error) {
 	return order, nil
 }
 
-func (orderRequest *OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) orders.OrderEntity {
+func (orderRequest OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) orders.OrderEntity {
 	creationDate := time.Now()
 	orderId := orders.GenerateOrderId(region, environment, creationDate, strconv.Itoa(rand.Int()))
 

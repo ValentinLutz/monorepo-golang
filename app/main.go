@@ -41,7 +41,7 @@ func main() {
 	internal.SetLogLevel(newConfig.Logger.Level)
 
 	newDatabase := database.NewDatabase(logger)
-	db := newDatabase.Connect(&newConfig.Database)
+	db := newDatabase.Connect(newConfig.Database)
 
 	server := NewServer(logger, newConfig, db)
 

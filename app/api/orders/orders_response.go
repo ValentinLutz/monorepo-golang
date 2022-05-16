@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func (ordersResponse *OrdersResponse) ToJSON(writer io.Writer) error {
+func (ordersResponse OrdersResponse) ToJSON(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
 	return encoder.Encode(ordersResponse)
 }

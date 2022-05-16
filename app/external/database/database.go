@@ -15,7 +15,7 @@ func NewDatabase(logger *zerolog.Logger) *Database {
 	return &Database{logger: logger}
 }
 
-func (database *Database) Connect(config *Config) *sqlx.DB {
+func (database *Database) Connect(config Config) *sqlx.DB {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Host, config.Port, config.Username, config.Password, config.Database,

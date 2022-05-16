@@ -6,15 +6,15 @@ import (
 	"io"
 )
 
-func (orderResponse *OrderResponse) ToJSON(writer io.Writer) error {
+func (orderResponse OrderResponse) ToJSON(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
 	return encoder.Encode(orderResponse)
 }
 
-func FromOrderEntity(order *orders.OrderEntity) OrderResponse {
+func FromOrderEntity(order orders.OrderEntity) OrderResponse {
 	var orderItems []OrderItemResponse
 	for _, item := range order.Items {
-		orderItems = append(orderItems, FromOrderItemEntity(&item))
+		orderItems = append(orderItems, FromOrderItemEntity(item))
 	}
 
 	return OrderResponse{

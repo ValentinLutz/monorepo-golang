@@ -19,7 +19,7 @@ type ErrorResponse struct {
 	Message   string    `json:"message"`
 }
 
-func (error *ErrorResponse) ToJSON(writer io.Writer) error {
+func (error ErrorResponse) ToJSON(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
 	return encoder.Encode(error)
 }
