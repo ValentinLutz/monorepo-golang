@@ -30,6 +30,7 @@ jobs:
         with:
           version: v1.46.1
           working-directory: app
+          skip-pkg-cache: true
 
       - name: Build the container images
         run: make docker.build
