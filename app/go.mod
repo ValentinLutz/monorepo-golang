@@ -6,7 +6,7 @@ require (
 	github.com/hellofresh/health-go/v4 v4.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/lib/pq v1.10.5
+	github.com/lib/pq v1.10.6
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.1
 	gopkg.in/yaml.v2 v2.4.0
