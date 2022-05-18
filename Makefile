@@ -5,9 +5,9 @@ include .make/app.mk
 include .make/test.mk
 
 PROJECT_NAME ?= golang-reference-project
+VERSION ?= latest
 PROFILE ?= none-dev
 FLYWAY_USER ?= test
 FLYWAY_PASSWORD ?= test
-VERSION ?= $(shell date +"%y.%m.%d.%H%M%S")
 DOCKER_REGISTRY ?= ghcr.io
 DOCKER_REPOSITORY ?= valentinlutz
