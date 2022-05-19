@@ -15,3 +15,13 @@ services:
       POSTGRES_PASSWORD: test
     ports:
       - '5432:5432'
+
+  wiremock:
+    image: wiremock/wiremock:2.33.2
+    container_name: wiremock
+    hostname: wiremock
+    command: --no-request-journal --global-response-templating
+    volumes:
+      - ./wiremock/:/home/wiremock:ro
+    ports:
+      - '8081:8080'

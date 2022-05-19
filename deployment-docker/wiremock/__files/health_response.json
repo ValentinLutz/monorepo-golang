@@ -1,0 +1,4 @@
+{
+  "status": "OK",
+  "timestamp": "{{now timezone='UTC'}}"
+}

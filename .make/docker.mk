@@ -13,7 +13,7 @@ docker.push:: ## Publish container images | DOCKER_REGISTRY, DOCKER_REPOSITORY, 
 docker.up:: ## Start containers | PROJECT_NAME
 	docker-compose -p ${PROJECT_NAME} \
 		-f deployment-docker/docker-compose.yaml \
-		up -d
+		up -d --force-recreate
 
 docker.down:: ## Shutdown containers | PROJECT_NAME
 	docker-compose -p ${PROJECT_NAME} \
