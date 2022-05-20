@@ -3,7 +3,7 @@ package internal
 import (
 	"app/external/database"
 	"app/internal/config"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"os"
 )
 
