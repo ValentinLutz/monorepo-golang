@@ -14,7 +14,7 @@ jobs:
         id: create
         run: echo "::set-output name=version::$(date +"%y.%m.%d.%H%M%S")"
 
-  install-dependencies:
+  test-app:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -32,63 +32,12 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18.1
-
-      - name: Install app dependencies
-        run: cd app && go get
-
-      - name: Install smoke test dependencies
-        run: cd test-smoke && go get
-
-      - name: Install integration test dependencies
-        run: cd integration-test && go get
 
       - name: Install oapi-codegen
         run: go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.10.1
 
-  test-unit:
-    runs-on: ubuntu-22.04
-    needs:
-      - install-dependencies
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Set up GO
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18.1
-
       - name: Run unit tests
         run: make test.unit
-
-  linter:
-    runs-on: ubuntu-22.04
-    needs:
-      - install-dependencies
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Set up GO
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18.1
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -97,11 +46,11 @@ jobs:
           working-directory: app
           skip-pkg-cache: true
 
+
   create-image:
     needs:
       - create-version
-      - test-unit
-      - linter
+      - test-app
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
