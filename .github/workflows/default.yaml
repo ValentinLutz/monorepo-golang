@@ -18,6 +18,10 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - create-version
+    env:
+      DOCKER_REGISTRY: ghcr.io
+      DOCKER_REPOSITORY: valentinlutz
+      VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
 
