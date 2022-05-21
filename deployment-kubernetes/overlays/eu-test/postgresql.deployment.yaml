@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: postgresql
+          env:
+            - name: POSTGRES_DB
+              value: test_db

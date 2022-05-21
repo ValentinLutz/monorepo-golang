@@ -2,6 +2,9 @@
 app/config
 app/serve/openapi/**
 
+# Config for kubernetes development
+deployment-kubernetes/**/config.*.yaml
+
 # Generated GO clients
 *.gen.go
 

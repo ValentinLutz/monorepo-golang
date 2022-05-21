@@ -23,6 +23,6 @@ app.build:: app/serve/openapi/orders.yaml app/api/orders/orders.gen.go ## Build 
 	cd app && \
 		go build
 
-app.lint:: ## Runs linters against go code
+app.lint:: app/api/orders/orders.gen.go ## Runs linters against go code
 	cd app && \
 		golangci-lint run

@@ -1,5 +1,6 @@
 include .make/help.mk
 include .make/docker.mk
+include .make/kubernetes.mk
 include .make/database.mk
 include .make/app.mk
 include .make/test.mk

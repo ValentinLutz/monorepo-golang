@@ -8,7 +8,6 @@ services:
   postgresql:
     image: postgres:14.2
     container_name: postgresql
-    hostname: postgresql
     environment:
       POSTGRES_DB: dev_db
       POSTGRES_USER: test
@@ -19,7 +18,6 @@ services:
   wiremock:
     image: wiremock/wiremock:2.33.2
     container_name: wiremock
-    hostname: wiremock
     command: --no-request-journal --global-response-templating
     volumes:
       - ./wiremock/:/home/wiremock:ro

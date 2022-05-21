@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: postgresql-credentials
+    literals:
+      - username=InFutureNeedToInjectEnvVar
+      - password=SdzA7vp6GPPUNRjnelSs
+
+resources:
+  - app.deployment.yaml

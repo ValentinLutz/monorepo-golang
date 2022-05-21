@@ -19,5 +19,5 @@ database:
   host: postgresql
   port: 5432
   user: "test"
-  pass: "test"
+  password: "test"
   database: "dev_db"
