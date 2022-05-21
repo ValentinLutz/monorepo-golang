@@ -21,7 +21,7 @@ jobs:
     env:
       DOCKER_REGISTRY: ghcr.io
       DOCKER_REPOSITORY: valentinlutz
-      VERSION: ${{ needs.version.outputs.version }}
+      VERSION: ${{ needs.create-version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
 
