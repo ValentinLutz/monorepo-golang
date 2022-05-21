@@ -18,13 +18,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/cache@v3
-       with:
-         path: |
-           ~/.cache/go-build
-           ~/go/pkg/mod
-         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-         restore-keys: |
-           ${{ runner.os }}-go-
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Set up GO
         uses: actions/setup-go@v3
