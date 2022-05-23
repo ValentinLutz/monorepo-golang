@@ -9,6 +9,11 @@ secretGenerator:
     literals:
       - username=InFutureNeedToInjectEnvVar
       - password=SdzA7vp6GPPUNRjnelSs
+  - name: tls-certificate
+    files:
+      - cert.crt=none-dev.crt
+      - cert.key=none-dev.key
 
 resources:
   - app.deployment.yaml
+  - app.service.yaml

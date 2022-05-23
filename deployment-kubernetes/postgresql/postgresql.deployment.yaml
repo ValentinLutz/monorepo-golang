@@ -3,22 +3,31 @@ kind: Deployment
 metadata:
   name: postgresql
 spec:
+  selector:
+    matchLabels:
+      service: postgresql
   template:
+    metadata:
+      labels:
+        service: postgresql
     spec:
       containers:
         - name: postgresql
-          image: postgres:13.5
+          image: postgres:14.2
           imagePullPolicy: Always
           ports:
             - containerPort: 5432
+          args:
+            - -c
+            - log_statement=all
           env:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
+                  key: username
                   name: postgresql-credentials
-                  key: password
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgresql-credentials
                   key: password
+                  name: postgresql-credentials

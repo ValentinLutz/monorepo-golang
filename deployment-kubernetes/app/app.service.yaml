@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgresql
+  name: app
 spec:
   selector:
-    service: postgresql
+    service: app
   ports:
-    - port: 5432
+    - port: 8080
