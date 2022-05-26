@@ -18,7 +18,7 @@ func initClient() orders.Client {
 	}
 	client := &http.Client{Transport: tr}
 	return orders.Client{
-		Server: "https://localhost:8080",
+		Server: "http://localhost:8080",
 		Client: client,
 	}
 }

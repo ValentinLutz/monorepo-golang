@@ -19,7 +19,7 @@ func TestHealth(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get("https://localhost:8080/api/status/health")
+	response, err := client.Get("http://localhost:8080/api/status/health")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +34,7 @@ func TestPrometheusMetrics(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get("https://localhost:8080/api/status/metrics")
+	response, err := client.Get("http://localhost:8080/api/status/metrics")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func TestSwaggerUI(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get("https://localhost:8080/swagger")
+	response, err := client.Get("http://localhost:8080/swagger")
 	if err != nil {
 		t.Fatal(err)
 	}

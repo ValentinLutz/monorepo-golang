@@ -22,8 +22,6 @@ import (
 
 var (
 	configFile = *flag.String("config", "config/config.yaml", "config file")
-	certFile   = *flag.String("cert", "config/cert.crt", "tls certificate file")
-	keyFile    = *flag.String("key", "config/cert.key", "tls key file")
 )
 
 func main() {
@@ -53,7 +51,7 @@ func StartServer(server *http.Server, logger *zerolog.Logger) {
 	logger.Info().
 		Str("address", server.Addr).
 		Msg("Starting server")
-	err := server.ListenAndServeTLS(certFile, keyFile)
+	err := server.ListenAndServe()
 	if err != http.ErrServerClosed {
 		logger.Fatal().
 			Err(err).
