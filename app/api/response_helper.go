@@ -32,7 +32,7 @@ func StatusOK(responseWriter http.ResponseWriter, request *http.Request, body JS
 	}
 	err := body.ToJSON(responseWriter)
 	if err != nil {
-		Error(responseWriter, request, http.StatusInternalServerError, 9001, "panic it's over 9000")
+		Error(responseWriter, request, http.StatusInternalServerError, 9009, "panic it's over 9000")
 	}
 }
 
@@ -44,7 +44,7 @@ func StatusCreated(responseWriter http.ResponseWriter, request *http.Request, bo
 	}
 	err := body.ToJSON(responseWriter)
 	if err != nil {
-		Error(responseWriter, request, http.StatusInternalServerError, 9001, "panic it's over 9000")
+		Error(responseWriter, request, http.StatusInternalServerError, 9009, "panic it's over 9000")
 	}
 }
 
