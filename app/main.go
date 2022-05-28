@@ -1,6 +1,7 @@
 package main
 
 import (
+	"app/api"
 	"app/api/orders"
 	"app/api/status"
 	"app/external/database"
@@ -97,11 +98,13 @@ func NewServer(logger *zerolog.Logger, config internal.Config, db *sqlx.DB) *htt
 	statusAPI := status.NewAPI(logger, db, config.Database)
 	statusAPI.RegisterHandlers(router)
 
+	routerWithMiddleware := api.NewRequestResponseLogger(router, logger)
+
 	serverConfig := config.Server
 
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", serverConfig.Port),
-		Handler:      router,
+		Handler:      routerWithMiddleware,
 		ErrorLog:     internal.NewLoggerWrapper(logger).ToLogger(),
 		ReadTimeout:  time.Second * time.Duration(serverConfig.Timeout.Read),
 		WriteTimeout: time.Second * time.Duration(serverConfig.Timeout.Write),

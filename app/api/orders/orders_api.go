@@ -36,6 +36,7 @@ func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Reques
 	orderEntities, err := a.service.GetOrders()
 	if err != nil {
 		api.Error(responseWriter, request, http.StatusInternalServerError, 9009, err.Error())
+		return
 	}
 
 	var ordersResponse OrdersResponse
@@ -55,6 +56,7 @@ func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Reques
 	err = a.service.SaveOrder(orderRequest.ToOrderEntity(a.config.Region, a.config.Environment))
 	if err != nil {
 		api.Error(responseWriter, request, http.StatusInternalServerError, 9009, err.Error())
+		return
 	}
 
 	api.StatusCreated(responseWriter, request, nil)
@@ -67,6 +69,7 @@ func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request
 	orderEntity, err := a.service.GetOrder(orderId)
 	if err != nil {
 		api.Error(responseWriter, request, http.StatusNotFound, 300, err.Error())
+		return
 	}
 
 	response := FromOrderEntity(orderEntity)
