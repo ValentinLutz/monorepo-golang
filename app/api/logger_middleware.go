@@ -20,8 +20,8 @@ func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Reque
 
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		rrl.logger.Error().Msgf("Error reading request body: %v", err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		rrl.logger.Error().Err(err).Msg("Error reading request body")
+		Error(w, r, http.StatusInternalServerError, 9009, err.Error())
 		return
 	}
 	reader := io.NopCloser(bytes.NewBuffer(requestBody))
@@ -32,17 +32,34 @@ func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	rrl.handler.ServeHTTP(rw, r)
 
 	if rw.status >= 400 {
-		rrl.logger.Info().
-			Str("method", r.Method).
-			Str("path", r.URL.Path).
-			Interface("body", string(requestBody)).
-			Msg("Request")
-		rrl.logger.Info().
-			Str("duration", time.Since(startTime).String()).
-			Int("status", rw.status).
-			Str("body", string(rw.body)).
-			Msg("Response")
+		rrl.logRequest(r, requestBody)
+		rrl.logResponse(startTime, rw)
 	}
+}
+
+func (rrl *RequestResponseLogger) logRequest(r *http.Request, requestBody []byte) {
+	//if requestBody == nil || len(requestBody) <= 0 {
+	//	requestBody = []byte("{}")
+	//}
+
+	rrl.logger.Info().
+		Str("method", r.Method).
+		Str("path", r.URL.Path).
+		Str("body", string(requestBody)).
+		Msg("Request")
+}
+
+func (rrl *RequestResponseLogger) logResponse(startTime time.Time, rw *responseWriter) {
+	//responseBody := rw.body
+	//if responseBody == nil || len(responseBody) <= 0 {
+	//	responseBody = []byte("{}")
+	//}
+
+	rrl.logger.Info().
+		Str("duration", time.Since(startTime).String()).
+		Int("status", rw.status).
+		Str("body", string(rw.body)).
+		Msg("Response")
 }
 
 func NewRequestResponseLogger(handlerToWrap http.Handler, logger *zerolog.Logger) *RequestResponseLogger {
