@@ -38,10 +38,6 @@ func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Reque
 }
 
 func (rrl *RequestResponseLogger) logRequest(r *http.Request, requestBody []byte) {
-	//if requestBody == nil || len(requestBody) <= 0 {
-	//	requestBody = []byte("{}")
-	//}
-
 	rrl.logger.Info().
 		Str("method", r.Method).
 		Str("path", r.URL.Path).
@@ -50,11 +46,6 @@ func (rrl *RequestResponseLogger) logRequest(r *http.Request, requestBody []byte
 }
 
 func (rrl *RequestResponseLogger) logResponse(startTime time.Time, rw *responseWriter) {
-	//responseBody := rw.body
-	//if responseBody == nil || len(responseBody) <= 0 {
-	//	responseBody = []byte("{}")
-	//}
-
 	rrl.logger.Info().
 		Str("duration", time.Since(startTime).String()).
 		Int("status", rw.status).
