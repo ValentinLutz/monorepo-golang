@@ -1,8 +1,8 @@
 package orders
 
 import (
-	"app/api"
 	"app/internal"
+	"app/internal/errors"
 	"app/internal/orders"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
@@ -35,7 +35,7 @@ func (a *API) RegisterHandlers(router *httprouter.Router) {
 func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Request) {
 	orderEntities, err := a.service.GetOrders()
 	if err != nil {
-		api.Error(responseWriter, request, http.StatusInternalServerError, 9009, err.Error())
+		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 
@@ -44,22 +44,22 @@ func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Reques
 		ordersResponse = append(ordersResponse, FromOrderEntity(order))
 	}
 
-	api.StatusOK(responseWriter, request, &ordersResponse)
+	StatusOK(responseWriter, request, &ordersResponse)
 }
 
 func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
-		api.Error(responseWriter, request, http.StatusBadRequest, 200, err.Error())
+		Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, err.Error())
 		return
 	}
 	err = a.service.SaveOrder(orderRequest.ToOrderEntity(a.config.Region, a.config.Environment))
 	if err != nil {
-		api.Error(responseWriter, request, http.StatusInternalServerError, 9009, err.Error())
+		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 
-	api.StatusCreated(responseWriter, request, nil)
+	StatusCreated(responseWriter, request, nil)
 }
 
 func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
@@ -68,10 +68,10 @@ func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request
 
 	orderEntity, err := a.service.GetOrder(orderId)
 	if err != nil {
-		api.Error(responseWriter, request, http.StatusNotFound, 300, err.Error())
+		Error(responseWriter, request, http.StatusNotFound, errors.OrderNotFound, err.Error())
 		return
 	}
 
 	response := FromOrderEntity(orderEntity)
-	api.StatusOK(responseWriter, request, &response)
+	StatusOK(responseWriter, request, &response)
 }

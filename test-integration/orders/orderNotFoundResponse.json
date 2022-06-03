@@ -2,6 +2,6 @@
   "method": "GET",
   "path": "/api/orders/NOPE",
   "timestamp": "2022-05-06T19:41:19.9445496Z",
-  "error": 300,
+  "code": 4004,
   "message": "sql: no rows in result set"
 }

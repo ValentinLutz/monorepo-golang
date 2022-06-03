@@ -1,6 +1,7 @@
-package api
+package orders
 
 import (
+	"app/internal/errors"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -9,19 +10,6 @@ import (
 
 type JSONWriter interface {
 	ToJSON(writer io.Writer) error
-}
-
-type ErrorResponse struct {
-	Method    string    `json:"method"`
-	Path      string    `json:"path"`
-	Timestamp time.Time `json:"timestamp"`
-	Error     int       `json:"error"`
-	Message   string    `json:"message"`
-}
-
-func (error ErrorResponse) ToJSON(writer io.Writer) error {
-	encoder := json.NewEncoder(writer)
-	return encoder.Encode(error)
 }
 
 func StatusOK(responseWriter http.ResponseWriter, request *http.Request, body JSONWriter) {
@@ -43,17 +31,22 @@ func Status(responseWriter http.ResponseWriter, request *http.Request, statusCod
 	}
 }
 
-func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, error int, message string) {
+func (error ErrorResponse) ToJSON(writer io.Writer) error {
+	encoder := json.NewEncoder(writer)
+	return encoder.Encode(error)
+}
+
+func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, error errors.Error, message string) {
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
 	responseWriter.WriteHeader(statusCode)
 
 	errorResponse := ErrorResponse{
-		Method:    request.Method,
+		Method:    &request.Method,
 		Path:      request.RequestURI,
 		Timestamp: time.Now().UTC(),
-		Error:     error,
-		Message:   message,
+		Code:      int(error),
+		Message:   &message,
 	}
 
 	_ = errorResponse.ToJSON(responseWriter)

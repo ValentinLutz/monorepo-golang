@@ -59,6 +59,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/order_response"
+        404:
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
         default:
           description: Unexpected Error
           content:
@@ -130,16 +136,18 @@ components:
         - timestamp
         - code
       properties:
+        method:
+          type: string
+          example: GET
         path:
           type: string
-          example: /api/status
+          example: /api/orders
         timestamp:
           type: string
           format: date-time
         code:
           type: integer
-          format: int32
-          example: 9001
+          example: 9009
         message:
           type: string
           example: panic it's over 9000
