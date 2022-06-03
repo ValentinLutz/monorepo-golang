@@ -1,9 +1,9 @@
-package orders
+package order
 
 import (
 	"app/internal"
 	"app/internal/errors"
-	"app/internal/orders"
+	"app/internal/order"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog"
@@ -14,10 +14,10 @@ type API struct {
 	logger  *zerolog.Logger
 	db      *sqlx.DB
 	config  internal.Config
-	service *orders.Service
+	service *order.Service
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config internal.Config, service *orders.Service) *API {
+func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config internal.Config, service *order.Service) *API {
 	return &API{
 		logger:  logger,
 		db:      db,
@@ -64,7 +64,7 @@ func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Reques
 
 func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	params := httprouter.ParamsFromContext(request.Context())
-	orderId := orders.OrderId(params.ByName("orderId"))
+	orderId := order.OrderId(params.ByName("orderId"))
 
 	orderEntity, err := a.service.GetOrder(orderId)
 	if err != nil {

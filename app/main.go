@@ -2,11 +2,11 @@ package main
 
 import (
 	"app/api"
-	"app/api/orders"
+	"app/api/order"
 	"app/api/status"
 	"app/external/database"
 	"app/internal"
-	internalOrders "app/internal/orders"
+	internalOrders "app/internal/order"
 	"app/serve"
 	"context"
 	"flag"
@@ -88,7 +88,7 @@ func NewServer(logger *zerolog.Logger, config internal.Config, db *sqlx.DB) *htt
 	orderItemRepository := internalOrders.NewOrderItemRepository(logger, db)
 	ordersService := internalOrders.NewService(logger, db, config, &orderRepository, &orderItemRepository)
 
-	orderAPI := orders.NewAPI(logger, db, config, ordersService)
+	orderAPI := order.NewAPI(logger, db, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewSwaggerUI(logger)

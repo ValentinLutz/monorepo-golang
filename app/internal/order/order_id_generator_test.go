@@ -1,21 +1,21 @@
-package orders_test
+package order_test
 
 import (
 	"app/internal/config"
-	"app/internal/orders"
+	"app/internal/order"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
-var generatorOrderId = func(region config.Region, environment config.Environment, timestamp time.Time, salt string, expected orders.OrderId) func(t *testing.T) {
+var generatorOrderId = func(region config.Region, environment config.Environment, timestamp time.Time, salt string, expected order.OrderId) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Logf("Region: %v", region)
 		t.Logf("Environment: %v", environment)
 		t.Logf("timestamp: %v", timestamp.Format(time.RFC3339))
 		t.Logf("Salt: %v", salt)
 		// WHEN
-		actual := orders.GenerateOrderId(region, environment, timestamp, salt)
+		actual := order.GenerateOrderId(region, environment, timestamp, salt)
 		// THEN
 		assert.Equal(t, expected, actual)
 	}

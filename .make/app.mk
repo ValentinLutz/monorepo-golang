@@ -6,8 +6,8 @@ app/serve/openapi/orders.yaml: api-definition/orders.yaml ## Copy orders open ap
 
 app/api/orders/orders.gen.go: api-definition/orders.yaml ## Generate orders server from open api definition
 	oapi-codegen -generate types \
-		-package orders \
-		./api-definition/orders.yaml  > app/api/orders/orders.gen.go
+		-package order \
+		./api-definition/orders.yaml  > app/api/order/orders.gen.go
 
 app.run:: app/config/config.yaml app/serve/openapi/orders.yaml app/api/orders/orders.gen.go ## Run the app
 	cd app && \

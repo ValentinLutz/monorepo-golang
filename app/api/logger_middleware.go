@@ -1,7 +1,7 @@
 package api
 
 import (
-	"app/api/orders"
+	"app/api/order"
 	"app/internal/errors"
 	"bytes"
 	"github.com/rs/zerolog"
@@ -23,7 +23,7 @@ func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		rrl.logger.Error().Err(err).Msg("Error reading request body")
-		orders.Error(w, r, http.StatusInternalServerError, errors.Panic, err.Error())
+		order.Error(w, r, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 	reader := io.NopCloser(bytes.NewBuffer(requestBody))

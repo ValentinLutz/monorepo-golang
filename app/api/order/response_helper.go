@@ -1,4 +1,4 @@
-package orders
+package order
 
 import (
 	"app/internal/errors"

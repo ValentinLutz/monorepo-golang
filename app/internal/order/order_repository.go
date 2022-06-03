@@ -1,4 +1,4 @@
-package orders
+package order
 
 import (
 	"github.com/jmoiron/sqlx"

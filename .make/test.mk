@@ -1,7 +1,7 @@
 test-integration/orders/orders.gen.go: api-definition/orders.yaml ## Generate integration test orders client from open api definition
 	oapi-codegen -generate types,client \
-		-package orders \
-		./api-definition/orders.yaml  > test-integration/orders/orders.gen.go
+		-package order \
+		./api-definition/orders.yaml  > test-integration/order/orders.gen.go
 
 test.unit::  app/serve/openapi/orders.yaml app/api/orders/orders.gen.go ## Run the unit tests
 	cd app && \

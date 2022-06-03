@@ -1,3 +1,3 @@
-package orders
+package order
 
 type OrderId string

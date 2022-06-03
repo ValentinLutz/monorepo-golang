@@ -1,4 +1,4 @@
-package orders_test
+package order_test
 
 import (
 	"context"
@@ -8,16 +8,16 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"test-integration/orders"
+	"test-integration/order"
 	"testing"
 )
 
-func initClient() orders.Client {
+func initClient() order.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	return orders.Client{
+	return order.Client{
 		Server: "http://localhost:8080",
 		Client: client,
 	}
@@ -35,9 +35,9 @@ func TestGetOrder(t *testing.T) {
 	defer apiOrder.Body.Close()
 
 	// THEN
-	var actualResponse orders.OrderResponse
+	var actualResponse order.OrderResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse orders.OrderResponse
+	var expectedResponse order.OrderResponse
 	readToObject(t, readFile(t, "orderResponse.json"), &expectedResponse)
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
@@ -56,9 +56,9 @@ func TestGetOrderNotFound(t *testing.T) {
 	defer apiOrder.Body.Close()
 
 	// THEN
-	var actualResponse orders.ErrorResponse
+	var actualResponse order.ErrorResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse orders.ErrorResponse
+	var expectedResponse order.ErrorResponse
 	readToObject(t, readFile(t, "orderNotFoundResponse.json"), &expectedResponse)
 	expectedResponse.Timestamp = actualResponse.Timestamp
 
@@ -78,9 +78,9 @@ func TestGetOrders(t *testing.T) {
 	defer apiOrder.Body.Close()
 
 	// THEN
-	var actualResponse orders.OrdersResponse
+	var actualResponse order.OrdersResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse orders.OrdersResponse
+	var expectedResponse order.OrdersResponse
 	readToObject(t, readFile(t, "ordersResponse.json"), &expectedResponse)
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
