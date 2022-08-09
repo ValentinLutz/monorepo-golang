@@ -10,7 +10,7 @@ docker.push:: ## Publish container images | DOCKER_REGISTRY, DOCKER_REPOSITORY, 
 	docker push \
 		${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${PROJECT_NAME}:latest
 
-docker.up:: ## Start containers | PROJECT_NAME
+docker.up:: docker.build ## Start containers | PROJECT_NAME
 	docker-compose -p ${PROJECT_NAME} \
 		-f deployment-docker/docker-compose.yaml \
 		up -d --force-recreate
@@ -20,7 +20,6 @@ docker.down:: ## Shutdown containers | PROJECT_NAME
 		-f deployment-docker/docker-compose.yaml \
 		down
 
-docker.app.up:: docker.build ## Start app container | PROJECT_NAME
-	docker-compose -p ${PROJECT_NAME} \
-		-f deployment-docker/app/docker-compose.yaml \
-		up
+docker.app.up:: docker.up database.migrate ## Start containers | PROJECT_NAME
+	docker logs app \
+		--follow

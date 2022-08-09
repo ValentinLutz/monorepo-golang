@@ -17,7 +17,7 @@ logger:
 # Database config
 database:
   host: localhost
-  port: 5432
+  port: 9432
   user: "test"
   password: "test"
   database: "dev_db"

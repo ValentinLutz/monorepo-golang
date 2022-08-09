@@ -5,6 +5,17 @@ networks:
     name: golang-reference-project
 
 services:
+  app:
+    image: ghcr.io/valentinlutz/golang-reference-project:latest
+    container_name: app
+    depends_on:
+      - postgresql
+      - wiremock
+    volumes:
+      - ../config/config.none-container.yaml:/app/config/config.yaml:ro
+    ports:
+      - '9080:8080'
+
   postgresql:
     image: postgres:14.2
     container_name: postgresql
@@ -13,7 +24,7 @@ services:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
     ports:
-      - '5432:5432'
+      - '9432:5432'
 
   wiremock:
     image: wiremock/wiremock:2.33.2
@@ -22,4 +33,4 @@ services:
     volumes:
       - ./wiremock/:/home/wiremock:ro
     ports:
-      - '8081:8080'
+      - '9081:8080'
