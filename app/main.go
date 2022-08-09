@@ -81,7 +81,7 @@ func GracefulServerShutdown(server *http.Server, logger *zerolog.Logger) {
 	}
 }
 
-func NewServer(logger *zerolog.Logger, config internal.Config, db *sqlx.DB) *http.Server {
+func NewServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
 	orderRepository := internalOrders.NewOrderRepository(logger, db)

@@ -11,7 +11,7 @@ func (orderResponse OrderResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(orderResponse)
 }
 
-func FromOrderEntity(order order.OrderEntity) OrderResponse {
+func FromOrderEntity(order order.Entity) OrderResponse {
 	var orderItems []OrderItemResponse
 	for _, item := range order.Items {
 		orderItems = append(orderItems, FromOrderItemEntity(item))

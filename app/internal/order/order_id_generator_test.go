@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var generatorOrderId = func(region config.Region, environment config.Environment, timestamp time.Time, salt string, expected order.OrderId) func(t *testing.T) {
+var generatorOrderId = func(region config.Region, environment config.Environment, timestamp time.Time, salt string, expected order.Id) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Logf("Region: %v", region)
 		t.Logf("Environment: %v", environment)

@@ -2,9 +2,9 @@ package order
 
 import "time"
 
-type OrderItemEntity struct {
+type ItemEntity struct {
 	Id           int       `db:"id"`
-	OrderId      OrderId   `db:"order_id"`
+	OrderId      Id        `db:"order_id"`
 	Name         string    `db:"item_name"`
 	CreationDate time.Time `db:"creation_date"`
 }

@@ -13,11 +13,11 @@ import (
 type API struct {
 	logger  *zerolog.Logger
 	db      *sqlx.DB
-	config  internal.Config
+	config  *internal.Config
 	service *order.Service
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config internal.Config, service *order.Service) *API {
+func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *internal.Config, service *order.Service) *API {
 	return &API{
 		logger:  logger,
 		db:      db,
@@ -40,8 +40,8 @@ func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Reques
 	}
 
 	var ordersResponse OrdersResponse
-	for _, order := range orderEntities {
-		ordersResponse = append(ordersResponse, FromOrderEntity(order))
+	for _, orderEntity := range orderEntities {
+		ordersResponse = append(ordersResponse, FromOrderEntity(orderEntity))
 	}
 
 	StatusOK(responseWriter, request, &ordersResponse)
@@ -64,7 +64,7 @@ func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Reques
 
 func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	params := httprouter.ParamsFromContext(request.Context())
-	orderId := order.OrderId(params.ByName("orderId"))
+	orderId := order.Id(params.ByName("orderId"))
 
 	orderEntity, err := a.service.GetOrder(orderId)
 	if err != nil {

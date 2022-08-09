@@ -13,6 +13,7 @@ type Config struct {
 	Server      ServerConfig       `yaml:"server"`
 	Logger      LoggerConfig       `yaml:"logger"`
 	Database    database.Config    `yaml:"database"`
+	Client      Client             `yaml:"client"`
 }
 
 type ServerConfig struct {
@@ -26,10 +27,18 @@ type TimeoutConfig struct {
 	Idle  int `yaml:"idle"`
 }
 
-func NewConfig(path string) (Config, error) {
+type Client struct {
+	PaymentClient ClientConfig `yaml:"payment"`
+}
+
+type ClientConfig struct {
+	Url string `yaml:"url"`
+}
+
+func NewConfig(path string) (*Config, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return Config{}, err
+		return &Config{}, err
 	}
 	defer func(file *os.File) {
 		closeErr := file.Close()
@@ -39,10 +48,10 @@ func NewConfig(path string) (Config, error) {
 	}(file)
 
 	decoder := yaml.NewDecoder(file)
-	var decodedConfig Config
+	var decodedConfig *Config
 	err = decoder.Decode(&decodedConfig)
 	if err != nil {
-		return Config{}, err
+		return &Config{}, err
 	}
 
 	return decodedConfig, nil

@@ -12,28 +12,28 @@ import (
 
 func FromJSON(reader io.Reader) (OrderRequest, error) {
 	decoder := json.NewDecoder(reader)
-	var order OrderRequest
-	err := decoder.Decode(&order)
+	var orderRequest OrderRequest
+	err := decoder.Decode(&orderRequest)
 	if err != nil {
 		return OrderRequest{}, err
 	}
-	return order, nil
+	return orderRequest, nil
 }
 
-func (orderRequest OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) order.OrderEntity {
+func (orderRequest OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) order.Entity {
 	creationDate := time.Now()
 	orderId := order.GenerateOrderId(region, environment, creationDate, strconv.Itoa(rand.Int()))
 
-	var orderItems []order.OrderItemEntity
+	var orderItems []order.ItemEntity
 	for _, item := range orderRequest.Items {
 		orderItems = append(orderItems, item.ToOrderItemEntity(orderId, creationDate))
 	}
 
-	return order.OrderEntity{
+	return order.Entity{
 		Id:           orderId,
 		Workflow:     "default_workflow",
 		CreationDate: creationDate,
-		Status:       order.OrderPlaced,
+		Status:       order.Placed,
 		Items:        orderItems,
 	}
 }

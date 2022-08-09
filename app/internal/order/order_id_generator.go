@@ -9,7 +9,9 @@ import (
 	"time"
 )
 
-func GenerateOrderId(region config.Region, environment config.Environment, timestamp time.Time, salt string) OrderId {
+type Id string
+
+func GenerateOrderId(region config.Region, environment config.Environment, timestamp time.Time, salt string) Id {
 	valueToHash := string(region) + string(environment) + timestamp.Format(time.RFC3339) + salt
 	md5Sum := md5.Sum([]byte(valueToHash))
 
@@ -19,7 +21,7 @@ func GenerateOrderId(region config.Region, environment config.Environment, times
 	regionIdentifier := buildRegionIdentifier(region, environment)
 
 	base64StringHalfLength := len(base64WithoutUnderscore) / 2
-	return OrderId(base64WithoutUnderscore[0:base64StringHalfLength] + regionIdentifier + base64WithoutUnderscore[base64StringHalfLength:])
+	return Id(base64WithoutUnderscore[0:base64StringHalfLength] + regionIdentifier + base64WithoutUnderscore[base64StringHalfLength:])
 }
 
 func replaceHyphenAndUnderscore(input string) string {

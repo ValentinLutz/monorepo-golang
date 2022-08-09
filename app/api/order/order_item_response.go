@@ -11,7 +11,7 @@ func (orderItemResponse OrderItemResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(orderItemResponse)
 }
 
-func FromOrderItemEntity(orderItem order.OrderItemEntity) OrderItemResponse {
+func FromOrderItemEntity(orderItem order.ItemEntity) OrderItemResponse {
 	return OrderItemResponse{
 		Name: orderItem.Name,
 	}

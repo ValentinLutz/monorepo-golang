@@ -22,7 +22,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error_response"
     post:
-
       summary: Create an order
       tags:
         - orders
@@ -132,6 +131,7 @@ components:
     error_response:
       type: object
       required:
+        - method
         - path
         - timestamp
         - code

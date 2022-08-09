@@ -42,7 +42,7 @@ func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode
 	responseWriter.WriteHeader(statusCode)
 
 	errorResponse := ErrorResponse{
-		Method:    &request.Method,
+		Method:    request.Method,
 		Path:      request.RequestURI,
 		Timestamp: time.Now().UTC(),
 		Code:      int(error),

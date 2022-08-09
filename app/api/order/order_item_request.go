@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func (orderItemRequest OrderItemRequest) ToOrderItemEntity(orderId order.OrderId, creationDate time.Time) order.OrderItemEntity {
-	return order.OrderItemEntity{
+func (orderItemRequest OrderItemRequest) ToOrderItemEntity(orderId order.Id, creationDate time.Time) order.ItemEntity {
+	return order.ItemEntity{
 		OrderId:      orderId,
 		CreationDate: creationDate,
 		Name:         orderItemRequest.Name,

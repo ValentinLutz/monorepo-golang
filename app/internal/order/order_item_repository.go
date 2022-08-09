@@ -6,10 +6,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type OrderItemRepository interface {
-	FindAll() ([]OrderItemEntity, error)
-	FindAllByOrderId(orderId OrderId) ([]OrderItemEntity, error)
-	SaveAll(orderItemEntities []OrderItemEntity) error
+type ItemRepository interface {
+	FindAll() ([]ItemEntity, error)
+	FindAllByOrderId(orderId Id) ([]ItemEntity, error)
+	SaveAll(orderItemEntities []ItemEntity) error
 }
 
 type PostgreSQLOrderItemRepository struct {
@@ -21,7 +21,7 @@ func NewOrderItemRepository(logger *zerolog.Logger, database *sqlx.DB) PostgreSQ
 	return PostgreSQLOrderItemRepository{logger: logger, db: database}
 }
 
-func (orderItemRepository *PostgreSQLOrderItemRepository) FindAll() ([]OrderItemEntity, error) {
+func (orderItemRepository *PostgreSQLOrderItemRepository) FindAll() ([]ItemEntity, error) {
 	rows, err := orderItemRepository.db.Query("SELECT id, order_id, creation_date, item_name FROM golang_reference_project.order_item")
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (orderItemRepository *PostgreSQLOrderItemRepository) FindAll() ([]OrderItem
 	return extractOrderItemEntities(rows)
 }
 
-func (orderItemRepository *PostgreSQLOrderItemRepository) FindAllByOrderId(orderId OrderId) ([]OrderItemEntity, error) {
+func (orderItemRepository *PostgreSQLOrderItemRepository) FindAllByOrderId(orderId Id) ([]ItemEntity, error) {
 	rows, err := orderItemRepository.db.Query("SELECT id, order_id, creation_date, item_name FROM golang_reference_project.order_item WHERE order_id = $1", orderId)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (orderItemRepository *PostgreSQLOrderItemRepository) FindAllByOrderId(order
 	return extractOrderItemEntities(rows)
 }
 
-func (orderItemRepository *PostgreSQLOrderItemRepository) SaveAll(orderItemEntities []OrderItemEntity) error {
+func (orderItemRepository *PostgreSQLOrderItemRepository) SaveAll(orderItemEntities []ItemEntity) error {
 	_, err := orderItemRepository.db.NamedExec(
 		`INSERT INTO golang_reference_project.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
 	if err != nil {
@@ -50,10 +50,10 @@ func (orderItemRepository *PostgreSQLOrderItemRepository) SaveAll(orderItemEntit
 	return err
 }
 
-func extractOrderItemEntities(rows *sql.Rows) ([]OrderItemEntity, error) {
-	var orderItemEntities []OrderItemEntity
+func extractOrderItemEntities(rows *sql.Rows) ([]ItemEntity, error) {
+	var orderItemEntities []ItemEntity
 	for rows.Next() {
-		var orderItemEntity OrderItemEntity
+		var orderItemEntity ItemEntity
 
 		err := rows.Scan(&orderItemEntity.Id, &orderItemEntity.OrderId, &orderItemEntity.CreationDate, &orderItemEntity.Name)
 		if err != nil {

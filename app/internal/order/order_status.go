@@ -1,10 +1,10 @@
 package order
 
-type OrderStatus string
+type Status string
 
 const (
-	OrderPlaced     OrderStatus = "order_placed"
-	OrderInProgress OrderStatus = "order_in_progress"
-	OrderCanceled   OrderStatus = "order_canceled"
-	OrderCompleted  OrderStatus = "order_completed"
+	Placed     Status = "order_placed"
+	InProgress Status = "order_in_progress"
+	Canceled   Status = "order_canceled"
+	Completed  Status = "order_completed"
 )
