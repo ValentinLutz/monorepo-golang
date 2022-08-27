@@ -4,7 +4,6 @@ import (
 	"app/internal"
 	"app/internal/errors"
 	"app/internal/order"
-	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog"
 	"net/http"
@@ -12,15 +11,13 @@ import (
 
 type API struct {
 	logger  *zerolog.Logger
-	db      *sqlx.DB
 	config  *internal.Config
 	service *order.Service
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config *internal.Config, service *order.Service) *API {
+func NewAPI(logger *zerolog.Logger, config *internal.Config, service *order.Service) *API {
 	return &API{
 		logger:  logger,
-		db:      db,
 		config:  config,
 		service: service,
 	}
@@ -41,7 +38,12 @@ func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Reques
 
 	var ordersResponse OrdersResponse
 	for _, orderEntity := range orderEntities {
-		ordersResponse = append(ordersResponse, FromOrderEntity(orderEntity))
+		orderEntity, err := FromOrderEntity(orderEntity)
+		if err != nil {
+			Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		}
+		ordersResponse = append(ordersResponse, orderEntity)
+
 	}
 
 	StatusOK(responseWriter, request, &ordersResponse)
@@ -72,6 +74,9 @@ func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request
 		return
 	}
 
-	response := FromOrderEntity(orderEntity)
+	response, err := FromOrderEntity(orderEntity)
+	if err != nil {
+		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+	}
 	StatusOK(responseWriter, request, &response)
 }

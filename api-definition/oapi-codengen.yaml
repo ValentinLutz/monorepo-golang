@@ -1,0 +1,6 @@
+package: order
+generate:
+  models: true
+
+compatibility:
+  old-aliasing: true

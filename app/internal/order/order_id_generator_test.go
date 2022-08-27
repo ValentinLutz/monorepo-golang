@@ -12,7 +12,7 @@ var generatorOrderId = func(region config.Region, environment config.Environment
 	return func(t *testing.T) {
 		t.Logf("Region: %v", region)
 		t.Logf("Environment: %v", environment)
-		t.Logf("timestamp: %v", timestamp.Format(time.RFC3339))
+		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
 		t.Logf("Salt: %v", salt)
 		// WHEN
 		actual := order.GenerateOrderId(region, environment, timestamp, salt)

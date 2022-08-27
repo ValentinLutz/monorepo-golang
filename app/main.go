@@ -42,13 +42,13 @@ func main() {
 	newDatabase := database.NewDatabase(logger)
 	db := newDatabase.Connect(newConfig.Database)
 
-	server := NewServer(logger, newConfig, db)
+	server := newServer(logger, newConfig, db)
 
-	go StartServer(server, logger)
-	GracefulServerShutdown(server, logger)
+	go startServer(server, logger)
+	shutdownServerGracefully(server, logger)
 }
 
-func StartServer(server *http.Server, logger *zerolog.Logger) {
+func startServer(server *http.Server, logger *zerolog.Logger) {
 	logger.Info().
 		Str("address", server.Addr).
 		Msg("Starting server")
@@ -61,7 +61,7 @@ func StartServer(server *http.Server, logger *zerolog.Logger) {
 
 }
 
-func GracefulServerShutdown(server *http.Server, logger *zerolog.Logger) {
+func shutdownServerGracefully(server *http.Server, logger *zerolog.Logger) {
 	osSignal := make(chan os.Signal, 1)
 	signal.Notify(osSignal, os.Interrupt, syscall.SIGTERM)
 	<-osSignal
@@ -81,14 +81,14 @@ func GracefulServerShutdown(server *http.Server, logger *zerolog.Logger) {
 	}
 }
 
-func NewServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
+func newServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
 	orderRepository := internalOrders.NewOrderRepository(logger, db)
 	orderItemRepository := internalOrders.NewOrderItemRepository(logger, db)
 	ordersService := internalOrders.NewService(logger, db, config, &orderRepository, &orderItemRepository)
 
-	orderAPI := order.NewAPI(logger, db, config, ordersService)
+	orderAPI := order.NewAPI(logger, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewSwaggerUI(logger)
