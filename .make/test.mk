@@ -14,4 +14,12 @@ test.integration:: test-integration/orders/orders.gen.go ## Run the integration 
 	cd test-integration && \
 		go test -count=1 ./...
 
-test:: test.unit test.smoke test.integration ## Run all tests
+test.load:: ## Run load tests
+	docker run -it \
+		--rm \
+		--volume ${PWD}/test-load:/k6 \
+		--network golang-reference-project \
+        grafana/k6:0.39.0 \
+		run /k6/script.js \
+
+test:: test.unit test.smoke test.integration test.load ## Run all tests

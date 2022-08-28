@@ -28,7 +28,8 @@ func (database *Database) Connect(config Config) *sqlx.DB {
 			Msg("Failed to connect to database")
 	}
 
-	db.SetMaxIdleConns(10)
+	db.SetMaxIdleConns(config.MaxIdleConnections)
+	db.SetMaxOpenConns(config.MaxOpenConnections)
 
 	err = db.Ping()
 	if err != nil {
