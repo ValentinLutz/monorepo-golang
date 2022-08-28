@@ -55,13 +55,18 @@ func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Reques
 		Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, err.Error())
 		return
 	}
-	err = a.service.SaveOrder(orderRequest.ToOrderEntity(a.config.Region, a.config.Environment))
+	orderEntity, err := a.service.SaveOrder(orderRequest.ToOrderEntity(a.config.Region, a.config.Environment))
 	if err != nil {
 		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 
-	StatusCreated(responseWriter, request, nil)
+	response, err := FromOrderEntity(orderEntity)
+	if err != nil {
+		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+	}
+
+	StatusCreated(responseWriter, request, response)
 }
 
 func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {

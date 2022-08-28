@@ -2,6 +2,3 @@ package: order
 generate:
   client: true
   models: true
-
-compatibility:
-  old-aliasing: true

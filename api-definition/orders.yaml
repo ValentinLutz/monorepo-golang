@@ -33,6 +33,10 @@ paths:
       responses:
         201:
           description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/order_response"
         default:
           description: Unexpected Error
           content:

@@ -1,6 +1,7 @@
 package order_test
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/json"
@@ -21,6 +22,40 @@ func initClient() order.Client {
 		Server: "http://localhost:8080",
 		Client: client,
 	}
+}
+
+func TestPostOrder(t *testing.T) {
+	// GIVEN
+	client := initClient()
+	orderItems := []order.OrderItemRequest{
+		{Name: "caramel"},
+		{Name: "clementine"},
+	}
+	orderRequest := order.OrderRequest{Items: orderItems}
+	var body bytes.Buffer
+	err := json.NewEncoder(&body).Encode(orderRequest)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// WHEN
+	apiOrder, err := client.PostApiOrdersWithBody(context.Background(), "application/json", &body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer apiOrder.Body.Close()
+
+	// THEN
+	var actualResponse order.OrderResponse
+	readToObject(t, apiOrder.Body, &actualResponse)
+	assert.Equal(t, 201, apiOrder.StatusCode)
+	assert.Equal(t, order.OrderPlaced, actualResponse.Status)
+	assert.Equal(t, []order.OrderItemResponse{
+		{Name: "caramel"},
+		{Name: "clementine"},
+	}, actualResponse.Items)
+	assert.NotEmpty(t, actualResponse.OrderId)
+	assert.NotEmpty(t, actualResponse.CreationDate)
 }
 
 func TestGetOrder(t *testing.T) {

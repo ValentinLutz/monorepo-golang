@@ -53,10 +53,10 @@ func (service *Service) GetOrders() ([]Entity, error) {
 	return orderEntities, nil
 }
 
-func (service *Service) SaveOrder(orderEntity Entity) error {
+func (service *Service) SaveOrder(orderEntity Entity) (Entity, error) {
 	service.orderRepository.Save(orderEntity)
 	err := service.orderItemRepository.SaveAll(orderEntity.Items)
-	return err
+	return orderEntity, err
 }
 
 func (service *Service) GetOrder(orderId Id) (Entity, error) {
