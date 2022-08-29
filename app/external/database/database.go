@@ -9,16 +9,17 @@ import (
 
 type Database struct {
 	logger *zerolog.Logger
+	config *Config
 }
 
-func NewDatabase(logger *zerolog.Logger) *Database {
-	return &Database{logger: logger}
+func New(logger *zerolog.Logger, config *Config) *Database {
+	return &Database{logger: logger, config: config}
 }
 
-func (database *Database) Connect(config Config) *sqlx.DB {
+func (database *Database) Connect() *sqlx.DB {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.Host, config.Port, config.Username, config.Password, config.Database,
+		database.config.Host, database.config.Port, database.config.Username, database.config.Password, database.config.Database,
 	)
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
@@ -28,8 +29,8 @@ func (database *Database) Connect(config Config) *sqlx.DB {
 			Msg("Failed to connect to database")
 	}
 
-	db.SetMaxIdleConns(config.MaxIdleConnections)
-	db.SetMaxOpenConns(config.MaxOpenConnections)
+	db.SetMaxIdleConns(database.config.MaxIdleConnections)
+	db.SetMaxOpenConns(database.config.MaxOpenConnections)
 
 	err = db.Ping()
 	if err != nil {
