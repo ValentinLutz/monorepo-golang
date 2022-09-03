@@ -1,7 +1,7 @@
 const openAPIFiles = [
   {
-    url: '../openapi/orders.yaml',
-    name: 'Orders API'
+    url: '../openapi/order_api.yaml',
+    name: 'Order API'
   }
 ];
 
