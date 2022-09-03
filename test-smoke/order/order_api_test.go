@@ -1,4 +1,4 @@
-package order_test
+package order_api_test
 
 import (
 	"crypto/tls"

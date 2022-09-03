@@ -1,4 +1,4 @@
-docker.build:: app/serve/openapi/orders.yaml app/api/orders/orders.gen.go ## Build container images | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
+docker.build:: app/serve/openapi/order_api.yaml app/api/order/order.gen.go ## Build container images | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
 	docker build \
     		-t ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${PROJECT_NAME}:${VERSION} \
     		-t ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${PROJECT_NAME}:latest \

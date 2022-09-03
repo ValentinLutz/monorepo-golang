@@ -88,14 +88,14 @@ func newServer(logger *util.Logger, config *internal.Config, db *sqlx.DB) *http.
 	orderItemRepository := internalOrders.NewOrderItemRepository(logger, db)
 	ordersService := internalOrders.NewService(logger, db, config, &orderRepository, &orderItemRepository)
 
-	orderAPI := orderapi.NewAPI(logger, config, ordersService)
+	orderAPI := orderapi.New(logger, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewSwaggerUI(logger)
 	swaggerUI.RegisterSwaggerUI(router)
 	swaggerUI.RegisterOpenAPISchemas(router)
 
-	statusAPI := status.NewAPI(logger, db, config.Database)
+	statusAPI := statusapi.New(logger, db, config.Database)
 	statusAPI.RegisterHandlers(router)
 
 	routerWithMiddleware := api.NewRequestResponseLogger(router, logger)

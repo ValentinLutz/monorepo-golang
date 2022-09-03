@@ -15,7 +15,7 @@ type API struct {
 	service *order.Service
 }
 
-func NewAPI(logger *util.Logger, config *internal.Config, service *order.Service) *API {
+func New(logger *util.Logger, config *internal.Config, service *order.Service) *API {
 	return &API{
 		logger:  logger,
 		config:  config,
