@@ -1,7 +1,7 @@
-package orderapi
+package order_api
 
 import (
-	"app/internal/order"
+	"app/core/entity"
 	"encoding/json"
 	"io"
 )
@@ -11,7 +11,7 @@ func (orderResponse OrderResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(orderResponse)
 }
 
-func FromOrderEntity(order order.Entity) (OrderResponse, error) {
+func FromOrderEntity(order entity.Order) (OrderResponse, error) {
 	var orderItems []OrderItemResponse
 	for _, item := range order.Items {
 		orderItems = append(orderItems, FromOrderItemEntity(item))
@@ -23,7 +23,7 @@ func FromOrderEntity(order order.Entity) (OrderResponse, error) {
 	}
 
 	return OrderResponse{
-		OrderId:      string(order.Id),
+		OrderId:      string(order.OrderId),
 		CreationDate: order.CreationDate,
 		Status:       orderStatus,
 		Items:        orderItems,

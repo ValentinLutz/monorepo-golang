@@ -1,20 +1,19 @@
-package internal
+package config
 
 import (
-	"app/external/database"
-	"app/internal/config"
+	"app/infastructure"
 	"app/internal/util"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
 type Config struct {
-	Region      config.Region      `yaml:"region"`
-	Environment config.Environment `yaml:"environment"`
-	Server      ServerConfig       `yaml:"server"`
-	Logger      util.LoggerConfig  `yaml:"logger"`
-	Database    database.Config    `yaml:"database"`
-	Client      Client             `yaml:"client"`
+	Region      Region                       `yaml:"region"`
+	Environment Environment                  `yaml:"environment"`
+	Server      ServerConfig                 `yaml:"server"`
+	Logger      util.LoggerConfig            `yaml:"logger"`
+	Database    infastructure.DatabaseConfig `yaml:"database"`
+	Client      Client                       `yaml:"client"`
 }
 
 type ServerConfig struct {
@@ -36,7 +35,7 @@ type ClientConfig struct {
 	Url string `yaml:"url"`
 }
 
-func NewConfig(path string) (*Config, error) {
+func New(path string) (*Config, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return &Config{}, err

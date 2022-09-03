@@ -1,5 +1,5 @@
 INSERT INTO golang_reference_project.order
-    (id, workflow, creation_date, order_status)
+    (order_id, workflow, creation_date, order_status)
 VALUES ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed'),
 
        ('Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_in_progress'),

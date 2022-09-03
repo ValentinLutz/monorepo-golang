@@ -1,27 +1,29 @@
-package order
+package service
 
 import (
-	"app/internal"
+	"app/core/entity"
+	"app/core/port"
+	"app/internal/config"
 	"app/internal/util"
 	"github.com/jmoiron/sqlx"
 )
 
-type Service struct {
+type Order struct {
 	logger              *util.Logger
 	db                  *sqlx.DB
-	config              *internal.Config
-	orderRepository     Repository
-	orderItemRepository ItemRepository
+	config              *config.Config
+	orderRepository     port.OrderRepository
+	orderItemRepository port.OrderItemRepository
 }
 
-func NewService(
+func NewOrder(
 	logger *util.Logger,
 	db *sqlx.DB,
-	config *internal.Config,
-	orderRepository Repository,
-	orderItemRepository ItemRepository,
-) *Service {
-	return &Service{
+	config *config.Config,
+	orderRepository port.OrderRepository,
+	orderItemRepository port.OrderItemRepository,
+) *Order {
+	return &Order{
 		logger:              logger,
 		db:                  db,
 		config:              config,
@@ -30,7 +32,7 @@ func NewService(
 	}
 }
 
-func (service *Service) GetOrders() ([]Entity, error) {
+func (service *Order) GetOrders() ([]entity.Order, error) {
 	orderEntities, err := service.orderRepository.FindAll()
 	if err != nil {
 		return nil, err
@@ -41,7 +43,7 @@ func (service *Service) GetOrders() ([]Entity, error) {
 	}
 	for i, order := range orderEntities {
 		for _, orderItem := range orderItemEntities {
-			if order.Id == orderItem.OrderId {
+			if order.OrderId == orderItem.OrderId {
 				order.Items = append(order.Items, orderItem)
 				//sliceLen := len(orderItemEntities) - 1
 				//orderItemEntities[i] = orderItemEntities[sliceLen]
@@ -53,20 +55,20 @@ func (service *Service) GetOrders() ([]Entity, error) {
 	return orderEntities, nil
 }
 
-func (service *Service) SaveOrder(orderEntity Entity) (Entity, error) {
+func (service *Order) SaveOrder(orderEntity entity.Order) (entity.Order, error) {
 	service.orderRepository.Save(orderEntity)
 	err := service.orderItemRepository.SaveAll(orderEntity.Items)
 	return orderEntity, err
 }
 
-func (service *Service) GetOrder(orderId Id) (Entity, error) {
+func (service *Order) GetOrder(orderId entity.OrderId) (entity.Order, error) {
 	orderEntity, err := service.orderRepository.FindById(orderId)
 	if err != nil {
-		return Entity{}, err
+		return entity.Order{}, err
 	}
 	orderItemEntities, err := service.orderItemRepository.FindAllByOrderId(orderId)
 	if err != nil {
-		return Entity{}, err
+		return entity.Order{}, err
 	}
 	orderEntity.Items = orderItemEntities
 	return orderEntity, nil

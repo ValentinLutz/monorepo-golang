@@ -1,7 +1,7 @@
-package statusapi
+package status_api
 
 import (
-	"app/external/database"
+	"app/infastructure"
 	"app/internal/util"
 	"fmt"
 	"github.com/hellofresh/health-go/v4"
@@ -16,10 +16,10 @@ import (
 type API struct {
 	logger *util.Logger
 	db     *sqlx.DB
-	config database.Config
+	config *infastructure.DatabaseConfig
 }
 
-func New(logger *util.Logger, db *sqlx.DB, config database.Config) *API {
+func New(logger *util.Logger, db *sqlx.DB, config *infastructure.DatabaseConfig) *API {
 	return &API{
 		logger: logger,
 		db:     db,

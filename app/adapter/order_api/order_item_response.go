@@ -1,7 +1,7 @@
-package orderapi
+package order_api
 
 import (
-	"app/internal/order"
+	"app/core/entity"
 	"encoding/json"
 	"io"
 )
@@ -11,7 +11,7 @@ func (orderItemResponse OrderItemResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(orderItemResponse)
 }
 
-func FromOrderItemEntity(orderItem order.ItemEntity) OrderItemResponse {
+func FromOrderItemEntity(orderItem entity.OrderItem) OrderItemResponse {
 	return OrderItemResponse{
 		Name: orderItem.Name,
 	}

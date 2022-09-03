@@ -1,6 +1,7 @@
-package orderapi
+package order_api
 
 import (
+	"app/core/entity"
 	"app/internal/config"
 	"app/internal/order"
 	"encoding/json"
@@ -20,20 +21,20 @@ func FromJSON(reader io.Reader) (OrderRequest, error) {
 	return orderRequest, nil
 }
 
-func (orderRequest OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) order.Entity {
+func (orderRequest OrderRequest) ToOrderEntity(region config.Region, environment config.Environment) entity.Order {
 	creationDate := time.Now()
 	orderId := order.GenerateOrderId(region, environment, creationDate, strconv.Itoa(rand.Int()))
 
-	var orderItems []order.ItemEntity
+	var orderItems []entity.OrderItem
 	for _, item := range orderRequest.Items {
 		orderItems = append(orderItems, item.ToOrderItemEntity(orderId, creationDate))
 	}
 
-	return order.Entity{
-		Id:           orderId,
+	return entity.Order{
+		OrderId:      orderId,
 		Workflow:     "default_workflow",
 		CreationDate: creationDate,
-		Status:       order.Placed,
+		Status:       entity.OrderPlaced,
 		Items:        orderItems,
 	}
 }

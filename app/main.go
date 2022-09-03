@@ -1,12 +1,14 @@
 package main
 
 import (
+	"app/adapter/order_api"
+	"app/adapter/order_item_repo"
+	"app/adapter/order_repo"
+	"app/adapter/status_api"
 	"app/api"
-	"app/api/order"
-	"app/api/status"
-	"app/external/database"
-	"app/internal"
-	internalOrders "app/internal/order"
+	"app/core/service"
+	"app/infastructure"
+	"app/internal/config"
 	"app/internal/util"
 	"app/serve"
 	"context"
@@ -29,7 +31,7 @@ func main() {
 	flag.Parse()
 	mainLogger := util.New()
 
-	newConfig, err := internal.NewConfig(configFile)
+	newConfig, err := config.New(configFile)
 	if err != nil {
 		mainLogger.Log().Fatal().
 			Err(err).
@@ -39,7 +41,7 @@ func main() {
 
 	util.SetLogLevel(newConfig.Logger.Level)
 
-	newDatabase := database.New(mainLogger, &newConfig.Database)
+	newDatabase := infastructure.NewDatabase(mainLogger, &newConfig.Database)
 	db := newDatabase.Connect()
 
 	server := newServer(mainLogger, newConfig, db)
@@ -81,21 +83,21 @@ func shutdownServerGracefully(server *http.Server, logger *util.Logger) {
 	}
 }
 
-func newServer(logger *util.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
+func newServer(logger *util.Logger, config *config.Config, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
-	orderRepository := internalOrders.NewOrderRepository(logger, db)
-	orderItemRepository := internalOrders.NewOrderItemRepository(logger, db)
-	ordersService := internalOrders.NewService(logger, db, config, &orderRepository, &orderItemRepository)
+	orderRepository := order_repo.NewPostgreSQL(logger, db)
+	orderItemRepository := order_item_repo.NewPostgreSQL(logger, db)
+	ordersService := service.NewOrder(logger, db, config, &orderRepository, &orderItemRepository)
 
-	orderAPI := orderapi.New(logger, config, ordersService)
+	orderAPI := order_api.New(logger, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewSwaggerUI(logger)
 	swaggerUI.RegisterSwaggerUI(router)
 	swaggerUI.RegisterOpenAPISchemas(router)
 
-	statusAPI := statusapi.New(logger, db, config.Database)
+	statusAPI := status_api.New(logger, db, &config.Database)
 	statusAPI.RegisterHandlers(router)
 
 	routerWithMiddleware := api.NewRequestResponseLogger(router, logger)

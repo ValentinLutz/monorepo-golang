@@ -1,6 +1,6 @@
-package database
+package infastructure
 
-type Config struct {
+type DatabaseConfig struct {
 	Host               string `yaml:"host"`
 	Port               int    `yaml:"port"`
 	Username           string `yaml:"user"`

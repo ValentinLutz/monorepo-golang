@@ -1,4 +1,4 @@
-package database
+package infastructure
 
 import (
 	"app/internal/util"
@@ -9,10 +9,10 @@ import (
 
 type Database struct {
 	logger *util.Logger
-	config *Config
+	config *DatabaseConfig
 }
 
-func New(logger *util.Logger, config *Config) *Database {
+func NewDatabase(logger *util.Logger, config *DatabaseConfig) *Database {
 	return &Database{logger: logger, config: config}
 }
 

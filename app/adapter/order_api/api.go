@@ -1,10 +1,11 @@
-package orderapi
+package order_api
 
 import (
 	"app/api"
-	"app/internal"
+	"app/core/entity"
+	"app/core/port"
+	"app/internal/config"
 	"app/internal/errors"
-	"app/internal/order"
 	"app/internal/util"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
@@ -12,11 +13,11 @@ import (
 
 type API struct {
 	logger  *util.Logger
-	config  *internal.Config
-	service *order.Service
+	config  *config.Config
+	service port.OrderService
 }
 
-func New(logger *util.Logger, config *internal.Config, service *order.Service) *API {
+func New(logger *util.Logger, config *config.Config, service port.OrderService) *API {
 	return &API{
 		logger:  logger,
 		config:  config,
@@ -72,7 +73,7 @@ func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Reques
 
 func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	params := httprouter.ParamsFromContext(request.Context())
-	orderId := order.Id(params.ByName("orderId"))
+	orderId := entity.OrderId(params.ByName("orderId"))
 
 	orderEntity, err := a.service.GetOrder(orderId)
 	if err != nil {

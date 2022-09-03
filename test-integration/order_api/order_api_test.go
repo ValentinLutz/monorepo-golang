@@ -9,16 +9,16 @@ import (
 	"io"
 	"net/http"
 	"os"
-	orderapi "test-integration/order"
+	"test-integration/order_api"
 	"testing"
 )
 
-func initClient() orderapi.Client {
+func initClient() order_api.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	return orderapi.Client{
+	return order_api.Client{
 		Server: "http://localhost:8080",
 		Client: client,
 	}
@@ -36,9 +36,9 @@ func TestGetOrders(t *testing.T) {
 	defer apiOrder.Body.Close()
 
 	// THEN
-	var actualResponse orderapi.OrdersResponse
+	var actualResponse order_api.OrdersResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse orderapi.OrdersResponse
+	var expectedResponse order_api.OrdersResponse
 	readToObject(t, readFile(t, "ordersResponse.json"), &expectedResponse)
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
@@ -48,11 +48,11 @@ func TestGetOrders(t *testing.T) {
 func TestPostOrder(t *testing.T) {
 	// GIVEN
 	client := initClient()
-	orderItems := []orderapi.OrderItemRequest{
+	orderItems := []order_api.OrderItemRequest{
 		{Name: "caramel"},
 		{Name: "clementine"},
 	}
-	orderRequest := orderapi.OrderRequest{Items: orderItems}
+	orderRequest := order_api.OrderRequest{Items: orderItems}
 	var body bytes.Buffer
 	err := json.NewEncoder(&body).Encode(orderRequest)
 	if err != nil {
@@ -67,11 +67,11 @@ func TestPostOrder(t *testing.T) {
 	defer apiOrder.Body.Close()
 
 	// THEN
-	var actualResponse orderapi.OrderResponse
+	var actualResponse order_api.OrderResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
 	assert.Equal(t, 201, apiOrder.StatusCode)
-	assert.Equal(t, orderapi.OrderPlaced, actualResponse.Status)
-	assert.Equal(t, []orderapi.OrderItemResponse{
+	assert.Equal(t, order_api.OrderPlaced, actualResponse.Status)
+	assert.Equal(t, []order_api.OrderItemResponse{
 		{Name: "caramel"},
 		{Name: "clementine"},
 	}, actualResponse.Items)
@@ -91,9 +91,9 @@ func TestGetOrder(t *testing.T) {
 	defer apiOrder.Body.Close()
 
 	// THEN
-	var actualResponse orderapi.OrderResponse
+	var actualResponse order_api.OrderResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse orderapi.OrderResponse
+	var expectedResponse order_api.OrderResponse
 	readToObject(t, readFile(t, "orderResponse.json"), &expectedResponse)
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
@@ -112,9 +112,9 @@ func TestGetOrderNotFound(t *testing.T) {
 	defer apiOrder.Body.Close()
 
 	// THEN
-	var actualResponse orderapi.ErrorResponse
+	var actualResponse order_api.ErrorResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse orderapi.ErrorResponse
+	var expectedResponse order_api.ErrorResponse
 	readToObject(t, readFile(t, "orderNotFoundResponse.json"), &expectedResponse)
 	expectedResponse.Timestamp = actualResponse.Timestamp
 
