@@ -1,6 +1,7 @@
 package orderapi
 
 import (
+	"app/api"
 	"app/internal"
 	"app/internal/errors"
 	"app/internal/order"
@@ -32,7 +33,7 @@ func (a *API) RegisterHandlers(router *httprouter.Router) {
 func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Request) {
 	orderEntities, err := a.service.GetOrders()
 	if err != nil {
-		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		api.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 
@@ -40,33 +41,33 @@ func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Reques
 	for _, orderEntity := range orderEntities {
 		orderEntity, err := FromOrderEntity(orderEntity)
 		if err != nil {
-			Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+			api.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		}
 		ordersResponse = append(ordersResponse, orderEntity)
 
 	}
 
-	StatusOK(responseWriter, request, &ordersResponse)
+	api.StatusOK(responseWriter, request, &ordersResponse)
 }
 
 func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Request) {
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
-		Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, err.Error())
+		api.Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, err.Error())
 		return
 	}
 	orderEntity, err := a.service.SaveOrder(orderRequest.ToOrderEntity(a.config.Region, a.config.Environment))
 	if err != nil {
-		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		api.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 
 	response, err := FromOrderEntity(orderEntity)
 	if err != nil {
-		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		api.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 	}
 
-	StatusCreated(responseWriter, request, response)
+	api.StatusCreated(responseWriter, request, response)
 }
 
 func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
@@ -75,13 +76,13 @@ func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request
 
 	orderEntity, err := a.service.GetOrder(orderId)
 	if err != nil {
-		Error(responseWriter, request, http.StatusNotFound, errors.OrderNotFound, err.Error())
+		api.Error(responseWriter, request, http.StatusNotFound, errors.OrderNotFound, err.Error())
 		return
 	}
 
 	response, err := FromOrderEntity(orderEntity)
 	if err != nil {
-		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		api.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 	}
-	StatusOK(responseWriter, request, &response)
+	api.StatusOK(responseWriter, request, &response)
 }

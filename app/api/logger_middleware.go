@@ -1,7 +1,6 @@
 package api
 
 import (
-	"app/api/order"
 	"app/internal/errors"
 	"app/internal/util"
 	"bytes"
@@ -23,7 +22,7 @@ func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		rrl.logger.Log().Error().Err(err).Msg("Error reading request body")
-		orderapi.Error(w, r, http.StatusInternalServerError, errors.Panic, err.Error())
+		Error(w, r, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 	reader := io.NopCloser(bytes.NewBuffer(requestBody))

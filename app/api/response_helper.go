@@ -1,4 +1,4 @@
-package orderapi
+package api
 
 import (
 	"app/internal/errors"
@@ -7,6 +7,14 @@ import (
 	"net/http"
 	"time"
 )
+
+type ErrorResponse struct {
+	Code      int       `json:"code"`
+	Message   *string   `json:"message,omitempty"`
+	Method    string    `json:"method"`
+	Path      string    `json:"path"`
+	Timestamp time.Time `json:"timestamp"`
+}
 
 type JSONWriter interface {
 	ToJSON(writer io.Writer) error
