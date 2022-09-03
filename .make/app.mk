@@ -8,7 +8,7 @@ app/adapter/order_api/order.gen.go: api-definition/order_api.yaml api-definition
 	oapi-codegen --config api-definition/oapi-codengen.yaml \
 		api-definition/order_api.yaml  > app/adapter/order_api/order.gen.go
 
-app.run:: app/config/config.yaml app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go  database.migrate ## Run the app
+app.run:: app/config/config.yaml app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go ## Run the app
 	cd app && \
 		go run main.go
 

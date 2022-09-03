@@ -10,7 +10,7 @@ test.smoke:: ## Run the smoke tests
 	cd test-smoke && \
 		go test -count=1 ./...
 
-test.integration:: test-integration/order_api/order.gen.go ## Run the integration tests
+test.integration:: test-integration/order_api/order.gen.go database.migrate ## Run the integration tests
 	cd test-integration && \
 		go test -count=1 ./...
 

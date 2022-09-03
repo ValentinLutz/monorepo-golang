@@ -57,7 +57,8 @@ func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Reques
 		api.Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, err.Error())
 		return
 	}
-	orderEntity, err := a.service.SaveOrder(orderRequest.ToOrderEntity(a.config.Region, a.config.Environment))
+
+	orderEntity, err := a.service.PlaceOrder(orderRequest.ToOrderItemNames())
 	if err != nil {
 		api.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return

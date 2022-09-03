@@ -4,8 +4,12 @@ import (
 	"app/core/entity"
 	"app/core/port"
 	"app/internal/config"
+	"app/internal/order"
 	"app/internal/util"
 	"github.com/jmoiron/sqlx"
+	"math/rand"
+	"strconv"
+	"time"
 )
 
 type Order struct {
@@ -32,12 +36,12 @@ func NewOrder(
 	}
 }
 
-func (service *Order) GetOrders() ([]entity.Order, error) {
-	orderEntities, err := service.orderRepository.FindAll()
+func (s *Order) GetOrders() ([]entity.Order, error) {
+	orderEntities, err := s.orderRepository.FindAll()
 	if err != nil {
 		return nil, err
 	}
-	orderItemEntities, err := service.orderItemRepository.FindAll()
+	orderItemEntities, err := s.orderItemRepository.FindAll()
 	if err != nil {
 		return nil, err
 	}
@@ -55,18 +59,44 @@ func (service *Order) GetOrders() ([]entity.Order, error) {
 	return orderEntities, nil
 }
 
-func (service *Order) SaveOrder(orderEntity entity.Order) (entity.Order, error) {
-	service.orderRepository.Save(orderEntity)
-	err := service.orderItemRepository.SaveAll(orderEntity.Items)
+func (s *Order) PlaceOrder(itemNames []string) (entity.Order, error) {
+	creationDate := time.Now()
+	orderId := order.GenerateOrderId(
+		s.config.Region,
+		s.config.Environment,
+		creationDate,
+		strconv.Itoa(rand.Int()),
+	)
+
+	var orderItems []entity.OrderItem
+	for _, itemName := range itemNames {
+		orderItems = append(orderItems, entity.OrderItem{
+			OrderItemId:  0,
+			OrderId:      orderId,
+			Name:         itemName,
+			CreationDate: creationDate,
+		})
+	}
+
+	orderEntity := entity.Order{
+		OrderId:      orderId,
+		Workflow:     "default_workflow",
+		CreationDate: creationDate,
+		Status:       entity.OrderPlaced,
+		Items:        orderItems,
+	}
+
+	s.orderRepository.Save(orderEntity)
+	err := s.orderItemRepository.SaveAll(orderEntity.Items)
 	return orderEntity, err
 }
 
-func (service *Order) GetOrder(orderId entity.OrderId) (entity.Order, error) {
-	orderEntity, err := service.orderRepository.FindById(orderId)
+func (s *Order) GetOrder(orderId entity.OrderId) (entity.Order, error) {
+	orderEntity, err := s.orderRepository.FindById(orderId)
 	if err != nil {
 		return entity.Order{}, err
 	}
-	orderItemEntities, err := service.orderItemRepository.FindAllByOrderId(orderId)
+	orderItemEntities, err := s.orderItemRepository.FindAllByOrderId(orderId)
 	if err != nil {
 		return entity.Order{}, err
 	}
