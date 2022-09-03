@@ -1,8 +1,8 @@
 package order
 
 import (
+	"app/internal/util"
 	"github.com/jmoiron/sqlx"
-	"github.com/rs/zerolog"
 )
 
 type Repository interface {
@@ -12,11 +12,11 @@ type Repository interface {
 }
 
 type PostgresqlOrderRepository struct {
-	logger   *zerolog.Logger
+	logger   *util.Logger
 	database *sqlx.DB
 }
 
-func NewOrderRepository(logger *zerolog.Logger, database *sqlx.DB) PostgresqlOrderRepository {
+func NewOrderRepository(logger *util.Logger, database *sqlx.DB) PostgresqlOrderRepository {
 	return PostgresqlOrderRepository{logger: logger, database: database}
 }
 
@@ -64,7 +64,7 @@ func (orderRepository *PostgresqlOrderRepository) Save(orderEntity Entity) {
 		orderEntity,
 	)
 	if err != nil {
-		orderRepository.logger.Error().
+		orderRepository.logger.Log().Error().
 			Err(err).
 			Msg("Failed to save order entity into order table")
 	}

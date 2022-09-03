@@ -1,4 +1,4 @@
-package order
+package orderapi
 
 import (
 	"encoding/json"

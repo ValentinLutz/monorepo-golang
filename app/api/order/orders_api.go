@@ -1,21 +1,21 @@
-package order
+package orderapi
 
 import (
 	"app/internal"
 	"app/internal/errors"
 	"app/internal/order"
+	"app/internal/util"
 	"github.com/julienschmidt/httprouter"
-	"github.com/rs/zerolog"
 	"net/http"
 )
 
 type API struct {
-	logger  *zerolog.Logger
+	logger  *util.Logger
 	config  *internal.Config
 	service *order.Service
 }
 
-func NewAPI(logger *zerolog.Logger, config *internal.Config, service *order.Service) *API {
+func NewAPI(logger *util.Logger, config *internal.Config, service *order.Service) *API {
 	return &API{
 		logger:  logger,
 		config:  config,

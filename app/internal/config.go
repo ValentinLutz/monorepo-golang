@@ -3,6 +3,7 @@ package internal
 import (
 	"app/external/database"
 	"app/internal/config"
+	"app/internal/util"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -11,7 +12,7 @@ type Config struct {
 	Region      config.Region      `yaml:"region"`
 	Environment config.Environment `yaml:"environment"`
 	Server      ServerConfig       `yaml:"server"`
-	Logger      LoggerConfig       `yaml:"logger"`
+	Logger      util.LoggerConfig  `yaml:"logger"`
 	Database    database.Config    `yaml:"database"`
 	Client      Client             `yaml:"client"`
 }

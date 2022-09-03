@@ -1,9 +1,9 @@
 package serve
 
 import (
+	"app/internal/util"
 	"embed"
 	"github.com/julienschmidt/httprouter"
-	"github.com/rs/zerolog"
 	"io/fs"
 	"net/http"
 )
@@ -15,10 +15,10 @@ var swaggerUIFiles embed.FS
 var openAPISchemaFiles embed.FS
 
 type SwaggerUI struct {
-	logger *zerolog.Logger
+	logger *util.Logger
 }
 
-func NewSwaggerUI(logger *zerolog.Logger) *SwaggerUI {
+func NewSwaggerUI(logger *util.Logger) *SwaggerUI {
 	return &SwaggerUI{logger: logger}
 }
 

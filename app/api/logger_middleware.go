@@ -3,8 +3,8 @@ package api
 import (
 	"app/api/order"
 	"app/internal/errors"
+	"app/internal/util"
 	"bytes"
-	"github.com/rs/zerolog"
 	"io"
 	"net/http"
 	"time"
@@ -14,7 +14,7 @@ import (
 // when a client or server error occurs
 type RequestResponseLogger struct {
 	handler http.Handler
-	logger  *zerolog.Logger
+	logger  *util.Logger
 }
 
 func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -22,8 +22,8 @@ func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Reque
 
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		rrl.logger.Error().Err(err).Msg("Error reading request body")
-		order.Error(w, r, http.StatusInternalServerError, errors.Panic, err.Error())
+		rrl.logger.Log().Error().Err(err).Msg("Error reading request body")
+		orderapi.Error(w, r, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 	reader := io.NopCloser(bytes.NewBuffer(requestBody))
@@ -40,7 +40,7 @@ func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Reque
 }
 
 func (rrl *RequestResponseLogger) logRequest(r *http.Request, requestBody []byte) {
-	rrl.logger.Info().
+	rrl.logger.Log().Info().
 		Str("method", r.Method).
 		Str("path", r.URL.Path).
 		Str("body", string(requestBody)).
@@ -48,14 +48,14 @@ func (rrl *RequestResponseLogger) logRequest(r *http.Request, requestBody []byte
 }
 
 func (rrl *RequestResponseLogger) logResponse(startTime time.Time, rw *responseWriter) {
-	rrl.logger.Info().
+	rrl.logger.Log().Info().
 		Str("duration", time.Since(startTime).String()).
 		Int("status", rw.status).
 		Str("body", string(rw.body)).
 		Msg("Response")
 }
 
-func NewRequestResponseLogger(handlerToWrap http.Handler, logger *zerolog.Logger) *RequestResponseLogger {
+func NewRequestResponseLogger(handlerToWrap http.Handler, logger *util.Logger) *RequestResponseLogger {
 	return &RequestResponseLogger{
 		handler: handlerToWrap,
 		logger:  logger,

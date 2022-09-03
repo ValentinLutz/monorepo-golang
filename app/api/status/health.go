@@ -11,7 +11,10 @@ import (
 func (api *API) registerHealthChecks() http.HandlerFunc {
 	healthStatus, err := health.New()
 	if err != nil {
-		api.logger.Fatal().Err(err).Msg("Failed to create health container")
+		api.logger.Log().
+			Fatal().
+			Err(err).
+			Msg("Failed to create health container")
 	}
 
 	psqlInfo := fmt.Sprintf(
@@ -27,7 +30,10 @@ func (api *API) registerHealthChecks() http.HandlerFunc {
 		}),
 	})
 	if err != nil {
-		api.logger.Fatal().Err(err).Msg("Failed to create postgres health check")
+		api.logger.Log().
+			Fatal().
+			Err(err).
+			Msg("Failed to create postgres health check")
 	}
 
 	return healthStatus.HandlerFunc

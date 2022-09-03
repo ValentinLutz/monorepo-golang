@@ -1,4 +1,4 @@
-package order
+package orderapi
 
 import (
 	internalOrder "app/internal/order"

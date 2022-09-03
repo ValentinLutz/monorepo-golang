@@ -2,12 +2,12 @@ package order
 
 import (
 	"app/internal"
+	"app/internal/util"
 	"github.com/jmoiron/sqlx"
-	"github.com/rs/zerolog"
 )
 
 type Service struct {
-	logger              *zerolog.Logger
+	logger              *util.Logger
 	db                  *sqlx.DB
 	config              *internal.Config
 	orderRepository     Repository
@@ -15,7 +15,7 @@ type Service struct {
 }
 
 func NewService(
-	logger *zerolog.Logger,
+	logger *util.Logger,
 	db *sqlx.DB,
 	config *internal.Config,
 	orderRepository Repository,

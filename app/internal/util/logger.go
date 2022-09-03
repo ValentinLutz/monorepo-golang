@@ -1,6 +1,7 @@
-package internal
+package util
 
 import (
+	"context"
 	"fmt"
 	"github.com/rs/zerolog"
 	"log"
@@ -26,18 +27,35 @@ type LoggerConfig struct {
 	Level  LogLevel `yaml:"level"`
 }
 
-func NewLogger() *zerolog.Logger {
+var logger zerolog.Logger
+
+type Logger struct {
+	logger *zerolog.Logger
+}
+
+func New() *Logger {
 	consoleWriter := zerolog.ConsoleWriter{
 		Out:        os.Stdout,
 		TimeFormat: time.RFC3339,
 	}
-
-	logger := zerolog.New(consoleWriter).
+	logger = zerolog.New(consoleWriter).
 		With().
 		Timestamp().
 		Logger()
 
-	return &logger
+	return &Logger{
+		logger: &logger,
+	}
+}
+
+func (logger *Logger) Log() *zerolog.Logger {
+	return logger.logger
+}
+
+func (logger *Logger) LogWithContext(context context.Context) *zerolog.Logger {
+	correlationId := context.Value("correlation_id").(string)
+	loggerWithContext := logger.logger.With().Str("correlationId", correlationId).Logger()
+	return &loggerWithContext
 }
 
 func SetLogLevel(logLevel LogLevel) {
@@ -61,8 +79,8 @@ func (logLevel *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error
 	return fmt.Errorf("log level is invalid: %s", parsedLogLevel)
 }
 
-func (logLevel LogLevel) toZeroLogLevel() zerolog.Level {
-	switch logLevel {
+func (logLevel *LogLevel) toZeroLogLevel() zerolog.Level {
+	switch *logLevel {
 	case TRACE:
 		return zerolog.TraceLevel
 	case DEBUG:
@@ -82,15 +100,15 @@ func (logLevel LogLevel) toZeroLogLevel() zerolog.Level {
 }
 
 type LoggerWrapper struct {
-	logger *zerolog.Logger
+	logger *Logger
 }
 
-func NewLoggerWrapper(logger *zerolog.Logger) *LoggerWrapper {
+func NewLoggerWrapper(logger *Logger) *LoggerWrapper {
 	return &LoggerWrapper{logger: logger}
 }
 
 func (lw *LoggerWrapper) Write(p []byte) (n int, err error) {
-	lw.logger.Error().Msg(strings.TrimSpace(string(p)))
+	lw.logger.logger.Error().Msg(strings.TrimSpace(string(p)))
 	return len(p), nil
 }
 

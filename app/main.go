@@ -7,13 +7,13 @@ import (
 	"app/external/database"
 	"app/internal"
 	internalOrders "app/internal/order"
+	"app/internal/util"
 	"app/serve"
 	"context"
 	"flag"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
-	"github.com/rs/zerolog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,41 +27,41 @@ var (
 
 func main() {
 	flag.Parse()
-	logger := internal.NewLogger()
+	mainLogger := util.New()
 
 	newConfig, err := internal.NewConfig(configFile)
 	if err != nil {
-		logger.Fatal().
+		mainLogger.Log().Fatal().
 			Err(err).
 			Str("path", configFile).
 			Msg("Failed to load config file")
 	}
 
-	internal.SetLogLevel(newConfig.Logger.Level)
+	util.SetLogLevel(newConfig.Logger.Level)
 
-	newDatabase := database.New(logger, &newConfig.Database)
+	newDatabase := database.New(mainLogger, &newConfig.Database)
 	db := newDatabase.Connect()
 
-	server := newServer(logger, newConfig, db)
+	server := newServer(mainLogger, newConfig, db)
 
-	go startServer(server, logger)
-	shutdownServerGracefully(server, logger)
+	go startServer(server, mainLogger)
+	shutdownServerGracefully(server, mainLogger)
 }
 
-func startServer(server *http.Server, logger *zerolog.Logger) {
-	logger.Info().
+func startServer(server *http.Server, logger *util.Logger) {
+	logger.Log().Info().
 		Str("address", server.Addr).
 		Msg("Starting server")
 	err := server.ListenAndServe()
 	if err != http.ErrServerClosed {
-		logger.Fatal().
+		logger.Log().Fatal().
 			Err(err).
 			Msg("Failed to start server")
 	}
 
 }
 
-func shutdownServerGracefully(server *http.Server, logger *zerolog.Logger) {
+func shutdownServerGracefully(server *http.Server, logger *util.Logger) {
 	osSignal := make(chan os.Signal, 1)
 	signal.Notify(osSignal, os.Interrupt, syscall.SIGTERM)
 	<-osSignal
@@ -70,25 +70,25 @@ func shutdownServerGracefully(server *http.Server, logger *zerolog.Logger) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	logger.Info().Float64("timeout", timeout.Seconds()).Msg("Stopping server")
+	logger.Log().Info().Float64("timeout", timeout.Seconds()).Msg("Stopping server")
 	err := server.Shutdown(ctx)
 	if err != nil {
-		logger.Error().
+		logger.Log().Error().
 			Err(err).
 			Msg("Failed to shutdown server")
 	} else {
-		logger.Info().Msg("Server stopped")
+		logger.Log().Info().Msg("Server stopped")
 	}
 }
 
-func newServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
+func newServer(logger *util.Logger, config *internal.Config, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
 	orderRepository := internalOrders.NewOrderRepository(logger, db)
 	orderItemRepository := internalOrders.NewOrderItemRepository(logger, db)
 	ordersService := internalOrders.NewService(logger, db, config, &orderRepository, &orderItemRepository)
 
-	orderAPI := order.NewAPI(logger, config, ordersService)
+	orderAPI := orderapi.NewAPI(logger, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewSwaggerUI(logger)
@@ -105,7 +105,7 @@ func newServer(logger *zerolog.Logger, config *internal.Config, db *sqlx.DB) *ht
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", serverConfig.Port),
 		Handler:      routerWithMiddleware,
-		ErrorLog:     internal.NewLoggerWrapper(logger).ToLogger(),
+		ErrorLog:     util.NewLoggerWrapper(logger).ToLogger(),
 		ReadTimeout:  time.Second * time.Duration(serverConfig.Timeout.Read),
 		WriteTimeout: time.Second * time.Duration(serverConfig.Timeout.Write),
 		IdleTimeout:  time.Second * time.Duration(serverConfig.Timeout.Idle),

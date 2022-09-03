@@ -1,9 +1,9 @@
 package order
 
 import (
+	"app/internal/util"
 	"database/sql"
 	"github.com/jmoiron/sqlx"
-	"github.com/rs/zerolog"
 )
 
 type ItemRepository interface {
@@ -13,11 +13,11 @@ type ItemRepository interface {
 }
 
 type PostgreSQLOrderItemRepository struct {
-	logger *zerolog.Logger
+	logger *util.Logger
 	db     *sqlx.DB
 }
 
-func NewOrderItemRepository(logger *zerolog.Logger, database *sqlx.DB) PostgreSQLOrderItemRepository {
+func NewOrderItemRepository(logger *util.Logger, database *sqlx.DB) PostgreSQLOrderItemRepository {
 	return PostgreSQLOrderItemRepository{logger: logger, db: database}
 }
 
@@ -43,7 +43,7 @@ func (orderItemRepository *PostgreSQLOrderItemRepository) SaveAll(orderItemEntit
 	_, err := orderItemRepository.db.NamedExec(
 		`INSERT INTO golang_reference_project.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
 	if err != nil {
-		orderItemRepository.logger.Error().
+		orderItemRepository.logger.Log().Error().
 			Err(err).
 			Msg("Failed to save order item entities into order item table")
 	}

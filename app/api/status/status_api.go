@@ -2,19 +2,19 @@ package status
 
 import (
 	"app/external/database"
+	"app/internal/util"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
-	"github.com/rs/zerolog"
 	"net/http"
 )
 
 type API struct {
-	logger *zerolog.Logger
+	logger *util.Logger
 	db     *sqlx.DB
 	config database.Config
 }
 
-func NewAPI(logger *zerolog.Logger, db *sqlx.DB, config database.Config) *API {
+func NewAPI(logger *util.Logger, db *sqlx.DB, config database.Config) *API {
 	return &API{
 		logger: logger,
 		db:     db,
