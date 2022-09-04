@@ -116,7 +116,11 @@ func TestGetOrderNotFound(t *testing.T) {
 
 	// WHEN
 	startTime := time.Now()
-	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "NOPE")
+	addCorrelationIdHeader := func(ctx context.Context, req *http.Request) error {
+		req.Header.Add("Correlation-ID", "2685342d-4888-4d74-9a57-aa5393fc8e35")
+		return nil
+	}
+	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "NOPE", addCorrelationIdHeader)
 	if err != nil {
 		t.Fatal(err)
 	}

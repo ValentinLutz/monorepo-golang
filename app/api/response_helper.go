@@ -2,6 +2,7 @@ package api
 
 import (
 	"app/internal/errors"
+	"app/internal/util"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -9,11 +10,12 @@ import (
 )
 
 type ErrorResponse struct {
-	Code      int       `json:"code"`
-	Message   *string   `json:"message,omitempty"`
-	Method    string    `json:"method"`
-	Path      string    `json:"path"`
-	Timestamp time.Time `json:"timestamp"`
+	Code          int       `json:"code"`
+	Message       *string   `json:"message,omitempty"`
+	Method        string    `json:"method"`
+	Path          string    `json:"path"`
+	Timestamp     time.Time `json:"timestamp"`
+	CorrelationId string    `json:"correlation_id"`
 }
 
 type JSONWriter interface {
@@ -50,11 +52,12 @@ func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode
 	responseWriter.WriteHeader(statusCode)
 
 	errorResponse := ErrorResponse{
-		Method:    request.Method,
-		Path:      request.RequestURI,
-		Timestamp: time.Now().UTC(),
-		Code:      int(error),
-		Message:   &message,
+		Code:          int(error),
+		Message:       &message,
+		Method:        request.Method,
+		Path:          request.RequestURI,
+		Timestamp:     time.Now().UTC(),
+		CorrelationId: request.Context().Value(util.CorrelationIdKey{}).(string),
 	}
 
 	_ = errorResponse.ToJSON(responseWriter)
