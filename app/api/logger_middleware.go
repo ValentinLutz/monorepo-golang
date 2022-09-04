@@ -27,7 +27,7 @@ func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, 
 	if correlationId == "" {
 		correlationId = uuid.New().String()
 	}
-	requestContext = context.WithValue(requestContext, util.CorrelationIdKey, correlationId)
+	requestContext = context.WithValue(requestContext, util.CorrelationIdKey{}, correlationId)
 
 	requestBody, err := io.ReadAll(request.Body)
 	if err != nil {
