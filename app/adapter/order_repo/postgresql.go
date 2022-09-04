@@ -53,14 +53,10 @@ func (orderRepository *PostgreSQL) FindById(orderId entity.OrderId) (entity.Orde
 	return orderEntity, nil
 }
 
-func (orderRepository *PostgreSQL) Save(orderEntity entity.Order) {
+func (orderRepository *PostgreSQL) Save(orderEntity entity.Order) error {
 	_, err := orderRepository.database.NamedExec(
 		`INSERT INTO golang_reference_project.order (order_id, creation_date, order_status, workflow) VALUES (:order_id, :creation_date, :order_status, :workflow)`,
 		orderEntity,
 	)
-	if err != nil {
-		orderRepository.logger.Log().Error().
-			Err(err).
-			Msg("Failed to save order_repo entity into order_repo table")
-	}
+	return err
 }

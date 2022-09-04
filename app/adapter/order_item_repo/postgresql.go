@@ -37,11 +37,6 @@ func (orderItemRepository *PostgreSQL) FindAllByOrderId(orderId entity.OrderId) 
 func (orderItemRepository *PostgreSQL) SaveAll(orderItemEntities []entity.OrderItem) error {
 	_, err := orderItemRepository.db.NamedExec(
 		`INSERT INTO golang_reference_project.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
-	if err != nil {
-		orderItemRepository.logger.Log().Error().
-			Err(err).
-			Msg("Failed to save order_repo item entities into order_repo item table")
-	}
 	return err
 }
 

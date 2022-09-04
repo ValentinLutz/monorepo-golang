@@ -35,7 +35,7 @@ func (api *API) RegisterHandlers(router *httprouter.Router) {
 func (api *API) registerHealthChecks() http.HandlerFunc {
 	healthStatus, err := health.New()
 	if err != nil {
-		api.logger.Log().
+		api.logger.WithoutContext().
 			Fatal().
 			Err(err).
 			Msg("Failed to create health container")
@@ -54,7 +54,7 @@ func (api *API) registerHealthChecks() http.HandlerFunc {
 		}),
 	})
 	if err != nil {
-		api.logger.Log().
+		api.logger.WithoutContext().
 			Fatal().
 			Err(err).
 			Msg("Failed to create postgres health check")

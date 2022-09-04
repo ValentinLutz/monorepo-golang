@@ -45,14 +45,14 @@ func (s *Order) GetOrders() ([]entity.Order, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, order := range orderEntities {
+	for i, orderEntity := range orderEntities {
 		for _, orderItem := range orderItemEntities {
-			if order.OrderId == orderItem.OrderId {
-				order.Items = append(order.Items, orderItem)
+			if orderEntity.OrderId == orderItem.OrderId {
+				orderEntity.Items = append(orderEntity.Items, orderItem)
 				//sliceLen := len(orderItemEntities) - 1
 				//orderItemEntities[i] = orderItemEntities[sliceLen]
 				//orderItemEntities = orderItemEntities[:sliceLen]
-				orderEntities[i] = order
+				orderEntities[i] = orderEntity
 			}
 		}
 	}
@@ -86,8 +86,11 @@ func (s *Order) PlaceOrder(itemNames []string) (entity.Order, error) {
 		Items:        orderItems,
 	}
 
-	s.orderRepository.Save(orderEntity)
-	err := s.orderItemRepository.SaveAll(orderEntity.Items)
+	err := s.orderRepository.Save(orderEntity)
+	if err != nil {
+		return entity.Order{}, err
+	}
+	err = s.orderItemRepository.SaveAll(orderEntity.Items)
 	return orderEntity, err
 }
 

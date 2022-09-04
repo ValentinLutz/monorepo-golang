@@ -24,7 +24,8 @@ func (database *Database) Connect() *sqlx.DB {
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-		database.logger.Log().Fatal().
+		database.logger.WithoutContext().
+			Fatal().
 			Err(err).
 			Msg("Failed to connect to database")
 	}
@@ -34,7 +35,8 @@ func (database *Database) Connect() *sqlx.DB {
 
 	err = db.Ping()
 	if err != nil {
-		database.logger.Log().Fatal().
+		database.logger.WithoutContext().
+			Fatal().
 			Err(err).
 			Msg("Failed to ping database")
 	}

@@ -48,13 +48,13 @@ func New() *Logger {
 	}
 }
 
-func (logger *Logger) Log() *zerolog.Logger {
+func (logger *Logger) WithoutContext() *zerolog.Logger {
 	return logger.logger
 }
 
 const CorrelationIdKey = "correlation_id"
 
-func (logger *Logger) WithCorrelationId(context context.Context) *zerolog.Logger {
+func (logger *Logger) WithContext(context context.Context) *zerolog.Logger {
 	correlationId := context.Value(CorrelationIdKey).(string)
 	loggerWithContext := logger.logger.With().
 		Str(CorrelationIdKey, correlationId).

@@ -7,7 +7,7 @@ import (
 type OrderRepository interface {
 	FindAll() ([]entity.Order, error)
 	FindById(orderId entity.OrderId) (entity.Order, error)
-	Save(orderEntity entity.Order)
+	Save(orderEntity entity.Order) error
 }
 
 type OrderItemRepository interface {

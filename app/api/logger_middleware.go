@@ -31,7 +31,10 @@ func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, 
 
 	requestBody, err := io.ReadAll(request.Body)
 	if err != nil {
-		rrl.logger.Log().Error().Err(err).Msg("Error reading request body")
+		rrl.logger.WithContext(requestContext).
+			Error().
+			Err(err).
+			Msg("Error reading request body")
 		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
@@ -40,7 +43,7 @@ func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, 
 
 	rw := wrapResponseWriter(responseWriter)
 
-	rrl.handler.ServeHTTP(rw, request)
+	rrl.handler.ServeHTTP(rw, request.WithContext(requestContext))
 
 	if rw.status >= 400 {
 		rrl.logRequest(requestContext, request, requestBody)
@@ -49,7 +52,8 @@ func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, 
 }
 
 func (rrl *RequestResponseLogger) logRequest(context context.Context, request *http.Request, requestBody []byte) {
-	rrl.logger.WithCorrelationId(context).Info().
+	rrl.logger.WithContext(context).
+		Info().
 		Str("method", request.Method).
 		Str("path", request.URL.Path).
 		Str("body", string(requestBody)).
@@ -57,7 +61,8 @@ func (rrl *RequestResponseLogger) logRequest(context context.Context, request *h
 }
 
 func (rrl *RequestResponseLogger) logResponse(context context.Context, startTime time.Time, rw *responseWriter) {
-	rrl.logger.WithCorrelationId(context).Info().
+	rrl.logger.WithContext(context).
+		Info().
 		Str("duration", time.Since(startTime).String()).
 		Int("status", rw.status).
 		Str("body", string(rw.body)).

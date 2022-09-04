@@ -33,7 +33,8 @@ func main() {
 
 	newConfig, err := config.New(configFile)
 	if err != nil {
-		mainLogger.Log().Fatal().
+		mainLogger.WithoutContext().
+			Fatal().
 			Err(err).
 			Str("path", configFile).
 			Msg("Failed to load config file")
@@ -51,12 +52,12 @@ func main() {
 }
 
 func startServer(server *http.Server, logger *util.Logger) {
-	logger.Log().Info().
+	logger.WithoutContext().Info().
 		Str("address", server.Addr).
 		Msg("Starting server")
 	err := server.ListenAndServe()
 	if err != http.ErrServerClosed {
-		logger.Log().Fatal().
+		logger.WithoutContext().Fatal().
 			Err(err).
 			Msg("Failed to start server")
 	}
@@ -72,14 +73,20 @@ func shutdownServerGracefully(server *http.Server, logger *util.Logger) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	logger.Log().Info().Float64("timeout", timeout.Seconds()).Msg("Stopping server")
+	logger.WithoutContext().
+		Info().
+		Float64("timeout", timeout.Seconds()).
+		Msg("Stopping server")
 	err := server.Shutdown(ctx)
 	if err != nil {
-		logger.Log().Error().
+		logger.WithoutContext().
+			Error().
 			Err(err).
 			Msg("Failed to shutdown server")
 	} else {
-		logger.Log().Info().Msg("Server stopped")
+		logger.WithoutContext().
+			Info().
+			Msg("Server stopped")
 	}
 }
 
