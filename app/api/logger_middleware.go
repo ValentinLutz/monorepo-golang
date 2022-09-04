@@ -4,6 +4,8 @@ import (
 	"app/internal/errors"
 	"app/internal/util"
 	"bytes"
+	"context"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"time"
@@ -16,38 +18,46 @@ type RequestResponseLogger struct {
 	logger  *util.Logger
 }
 
-func (rrl *RequestResponseLogger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
 	startTime := time.Now()
 
-	requestBody, err := io.ReadAll(r.Body)
+	requestContext := request.Context()
+
+	correlationId := request.Header.Get("Correlation-ID")
+	if correlationId == "" {
+		correlationId = uuid.New().String()
+	}
+	requestContext = context.WithValue(requestContext, util.CorrelationIdKey, correlationId)
+
+	requestBody, err := io.ReadAll(request.Body)
 	if err != nil {
 		rrl.logger.Log().Error().Err(err).Msg("Error reading request body")
-		Error(w, r, http.StatusInternalServerError, errors.Panic, err.Error())
+		Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
 	}
 	reader := io.NopCloser(bytes.NewBuffer(requestBody))
-	r.Body = reader
+	request.Body = reader
 
-	rw := wrapResponseWriter(w)
+	rw := wrapResponseWriter(responseWriter)
 
-	rrl.handler.ServeHTTP(rw, r)
+	rrl.handler.ServeHTTP(rw, request)
 
 	if rw.status >= 400 {
-		rrl.logRequest(r, requestBody)
-		rrl.logResponse(startTime, rw)
+		rrl.logRequest(requestContext, request, requestBody)
+		rrl.logResponse(requestContext, startTime, rw)
 	}
 }
 
-func (rrl *RequestResponseLogger) logRequest(r *http.Request, requestBody []byte) {
-	rrl.logger.Log().Info().
-		Str("method", r.Method).
-		Str("path", r.URL.Path).
+func (rrl *RequestResponseLogger) logRequest(context context.Context, request *http.Request, requestBody []byte) {
+	rrl.logger.WithCorrelationId(context).Info().
+		Str("method", request.Method).
+		Str("path", request.URL.Path).
 		Str("body", string(requestBody)).
 		Msg("Request")
 }
 
-func (rrl *RequestResponseLogger) logResponse(startTime time.Time, rw *responseWriter) {
-	rrl.logger.Log().Info().
+func (rrl *RequestResponseLogger) logResponse(context context.Context, startTime time.Time, rw *responseWriter) {
+	rrl.logger.WithCorrelationId(context).Info().
 		Str("duration", time.Since(startTime).String()).
 		Int("status", rw.status).
 		Str("body", string(rw.body)).

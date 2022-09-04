@@ -52,9 +52,13 @@ func (logger *Logger) Log() *zerolog.Logger {
 	return logger.logger
 }
 
-func (logger *Logger) LogWithContext(context context.Context) *zerolog.Logger {
-	correlationId := context.Value("correlation_id").(string)
-	loggerWithContext := logger.logger.With().Str("correlationId", correlationId).Logger()
+const CorrelationIdKey = "correlation_id"
+
+func (logger *Logger) WithCorrelationId(context context.Context) *zerolog.Logger {
+	correlationId := context.Value(CorrelationIdKey).(string)
+	loggerWithContext := logger.logger.With().
+		Str(CorrelationIdKey, correlationId).
+		Logger()
 	return &loggerWithContext
 }
 
