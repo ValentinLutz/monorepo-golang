@@ -5,6 +5,7 @@ import (
 	"app/internal/util"
 	"bytes"
 	"context"
+	"encoding/json"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
@@ -52,21 +53,37 @@ func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, 
 }
 
 func (rrl *RequestResponseLogger) logRequest(context context.Context, request *http.Request, requestBody []byte) {
-	rrl.logger.WithContext(context).
+	loggingEvent := rrl.logger.WithContext(context).
 		Info().
 		Str("method", request.Method).
-		Str("path", request.URL.Path).
-		Str("body", string(requestBody)).
-		Msg("Request")
+		Str("path", request.URL.Path)
+
+	if !json.Valid(requestBody) {
+		loggingEvent.Bool("valid_json", false).
+			Str("body", string(requestBody))
+	} else {
+		loggingEvent.Bool("valid_json", true).
+			RawJSON("body", requestBody)
+	}
+
+	loggingEvent.Msg("Request")
 }
 
 func (rrl *RequestResponseLogger) logResponse(context context.Context, startTime time.Time, rw *responseWriter) {
-	rrl.logger.WithContext(context).
+	loggingEvent := rrl.logger.WithContext(context).
 		Info().
 		Str("duration", time.Since(startTime).String()).
-		Int("status", rw.status).
-		Str("body", string(rw.body)).
-		Msg("Response")
+		Int("status", rw.status)
+
+	if !json.Valid(rw.body) {
+		loggingEvent.Bool("valid_json", false).
+			Str("body", string(rw.body))
+	} else {
+		loggingEvent.Bool("valid_json", true).
+			RawJSON("body", rw.body)
+	}
+
+	loggingEvent.Msg("Response")
 }
 
 func NewRequestResponseLogger(handlerToWrap http.Handler, logger *util.Logger) *RequestResponseLogger {

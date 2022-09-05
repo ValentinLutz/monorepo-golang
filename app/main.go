@@ -100,13 +100,14 @@ func newServer(logger *util.Logger, config *config.Config, db *sqlx.DB) *http.Se
 	orderAPI := order_api.New(logger, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
+	statusAPI := status_api.New(logger, db, &config.Database)
+	statusAPI.RegisterHandlers(router)
+
 	swaggerUI := serve.NewSwaggerUI(logger)
 	swaggerUI.RegisterSwaggerUI(router)
 	swaggerUI.RegisterOpenAPISchemas(router)
 
-	statusAPI := status_api.New(logger, db, &config.Database)
-	statusAPI.RegisterHandlers(router)
-
+	// TODO do not use logger middleware on swagger ui and schemas
 	routerWithMiddleware := api.NewRequestResponseLogger(router, logger)
 
 	serverConfig := config.Server
