@@ -22,20 +22,16 @@ jobs:
             echo "::set-output name=version::$(date + "%y.%m.%d.%H%M%S" + "-SNAPSHOT")"
           fi
 
-  test-app:
+  build-app:
     runs-on: ubuntu-latest
     needs:
       - create-version
     env:
+      DOCKER_REGISTRY: ghcr.io
+      DOCKER_REPOSITORY: valentinlutz
       VERSION: ${{ needs.create-version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}
-          key: ${{ runner.os }}-${{ env.VERSION }}
 
       - uses: actions/cache@v3
         with:
@@ -63,22 +59,6 @@ jobs:
           version: v1.49.0
           working-directory: app
           skip-pkg-cache: true
-
-  build-image:
-    runs-on: ubuntu-latest
-    needs:
-      - create-version
-      - test-app
-    env:
-      DOCKER_REGISTRY: ghcr.io
-      DOCKER_REPOSITORY: valentinlutz
-      VERSION: ${{ needs.create-version.outputs.version }}
-    steps:
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}
-          key: ${{ runner.os }}-${{ env.VERSION }}
 
       - name: Build the container image
         run: make docker.build
