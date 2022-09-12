@@ -1,5 +1,5 @@
 # Config for local development
-app/config
+app/config/config.yaml
 app/serve/openapi/**
 
 # Config for kubernetes development

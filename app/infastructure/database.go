@@ -1,6 +1,7 @@
 package infastructure
 
 import (
+	"app/config"
 	"app/internal/util"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -9,10 +10,10 @@ import (
 
 type Database struct {
 	logger *util.Logger
-	config *DatabaseConfig
+	config *config.Database
 }
 
-func NewDatabase(logger *util.Logger, config *DatabaseConfig) *Database {
+func NewDatabase(logger *util.Logger, config *config.Database) *Database {
 	return &Database{logger: logger, config: config}
 }
 

@@ -1,19 +1,18 @@
 package config
 
 import (
-	"app/infastructure"
 	"app/internal/util"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
 type Config struct {
-	Region      Region                       `yaml:"region"`
-	Environment Environment                  `yaml:"environment"`
-	Server      ServerConfig                 `yaml:"server"`
-	Logger      util.LoggerConfig            `yaml:"logger"`
-	Database    infastructure.DatabaseConfig `yaml:"database"`
-	Client      Client                       `yaml:"client"`
+	Region      Region            `yaml:"region"`
+	Environment Environment       `yaml:"environment"`
+	Server      ServerConfig      `yaml:"server"`
+	Logger      util.LoggerConfig `yaml:"logger"`
+	Database    Database          `yaml:"database"`
+	Client      Client            `yaml:"client"`
 }
 
 type ServerConfig struct {
