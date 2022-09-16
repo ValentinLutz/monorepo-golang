@@ -1,8 +1,8 @@
 package order
 
 import (
+	"app/config"
 	"app/core/entity"
-	"app/internal/config"
 	"crypto/md5"
 	"encoding/base64"
 	"fmt"

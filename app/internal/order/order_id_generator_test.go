@@ -1,8 +1,8 @@
 package order_test
 
 import (
+	"app/config"
 	"app/core/entity"
-	"app/internal/config"
 	"app/internal/order"
 	"github.com/stretchr/testify/assert"
 	"testing"

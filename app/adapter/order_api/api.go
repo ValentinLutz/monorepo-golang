@@ -2,9 +2,9 @@ package order_api
 
 import (
 	"app/api"
+	"app/config"
 	"app/core/entity"
 	"app/core/port"
-	"app/internal/config"
 	"app/internal/errors"
 	"app/internal/util"
 	"github.com/julienschmidt/httprouter"
