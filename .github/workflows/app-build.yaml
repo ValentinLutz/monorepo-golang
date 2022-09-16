@@ -1,4 +1,4 @@
-name: default-workflow
+name: "app-build"
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
             echo "::set-output name=version::$(date +"%y.%m.%d.%H%M%S")-SNAPSHOT"
           fi
 
-  build-app:
+  build:
     runs-on: ubuntu-latest
     needs:
       - create-version
