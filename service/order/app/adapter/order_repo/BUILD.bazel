@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "order_repo",
+    srcs = ["postgresql.go"],
+    importpath = "monorepo/service/order/app/adapter/order_repo",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//service/order/app/core/entity",
+        "//service/order/app/internal/util",
+        "@com_github_jmoiron_sqlx//:sqlx",
+    ],
+)

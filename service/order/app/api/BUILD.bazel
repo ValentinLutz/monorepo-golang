@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "api",
+    srcs = [
+        "logger_middleware.go",
+        "response_helper.go",
+    ],
+    importpath = "monorepo/service/order/app/api",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//service/order/app/internal/util",
+        "@com_github_google_uuid//:uuid",
+    ],
+)

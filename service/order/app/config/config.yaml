@@ -1,0 +1,25 @@
+# Global config
+region: NONE
+environment: DEV
+
+# Server config
+server:
+  port: 8080
+  timeout:
+    read: 10
+    write: 10
+    idle: 10
+
+# Logger config
+logger:
+  level: DEBUG
+
+# Database config
+database:
+  host: localhost
+  port: 9432
+  user: "test"
+  password: "test"
+  database: "dev_db"
+  max_idle_connections: 10
+  max_open_connections: 90

@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "util",
+    srcs = ["logger.go"],
+    importpath = "monorepo/service/order/app/internal/util",
+    visibility = ["//service/order/app:__subpackages__"],
+    deps = ["@com_github_rs_zerolog//:zerolog"],
+)

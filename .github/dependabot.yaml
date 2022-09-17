@@ -1,16 +1,6 @@
 version: 2
 updates:
   - package-ecosystem: gomod
-    directory: /app
-    schedule:
-      interval: daily
-
-  - package-ecosystem: gomod
-    directory: /test-smoke
-    schedule:
-      interval: daily
-
-  - package-ecosystem: gomod
-    directory: /test-integration
+    directory: /
     schedule:
       interval: daily
