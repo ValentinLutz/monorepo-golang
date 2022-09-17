@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgresql
-spec:
-  selector:
-    service: postgresql
-  ports:
-    - port: 5432
