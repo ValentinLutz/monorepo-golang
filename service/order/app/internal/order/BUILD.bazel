@@ -21,9 +21,3 @@ go_test(
         "@com_github_stretchr_testify//assert",
     ],
 )
-
-go_test(
-    name = "lib_test",
-    srcs = ["order_id_generator_test.go"],
-    deps = ["@com_github_stretchr_testify//assert:go_default_library"],
-)

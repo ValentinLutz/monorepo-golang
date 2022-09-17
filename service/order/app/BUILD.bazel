@@ -26,14 +26,3 @@ go_binary(
     embed = [":app_lib"],
     visibility = ["//visibility:public"],
 )
-
-go_library(
-    name = "lib",
-    srcs = ["main.go"],
-    importpath = "",
-    visibility = ["//visibility:private"],
-    deps = [
-        "@com_github_jmoiron_sqlx//:go_default_library",
-        "@com_github_julienschmidt_httprouter//:go_default_library",
-    ],
-)
