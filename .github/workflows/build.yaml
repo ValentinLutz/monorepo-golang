@@ -13,6 +13,7 @@ jobs:
           path: |
             ~/.cache/bazelisk
             ~/.cache/bazel
+          key: ${{ runner.os }}-bazel
 
       - uses: actions/checkout@v3
 
