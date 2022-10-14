@@ -1,9 +1,6 @@
 # Config for local development
-app/config/config.yaml
-app/serve/openapi/**
-
-# Config for kubernetes development
-deployment-kubernetes/**/config.*.yaml
+**/app/config/config.yaml
+**/app/serve/openapi/**
 
 # Generated GO clients
 *.gen.go

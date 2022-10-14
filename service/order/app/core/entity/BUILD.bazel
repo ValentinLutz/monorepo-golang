@@ -1,8 +1,0 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "entity",
-    srcs = ["entity.go"],
-    importpath = "monorepo/service/order/app/core/entity",
-    visibility = ["//visibility:public"],
-)
