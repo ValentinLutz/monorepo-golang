@@ -4,7 +4,7 @@ help::
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) \
 		| awk -F':.*?## | \\| ' '{printf "\033[36m%-38s \033[37m %-68s \033[35m%s \n", $$1, $$2, $$3}'
 
-PROJECT_NAME ?= order-manager
+PROJECT_NAME ?= order-service
 VERSION ?= latest
 PROFILE ?= none-dev
 FLYWAY_USER ?= test
@@ -60,7 +60,7 @@ test.load:: ## Run load tests
 	docker run -it \
 		--rm \
 		--volume ${PWD}/test-load:/k6 \
-		--network order-manager \
+		--network order-service \
         grafana/k6:0.39.0 \
 		run /k6/script.js \
 
@@ -81,12 +81,14 @@ database.migrate:: ## Migrate database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 docker.build:: app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go ## Build container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
 ifneq ($(findstring SNAPSHOT,$(VERSION)),SNAPSHOT)
 	docker build \
+		-f ./app/Dockerfile \
 		-t ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${PROJECT_NAME}:latest \
-		app
+		../../
 endif
 	docker build \
+		-f ./app/Dockerfile \
 		-t ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${PROJECT_NAME}:${VERSION} \
-		app
+		../../
 
 docker.push:: ## Publish container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
 ifneq ($(findstring SNAPSHOT,$(VERSION)),SNAPSHOT)
@@ -97,12 +99,12 @@ endif
 		${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${PROJECT_NAME}:${VERSION}
 
 docker.up:: docker.build ## Start containers | PROJECT_NAME
-	docker-compose -p ${PROJECT_NAME} \
+	docker compose -p ${PROJECT_NAME} \
 		-f deployment-docker/docker-compose.yaml \
 		up -d --force-recreate
 
 docker.down:: ## Shutdown containers | PROJECT_NAME
-	docker-compose -p ${PROJECT_NAME} \
+	docker compose -p ${PROJECT_NAME} \
 		-f deployment-docker/docker-compose.yaml \
 		down
 
