@@ -3,6 +3,8 @@ module app
 go 1.19
 
 require (
+	github.com/ValentinLutz/monrepo/libraries/api-helper v0.0.0
+	github.com/ValentinLutz/monrepo/libraries/errors v0.0.0
 	github.com/google/uuid v1.3.0
 	github.com/hellofresh/health-go/v4 v4.7.0
 	github.com/jmoiron/sqlx v1.3.5
@@ -12,8 +14,6 @@ require (
 	github.com/rs/zerolog v1.28.0
 	github.com/stretchr/testify v1.8.0
 	gopkg.in/yaml.v3 v3.0.1
-	github.com/ValentinLutz/monrepo/libraries/api-helper v0.0.0
-	github.com/ValentinLutz/monrepo/libraries/errors v0.0.0
 )
 
 require (
