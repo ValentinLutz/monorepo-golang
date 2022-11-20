@@ -1,4 +1,4 @@
-module github.com/ValentinLutz/monrepo/libraries/testing
+module github.com/ValentinLutz/monrepo/libraries/testingutil
 
 go 1.19
 

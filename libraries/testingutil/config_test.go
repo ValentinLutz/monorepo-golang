@@ -1,7 +1,7 @@
 package testingutil_test
 
 import (
-	testingutil "github.com/ValentinLutz/monrepo/libraries/testing"
+	"github.com/ValentinLutz/monrepo/libraries/testingutil"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

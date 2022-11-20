@@ -1,0 +1,12 @@
+# Global config
+base_url: http://localhost:8080
+
+# Database config
+database:
+  host: localhost
+  port: 9432
+  user: "test"
+  password: "test"
+  database: "dev_db"
+  max_idle_connections: 10
+  max_open_connections: 90

@@ -2,12 +2,14 @@ package order_api_test
 
 import (
 	"crypto/tls"
+	"github.com/ValentinLutz/monrepo/libraries/testingutil"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"net/http"
 	"testing"
 )
 
-const baseUri = "http://app:8080"
+var config = testingutil.LoadConfig("../config/test")
 
 func initClient() http.Client {
 	tr := &http.Transport{
@@ -21,11 +23,16 @@ func TestHealth(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get(baseUri + "/api/status/health")
+	response, err := client.Get(config.BaseURL + "/api/status/health")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(response.Body)
 
 	// THEN
 	assert.Equal(t, 200, response.StatusCode)
@@ -36,11 +43,16 @@ func TestPrometheusMetrics(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get(baseUri + "/api/status/metrics")
+	response, err := client.Get(config.BaseURL + "/api/status/metrics")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(response.Body)
 
 	// THEN
 	assert.Equal(t, 200, response.StatusCode)
@@ -51,11 +63,16 @@ func TestSwaggerUI(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get(baseUri + "/swagger")
+	response, err := client.Get(config.BaseURL + "/swagger")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(response.Body)
 
 	// THEN
 	assert.Equal(t, 200, response.StatusCode)

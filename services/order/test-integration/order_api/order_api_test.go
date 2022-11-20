@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"github.com/ValentinLutz/monrepo/libraries/testingutil"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -14,13 +15,15 @@ import (
 	"time"
 )
 
+var config = testingutil.LoadConfig("../../config/test")
+
 func initClient() order_api.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
 	return order_api.Client{
-		Server: "http://localhost:8080",
+		Server: config.BaseURL,
 		Client: client,
 	}
 }

@@ -18,6 +18,19 @@ type DatabaseConfig struct {
 	Password string `yaml:"password"`
 }
 
+func LoadConfig(basePath string) *Config {
+	profile, present := os.LookupEnv("PROFILE")
+	if present != true {
+		panic("env PROFILE is not set")
+	}
+
+	parsedFile, err := ParseFile[Config](basePath + "/test-config." + profile + ".yaml")
+	if err != nil {
+		panic(err)
+	}
+	return parsedFile
+}
+
 func ParseFile[T any](path string) (*T, error) {
 	file, err := os.Open(path)
 	if err != nil {

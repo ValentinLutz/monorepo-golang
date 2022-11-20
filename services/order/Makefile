@@ -4,18 +4,18 @@ help::
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) \
 		| awk -F':.*?## | \\| ' '{printf "\033[36m%-38s \033[37m %-68s \033[35m%s \n", $$1, $$2, $$3}'
 
-PROJECT_NAME ?= order-service
-VERSION ?= latest
-PROFILE ?= none-dev
-FLYWAY_USER ?= test
-FLYWAY_PASSWORD ?= test
-DOCKER_REGISTRY ?= ghcr.io
-DOCKER_REPOSITORY ?= valentinlutz
+export PROJECT_NAME ?= order-service
+export VERSION ?= latest
+export PROFILE ?= none-dev
+export FLYWAY_USER ?= test
+export FLYWAY_PASSWORD ?= test
+export DOCKER_REGISTRY ?= ghcr.io
+export DOCKER_REPOSITORY ?= valentinlutz
 
 
 
-app/config/config.yaml: ./config/config.none-dev.yaml ## Copy none-dev config to app directory
-	install -D config/config.none-dev.yaml app/config/config.yaml
+app/config/app/config.yaml: ./config/app/config.none-dev.yaml ## Copy none-dev config to app directory
+	install -D config/app/config.none-dev.yaml app/config/config.yaml
 
 app/serve/openapi/order_api.yaml: api-definition/order_api.yaml ## Copy orders open api definition to app
 	install -D api-definition/order_api.yaml app/serve/openapi/order_api.yaml
@@ -25,7 +25,7 @@ app/adapter/order_api/order.gen.go: api-definition/order_api.yaml api-definition
 		oapi-codegen --config api-definition/oapi-codegen-app.yaml \
 		api-definition/order_api.yaml  > app/adapter/order_api/order.gen.go
 
-app.run:: app/config/config.yaml app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go ## Run the app
+app.run:: app/config/app/config.yaml app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go ## Run the app
 	cd app && \
 		go run main.go
 
