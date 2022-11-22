@@ -5,6 +5,8 @@ go 1.19
 require (
 	github.com/ValentinLutz/monrepo/libraries/testingutil v0.0.0
 	github.com/deepmap/oapi-codegen v1.11.0
+	github.com/jmoiron/sqlx v1.3.5
+	github.com/lib/pq v1.2.0
 	github.com/stretchr/testify v1.8.1
 )
 

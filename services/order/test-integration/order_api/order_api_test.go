@@ -5,7 +5,10 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"github.com/ValentinLutz/monrepo/libraries/testingutil"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -16,6 +19,46 @@ import (
 )
 
 var config = testingutil.LoadConfig("../../config/test")
+
+const addOrders = `
+INSERT INTO order_service.order
+(order_id, workflow, creation_date, order_status)
+VALUES ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed'),
+
+       ('Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_in_progress'),
+
+       ('sgy1K3*SXcv-NONE-DEV-eVbldUAYXnA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_canceled'),
+
+       ('F2P!criGu2L-NONE-DEV-fJ7bBFx1vHg', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_completed');
+
+INSERT INTO order_service.order_item
+    (order_id, creation_date, item_name)
+VALUES ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
+       ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'banana'),
+
+       ('Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA', '1980-01-01 00:00:00 +00:00', 'chocolate'),
+
+       ('sgy1K3*SXcv-NONE-DEV-eVbldUAYXnA', '1980-01-01 00:00:00 +00:00', 'marshmallow'),
+
+       ('F2P!criGu2L-NONE-DEV-fJ7bBFx1vHg', '1980-01-01 00:00:00 +00:00', 'apple');
+
+`
+
+const addOrder = `
+INSERT INTO order_service.order
+(order_id, workflow, creation_date, order_status)
+VALUES ('fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed');
+
+INSERT INTO order_service.order_item
+    (order_id, creation_date, item_name)
+VALUES ('fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
+       ('fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'banana');
+`
+
+const cleanDatabase = `
+DELETE FROM order_service.order_item;
+DELETE FROM order_service.order;
+`
 
 func initClient() order_api.Client {
 	tr := &http.Transport{
@@ -28,9 +71,43 @@ func initClient() order_api.Client {
 	}
 }
 
+func initDatabase() *sqlx.DB {
+	psqlInfo := fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Password, config.Database.Database,
+	)
+
+	db, err := sqlx.Connect("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec(cleanDatabase)
+	if err != nil {
+		panic(err)
+	}
+	return db
+}
+
+func createOrders(t *testing.T, db *sqlx.DB) {
+	_, err := db.Exec(addOrders)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func createOrder(t *testing.T, db *sqlx.DB) {
+	_, err := db.Exec(addOrder)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestGetOrders(t *testing.T) {
 	// GIVEN
 	client := initClient()
+	database := initDatabase()
+	createOrders(t, database)
 
 	// WHEN
 	startTime := time.Now()
@@ -86,16 +163,18 @@ func TestPostOrder(t *testing.T) {
 	}, actualResponse.Items)
 	assert.NotEmpty(t, actualResponse.OrderId)
 	assert.NotEmpty(t, actualResponse.CreationDate)
-	assert.GreaterOrEqual(t, int64(10), responseTimeInMs, "Response time in milliseconds")
+	assert.GreaterOrEqual(t, int64(50), responseTimeInMs, "Response time in milliseconds")
 }
 
 func TestGetOrder(t *testing.T) {
 	// GIVEN
 	client := initClient()
+	database := initDatabase()
+	createOrder(t, database)
 
 	// WHEN
 	startTime := time.Now()
-	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "IsQah2TkaqS-NONE-DEV-JewgL0Ye73g")
+	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +189,7 @@ func TestGetOrder(t *testing.T) {
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
-	assert.GreaterOrEqual(t, int64(10), responseTimeInMs)
+	assert.GreaterOrEqual(t, int64(50), responseTimeInMs)
 }
 
 func TestGetOrderNotFound(t *testing.T) {
