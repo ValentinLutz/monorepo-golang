@@ -1,4 +1,4 @@
-CREATE TABLE golang_reference_project.order
+CREATE TABLE order_service.order
 (
     order_id      VARCHAR     NOT NULL UNIQUE,
     creation_date TIMESTAMPTZ NOT NULL,
@@ -10,6 +10,6 @@ CREATE TABLE golang_reference_project.order
 
 CREATE TRIGGER update_order_modified_date
     BEFORE UPDATE
-    ON golang_reference_project.order
+    ON order_service.order
     FOR EACH ROW
-EXECUTE PROCEDURE golang_reference_project.update_modified_date();
+EXECUTE PROCEDURE order_service.update_modified_date();

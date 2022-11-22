@@ -17,7 +17,7 @@ func NewPostgreSQL(logger *util.Logger, database *sqlx.DB) PostgreSQL {
 }
 
 func (orderItemRepository *PostgreSQL) FindAll() ([]entity.OrderItem, error) {
-	rows, err := orderItemRepository.db.Query("SELECT order_item_id, order_id, creation_date, item_name FROM golang_reference_project.order_item")
+	rows, err := orderItemRepository.db.Query("SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item")
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (orderItemRepository *PostgreSQL) FindAll() ([]entity.OrderItem, error) {
 }
 
 func (orderItemRepository *PostgreSQL) FindAllByOrderId(orderId entity.OrderId) ([]entity.OrderItem, error) {
-	rows, err := orderItemRepository.db.Query("SELECT order_item_id, order_id, creation_date, item_name FROM golang_reference_project.order_item WHERE order_id = $1", orderId)
+	rows, err := orderItemRepository.db.Query("SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item WHERE order_id = $1", orderId)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (orderItemRepository *PostgreSQL) FindAllByOrderId(orderId entity.OrderId) 
 
 func (orderItemRepository *PostgreSQL) SaveAll(orderItemEntities []entity.OrderItem) error {
 	_, err := orderItemRepository.db.NamedExec(
-		`INSERT INTO golang_reference_project.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
+		`INSERT INTO order_service.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
 	return err
 }
 

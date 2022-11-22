@@ -17,7 +17,7 @@ func NewPostgreSQL(logger *util.Logger, database *sqlx.DB) PostgreSQL {
 
 func (orderRepository *PostgreSQL) FindAll() ([]entity.Order, error) {
 	rows, err := orderRepository.database.Query(
-		"SELECT order_id, creation_date, order_status FROM golang_reference_project.order",
+		"SELECT order_id, creation_date, order_status FROM order_service.order",
 	)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (orderRepository *PostgreSQL) FindAll() ([]entity.Order, error) {
 
 func (orderRepository *PostgreSQL) FindById(orderId entity.OrderId) (entity.Order, error) {
 	row := orderRepository.database.QueryRow(
-		"SELECT order_id, creation_date, order_status FROM golang_reference_project.order WHERE order_id = $1",
+		"SELECT order_id, creation_date, order_status FROM order_service.order WHERE order_id = $1",
 		orderId,
 	)
 
@@ -55,7 +55,7 @@ func (orderRepository *PostgreSQL) FindById(orderId entity.OrderId) (entity.Orde
 
 func (orderRepository *PostgreSQL) Save(orderEntity entity.Order) error {
 	_, err := orderRepository.database.NamedExec(
-		`INSERT INTO golang_reference_project.order (order_id, creation_date, order_status, workflow) VALUES (:order_id, :creation_date, :order_status, :workflow)`,
+		`INSERT INTO order_service.order (order_id, creation_date, order_status, workflow) VALUES (:order_id, :creation_date, :order_status, :workflow)`,
 		orderEntity,
 	)
 	return err
