@@ -24,5 +24,5 @@ func (env *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		*env = environment
 		return nil
 	}
-	return fmt.Errorf("environment is invalid: %v", environment)
+	return fmt.Errorf("environment '%v' is invalid", environment)
 }
