@@ -82,7 +82,7 @@ func (logLevel *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error
 		*logLevel = parsedLogLevel
 		return nil
 	}
-	return fmt.Errorf("log level is invalid: %s", parsedLogLevel)
+	return fmt.Errorf("log level '%v' is invalid", parsedLogLevel)
 }
 
 func (logLevel *LogLevel) toZeroLogLevel() zerolog.Level {

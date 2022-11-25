@@ -16,6 +16,6 @@ func FromOrderStatus(orderStatus entity.Status) (OrderStatus, error) {
 	case entity.OrderInProgress:
 		return OrderInProgress, nil
 	default:
-		return "", fmt.Errorf("can not map order_repo status: %s", orderStatus)
+		return "", fmt.Errorf("failed to map order status '%v'", orderStatus)
 	}
 }
