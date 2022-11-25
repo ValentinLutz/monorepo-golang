@@ -103,7 +103,7 @@ components:
       properties:
         order_id:
           type: string
-          example: I3xXiIqbP92-NONE-DEV-Ui*8i0kFHcA
+          example: I3xXiIqbP92-NONE-Ui*8i0kFHcA
         creation_date:
           type: string    
           format: date-time

@@ -5,9 +5,10 @@ import "fmt"
 type Environment string
 
 const (
-	DEV  Environment = "DEV"
-	TEST Environment = "TEST"
-	PROD Environment = "PROD"
+	LOCAL     Environment = "LOCAL"
+	CONTAINER Environment = "CONTAINER"
+	TEST      Environment = "TEST"
+	PROD      Environment = "PROD"
 )
 
 func (env *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -20,7 +21,7 @@ func (env *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	environment := Environment(environmentString)
 
 	switch environment {
-	case DEV, TEST, PROD:
+	case LOCAL, CONTAINER, TEST, PROD:
 		*env = environment
 		return nil
 	}

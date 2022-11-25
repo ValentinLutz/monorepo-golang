@@ -15,7 +15,7 @@ export DOCKER_REPOSITORY ?= valentinlutz
 
 
 app/config/app/config.yaml: config/app/config.none-local.yaml ## Copy none-local config to app directory
-	install -D config/app/config.none-dev.yaml app/config/config.yaml
+	install -D config/app/config.none-local.yaml app/config/config.yaml
 
 app/serve/openapi/order_api.yaml: api-definition/order_api.yaml ## Copy orders open api definition to app
 	install -D api-definition/order_api.yaml app/serve/openapi/order_api.yaml
