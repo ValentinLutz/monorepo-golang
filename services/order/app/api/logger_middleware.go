@@ -30,7 +30,7 @@ func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, 
 		correlationId = uuid.New().String()
 	}
 	requestContext = context.WithValue(requestContext, api.CorrelationIdKey{}, correlationId)
-	request.WithContext(requestContext)
+	request = request.WithContext(requestContext)
 
 	requestBody, err := io.ReadAll(request.Body)
 	if err != nil {
@@ -46,7 +46,7 @@ func (rrl *RequestResponseLogger) ServeHTTP(responseWriter http.ResponseWriter, 
 
 	rw := wrapResponseWriter(responseWriter)
 
-	rrl.handler.ServeHTTP(rw, request.WithContext(requestContext))
+	rrl.handler.ServeHTTP(rw, request)
 
 	if rw.status >= 400 {
 		rrl.logRequest(requestContext, request, requestBody)
