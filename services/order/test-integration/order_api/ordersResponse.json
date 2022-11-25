@@ -1,6 +1,6 @@
 [
   {
-    "order_id": "IsQah2TkaqS-NONE-DEV-JewgL0Ye73g",
+    "order_id": "IsQah2TkaqS-NONE-JewgL0Ye73g",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_placed",
     "items": [
@@ -13,7 +13,7 @@
     ]
   },
   {
-    "order_id": "Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA",
+    "order_id": "Fs2VoM7ZhrK-NONE-vzTf7kaHbRA",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_in_progress",
     "items": [
@@ -23,7 +23,7 @@
     ]
   },
   {
-    "order_id": "sgy1K3*SXcv-NONE-DEV-eVbldUAYXnA",
+    "order_id": "sgy1K3*SXcv-NONE-eVbldUAYXnA",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_canceled",
     "items": [
@@ -33,7 +33,7 @@
     ]
   },
   {
-    "order_id": "F2P!criGu2L-NONE-DEV-fJ7bBFx1vHg",
+    "order_id": "F2P!criGu2L-NONE-fJ7bBFx1vHg",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_completed",
     "items": [

@@ -9,14 +9,13 @@ import (
 	"time"
 )
 
-var generatorOrderId = func(region config.Region, environment config.Environment, timestamp time.Time, salt string, expected entity.OrderId) func(t *testing.T) {
+var testGeneratorOrderId = func(region config.Region, timestamp time.Time, salt string, expected entity.OrderId) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Logf("Region: %v", region)
-		t.Logf("Environment: %v", environment)
 		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
 		t.Logf("Salt: %v", salt)
 		// WHEN
-		actual := order.GenerateOrderId(region, environment, timestamp, salt)
+		actual := order.GenerateOrderId(region, timestamp, salt)
 		// THEN
 		assert.Equal(t, expected, actual)
 	}
@@ -28,13 +27,16 @@ func Test_GenerateOrderId(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Run("NONE-DEV", generatorOrderId(config.NONE, config.DEV, timestamp, "1", "fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA"))
-	t.Run("NONE-DEV", generatorOrderId(config.NONE, config.DEV, timestamp, "101", "X!d2QGwSqbz-NONE-DEV-O83j82*zsIw"))
-	t.Run("NONE-DEV", generatorOrderId(config.NONE, config.DEV, timestamp, "10101", "10GQefiu13u-NONE-DEV-6DiC6mjULDw"))
-	t.Run("NONE-DEV", generatorOrderId(config.NONE, config.DEV, timestamp, "1010101", "eHYnyDHx61P-NONE-DEV-xyozdTi9jcA"))
-	t.Run("EU-TEST", generatorOrderId(config.EU, config.TEST, timestamp, "1", "WYwajVCTfxv-EU-TEST-R16B1EOIYqA"))
-	t.Run("EU-TEST", generatorOrderId(config.EU, config.TEST, timestamp, "101", "*SOY*UcOhPS-EU-TEST-Ph7SlmnWyPA"))
-	t.Run("EU-TEST", generatorOrderId(config.EU, config.TEST, timestamp, "10101", "xn*jZKcJI0e-EU-TEST-XjStk3UhSxw"))
-	t.Run("EU-TEST", generatorOrderId(config.EU, config.TEST, timestamp, "1010101", "wUq!zyfXs!a-EU-TEST-Tm4spTd4IRA"))
-	t.Run("EU-PROD", generatorOrderId(config.EU, config.PROD, timestamp, "1", "xnl7K9M2NUw-EU-oLpPbSQHEWA"))
+	t.Run("NONE", testGeneratorOrderId(config.NONE, timestamp, "1", "zanhVXdOCEg-NONE-asPc!MEMcMw"))
+	t.Run("NONE", testGeneratorOrderId(config.NONE, timestamp, "101", "hjm847MUbWn-NONE-CsuoZDDc6LQ"))
+	t.Run("NONE", testGeneratorOrderId(config.NONE, timestamp, "10101", "TlhDaTmRWBr-NONE-UqIiPE7q!Qw"))
+	t.Run("NONE", testGeneratorOrderId(config.NONE, timestamp, "1010101", "uryHjO0*I1o-NONE-ngfDhQLBkFw"))
+	t.Run("EU", testGeneratorOrderId(config.EU, timestamp, "1", "7QGZGgo5999-EU-moedOlxN4BQ"))
+	t.Run("EU", testGeneratorOrderId(config.EU, timestamp, "101", "QN1iLILbclC-EU-wqVzId1oMHw"))
+	t.Run("EU", testGeneratorOrderId(config.EU, timestamp, "10101", "*vFRicU14gk-EU-cA*kDJf*Jig"))
+	t.Run("EU", testGeneratorOrderId(config.EU, timestamp, "1010101", "p5tCoqCnVfS-EU-J8C5J!L!mMA"))
+	t.Run("US", testGeneratorOrderId(config.US, timestamp, "1", "Ad6P0F0DuUq-US-jcj2Jqrklew"))
+	t.Run("US", testGeneratorOrderId(config.US, timestamp, "101", "kv0Hbli7PTn-US-TvwK!socVFg"))
+	t.Run("US", testGeneratorOrderId(config.US, timestamp, "10101", "MnWZUuMf7df-US-f9GUPjtFBdA"))
+	t.Run("US", testGeneratorOrderId(config.US, timestamp, "1010101", "gATm85KNU5H-US-UF!dI1xtcog"))
 }

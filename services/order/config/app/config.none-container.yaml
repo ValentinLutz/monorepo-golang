@@ -1,6 +1,6 @@
 # Global config
 region: NONE
-environment: DEV
+environment: CONTAINER
 
 # Server config
 server:

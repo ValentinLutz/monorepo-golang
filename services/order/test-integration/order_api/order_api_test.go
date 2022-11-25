@@ -20,46 +20,6 @@ import (
 
 var config = testingutil.LoadConfig("../../config/test")
 
-const addOrders = `
-INSERT INTO order_service.order
-(order_id, workflow, creation_date, order_status)
-VALUES ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed'),
-
-       ('Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_in_progress'),
-
-       ('sgy1K3*SXcv-NONE-DEV-eVbldUAYXnA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_canceled'),
-
-       ('F2P!criGu2L-NONE-DEV-fJ7bBFx1vHg', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_completed');
-
-INSERT INTO order_service.order_item
-    (order_id, creation_date, item_name)
-VALUES ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
-       ('IsQah2TkaqS-NONE-DEV-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'banana'),
-
-       ('Fs2VoM7ZhrK-NONE-DEV-vzTf7kaHbRA', '1980-01-01 00:00:00 +00:00', 'chocolate'),
-
-       ('sgy1K3*SXcv-NONE-DEV-eVbldUAYXnA', '1980-01-01 00:00:00 +00:00', 'marshmallow'),
-
-       ('F2P!criGu2L-NONE-DEV-fJ7bBFx1vHg', '1980-01-01 00:00:00 +00:00', 'apple');
-
-`
-
-const addOrder = `
-INSERT INTO order_service.order
-(order_id, workflow, creation_date, order_status)
-VALUES ('fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed');
-
-INSERT INTO order_service.order_item
-    (order_id, creation_date, item_name)
-VALUES ('fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
-       ('fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'banana');
-`
-
-const cleanDatabase = `
-DELETE FROM order_service.order_item;
-DELETE FROM order_service.order;
-`
-
 func initClient() order_api.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -71,7 +31,7 @@ func initClient() order_api.Client {
 	}
 }
 
-func initDatabase() *sqlx.DB {
+func initDatabase(t *testing.T) *sqlx.DB {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Password, config.Database.Database,
@@ -79,25 +39,21 @@ func initDatabase() *sqlx.DB {
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
+	cleanDatabase := `
+TRUNCATE TABLE order_service.order_item, order_service.order;
+`
 	_, err = db.Exec(cleanDatabase)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	return db
 }
 
-func createOrders(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec(addOrders)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func createOrder(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec(addOrder)
+func exec(t *testing.T, db *sqlx.DB, query string) {
+	_, err := db.Exec(query)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,8 +62,31 @@ func createOrder(t *testing.T, db *sqlx.DB) {
 func TestGetOrders(t *testing.T) {
 	// GIVEN
 	client := initClient()
-	database := initDatabase()
-	createOrders(t, database)
+	database := initDatabase(t)
+
+	addOrders := `
+INSERT INTO order_service.order
+(order_id, workflow, creation_date, order_status)
+VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed'),
+
+	   ('Fs2VoM7ZhrK-NONE-vzTf7kaHbRA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_in_progress'),
+
+	   ('sgy1K3*SXcv-NONE-eVbldUAYXnA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_canceled'),
+
+	   ('F2P!criGu2L-NONE-fJ7bBFx1vHg', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_completed');
+
+INSERT INTO order_service.order_item
+	(order_id, creation_date, item_name)
+VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
+	   ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'banana'),
+
+	   ('Fs2VoM7ZhrK-NONE-vzTf7kaHbRA', '1980-01-01 00:00:00 +00:00', 'chocolate'),
+
+	   ('sgy1K3*SXcv-NONE-eVbldUAYXnA', '1980-01-01 00:00:00 +00:00', 'marshmallow'),
+
+	   ('F2P!criGu2L-NONE-fJ7bBFx1vHg', '1980-01-01 00:00:00 +00:00', 'apple');
+`
+	exec(t, database, addOrders)
 
 	// WHEN
 	startTime := time.Now()
@@ -169,12 +148,24 @@ func TestPostOrder(t *testing.T) {
 func TestGetOrder(t *testing.T) {
 	// GIVEN
 	client := initClient()
-	database := initDatabase()
-	createOrder(t, database)
+	database := initDatabase(t)
+
+	const addOrder = `
+INSERT INTO order_service.order
+(order_id, workflow, creation_date, order_status)
+VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed');
+
+INSERT INTO order_service.order_item
+    (order_id, creation_date, item_name)
+VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
+       ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'banana');
+`
+
+	exec(t, database, addOrder)
 
 	// WHEN
 	startTime := time.Now()
-	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "fdCDxjV9o!O-NONE-DEV-ZCTH5i6fWcA")
+	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "fdCDxjV9o!O-NONE-ZCTH5i6fWcA")
 	if err != nil {
 		t.Fatal(err)
 	}

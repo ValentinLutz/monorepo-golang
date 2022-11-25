@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"github.com/ValentinLutz/monrepo/libraries/errors"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"time"
@@ -53,13 +54,18 @@ func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode
 	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
 	responseWriter.WriteHeader(statusCode)
 
+	correlationId := request.Context().Value(CorrelationIdKey{})
+	if correlationId == nil {
+		correlationId = uuid.New()
+	}
+
 	errorResponse := ErrorResponse{
 		Code:          int(error),
 		Message:       &message,
 		Method:        request.Method,
 		Path:          request.RequestURI,
 		Timestamp:     time.Now().UTC(),
-		CorrelationId: request.Context().Value(CorrelationIdKey{}).(string),
+		CorrelationId: correlationId.(string),
 	}
 
 	_ = errorResponse.ToJSON(responseWriter)

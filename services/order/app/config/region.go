@@ -7,6 +7,7 @@ type Region string
 const (
 	NONE Region = "NONE"
 	EU   Region = "EU"
+	US   Region = "US"
 )
 
 func (r *Region) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -19,9 +20,9 @@ func (r *Region) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	region := Region(regionString)
 
 	switch region {
-	case NONE, EU:
+	case NONE, EU, US:
 		*r = region
 		return nil
 	}
-	return fmt.Errorf("region is invalid: %s", region)
+	return fmt.Errorf("region '%v' is invalid", region)
 }

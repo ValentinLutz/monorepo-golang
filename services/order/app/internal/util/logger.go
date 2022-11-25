@@ -3,6 +3,7 @@ package util
 import (
 	"context"
 	"fmt"
+	"github.com/ValentinLutz/monrepo/libraries/api-helper"
 	"github.com/rs/zerolog"
 	"log"
 	"os"
@@ -56,7 +57,7 @@ type CorrelationIdKey struct {
 }
 
 func (logger *Logger) WithContext(context context.Context) *zerolog.Logger {
-	correlationId := context.Value(CorrelationIdKey{}).(string)
+	correlationId := context.Value(api.CorrelationIdKey{}).(string)
 	loggerWithContext := logger.logger.With().
 		Str("correlation_id", correlationId).
 		Logger()

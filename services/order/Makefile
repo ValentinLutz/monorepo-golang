@@ -6,7 +6,7 @@ help::
 
 export PROJECT_NAME ?= order-service
 export VERSION ?= latest
-export PROFILE ?= none-dev
+export PROFILE ?= none-local
 export FLYWAY_USER ?= test
 export FLYWAY_PASSWORD ?= test
 export DOCKER_REGISTRY ?= ghcr.io
@@ -14,7 +14,7 @@ export DOCKER_REPOSITORY ?= valentinlutz
 
 
 
-app/config/app/config.yaml: ./config/app/config.none-dev.yaml ## Copy none-dev config to app directory
+app/config/app/config.yaml: config/app/config.none-local.yaml ## Copy none-local config to app directory
 	install -D config/app/config.none-dev.yaml app/config/config.yaml
 
 app/serve/openapi/order_api.yaml: api-definition/order_api.yaml ## Copy orders open api definition to app
@@ -52,7 +52,7 @@ test.smoke:: ## Run the smoke tests
 	cd test-smoke && \
 		go test -count=1 ./...
 
-test.integration:: test-integration/order_api/order.gen.go database.migrate ## Run the integration tests
+test.integration:: test-integration/order_api/order.gen.go ## Run the integration tests
 	cd test-integration && \
 		go test -count=1 ./...
 

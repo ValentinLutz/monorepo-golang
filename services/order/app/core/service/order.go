@@ -63,7 +63,6 @@ func (s *Order) PlaceOrder(itemNames []string) (entity.Order, error) {
 	creationDate := time.Now()
 	orderId := order.GenerateOrderId(
 		s.config.Region,
-		s.config.Environment,
 		creationDate,
 		strconv.Itoa(rand.Int()),
 	)
