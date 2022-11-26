@@ -4,6 +4,7 @@ import (
 	"app/core/entity"
 	"database/sql"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type PostgreSQL struct {
@@ -14,8 +15,8 @@ func NewPostgreSQL(database *sqlx.DB) PostgreSQL {
 	return PostgreSQL{db: database}
 }
 
-func (orderItemRepository *PostgreSQL) FindAll() ([]entity.OrderItem, error) {
-	rows, err := orderItemRepository.db.Query("SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item")
+func (orderItemRepository *PostgreSQL) FindAllByOrderIds(orderIds []entity.OrderId) ([]entity.OrderItem, error) {
+	rows, err := orderItemRepository.db.Query("SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item WHERE order_id = ANY($1)", pq.Array(orderIds))
 	if err != nil {
 		return nil, err
 	}

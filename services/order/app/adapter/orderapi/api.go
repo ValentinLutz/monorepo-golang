@@ -8,6 +8,7 @@ import (
 	"github.com/ValentinLutz/monrepo/libraries/apputil/httpresponse"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"strconv"
 )
 
 type API struct {
@@ -29,7 +30,17 @@ func (a *API) RegisterHandlers(router *httprouter.Router) {
 }
 
 func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Request) {
-	orderEntities, err := a.service.GetOrders()
+	queryParams := request.URL.Query()
+	limit, err := strconv.Atoi(queryParams.Get("limit"))
+	if err != nil {
+		limit = 50
+	}
+	offset, err := strconv.Atoi(queryParams.Get("offset"))
+	if err != nil {
+		offset = 0
+	}
+
+	orderEntities, err := a.service.GetOrders(limit, offset)
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return

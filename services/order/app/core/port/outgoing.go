@@ -5,13 +5,13 @@ import (
 )
 
 type OrderRepository interface {
-	FindAll() ([]entity.Order, error)
+	FindAll(limit int, offset int) ([]entity.Order, error)
 	FindById(orderId entity.OrderId) (entity.Order, error)
 	Save(orderEntity entity.Order) error
 }
 
 type OrderItemRepository interface {
-	FindAll() ([]entity.OrderItem, error)
+	FindAllByOrderIds(orderIds []entity.OrderId) ([]entity.OrderItem, error)
 	FindAllByOrderId(orderId entity.OrderId) ([]entity.OrderItem, error)
 	SaveAll(orderItemEntities []entity.OrderItem) error
 }

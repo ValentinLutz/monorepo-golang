@@ -32,22 +32,26 @@ func NewOrder(
 	}
 }
 
-func (s *Order) GetOrders() ([]entity.Order, error) {
-	orderEntities, err := s.orderRepository.FindAll()
+func (s *Order) GetOrders(limit int, offset int) ([]entity.Order, error) {
+	orderEntities, err := s.orderRepository.FindAll(limit, offset)
 	if err != nil {
 		return nil, err
 	}
-	orderItemEntities, err := s.orderItemRepository.FindAll()
+
+	var orderIds []entity.OrderId
+	for _, orderEntity := range orderEntities {
+		orderIds = append(orderIds, orderEntity.OrderId)
+	}
+
+	orderItemEntities, err := s.orderItemRepository.FindAllByOrderIds(orderIds)
 	if err != nil {
 		return nil, err
 	}
+
 	for i, orderEntity := range orderEntities {
 		for _, orderItem := range orderItemEntities {
 			if orderEntity.OrderId == orderItem.OrderId {
 				orderEntity.Items = append(orderEntity.Items, orderItem)
-				//sliceLen := len(orderItemEntities) - 1
-				//orderItemEntities[i] = orderItemEntities[sliceLen]
-				//orderItemEntities = orderItemEntities[:sliceLen]
 				orderEntities[i] = orderEntity
 			}
 		}
