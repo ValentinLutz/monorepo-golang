@@ -5,20 +5,6 @@ networks:
     name: order-service
 
 services:
-  app:
-    image: ghcr.io/valentinlutz/order-service:latest
-    build:
-      context: ../../../
-      dockerfile: ./services/order/app/Dockerfile
-    container_name: app
-    depends_on:
-      - postgresql
-      - wiremock
-    volumes:
-      - ../config/app/config.none-container.yaml:/app/config/config.yaml:ro
-    ports:
-      - '9080:8080'
-
   postgresql:
     image: postgres:14.2
     container_name: postgresql
@@ -37,13 +23,3 @@ services:
       - ./wiremock/:/home/wiremock:ro
     ports:
       - '9081:8080'
-
-  prometheus:
-    image: prom/prometheus:v2.38.0
-    container_name: prometheus
-    depends_on:
-      - app
-    volumes:
-      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
-    ports:
-      - '9091:9090'
