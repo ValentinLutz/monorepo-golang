@@ -1,16 +1,14 @@
-package api
+package httpresponse
 
 import (
 	"encoding/json"
-	"github.com/ValentinLutz/monrepo/libraries/errors"
+	"github.com/ValentinLutz/monrepo/libraries/apputil/errors"
+	"github.com/ValentinLutz/monrepo/libraries/apputil/middleware"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"time"
 )
-
-type CorrelationIdKey struct {
-}
 
 type ErrorResponse struct {
 	Code          int       `json:"code"`
@@ -49,14 +47,18 @@ func (error ErrorResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(error)
 }
 
+func InternalServerError(responseWriter http.ResponseWriter, request *http.Request, message string) {
+	Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, message)
+}
+
 func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, error errors.Error, message string) {
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
 	responseWriter.WriteHeader(statusCode)
 
-	correlationId := request.Context().Value(CorrelationIdKey{})
+	correlationId := request.Context().Value(middleware.CorrelationIdKey{})
 	if correlationId == nil {
-		correlationId = uuid.New()
+		correlationId = uuid.NewString()
 	}
 
 	errorResponse := ErrorResponse{

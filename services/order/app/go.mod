@@ -3,12 +3,11 @@ module app
 go 1.19
 
 require (
-	github.com/ValentinLutz/monrepo/libraries/api-helper v0.0.0
-	github.com/ValentinLutz/monrepo/libraries/errors v0.0.0
-	github.com/google/uuid v1.3.0
+	github.com/ValentinLutz/monrepo/libraries/apputil v0.0.0
 	github.com/hellofresh/health-go/v4 v4.7.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/julienschmidt/httprouter v1.3.0
+	github.com/justinas/alice v1.2.0
 	github.com/lib/pq v1.10.7
 	github.com/prometheus/client_golang v1.13.0
 	github.com/rs/zerolog v1.28.0
@@ -21,6 +20,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -30,6 +30,7 @@ require (
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
+	github.com/rs/xid v1.4.0 // indirect
 	go.opentelemetry.io/otel v1.10.0 // indirect
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
@@ -37,7 +38,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
-replace (
-	github.com/ValentinLutz/monrepo/libraries/api-helper v0.0.0 => ../../../libraries/api-helper
-	github.com/ValentinLutz/monrepo/libraries/errors v0.0.0 => ../../../libraries/errors
-)
+replace github.com/ValentinLutz/monrepo/libraries/apputil v0.0.0 => ../../../libraries/apputil

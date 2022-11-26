@@ -13,6 +13,7 @@ server:
 # Logger config
 logger:
   level: INFO
+  json: false
 
 # Database config
 database:

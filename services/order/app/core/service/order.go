@@ -5,7 +5,6 @@ import (
 	"app/core/entity"
 	"app/core/port"
 	"app/internal/order"
-	"app/internal/util"
 	"github.com/jmoiron/sqlx"
 	"math/rand"
 	"strconv"
@@ -13,7 +12,6 @@ import (
 )
 
 type Order struct {
-	logger              *util.Logger
 	db                  *sqlx.DB
 	config              *config.Config
 	orderRepository     port.OrderRepository
@@ -21,14 +19,12 @@ type Order struct {
 }
 
 func NewOrder(
-	logger *util.Logger,
 	db *sqlx.DB,
 	config *config.Config,
 	orderRepository port.OrderRepository,
 	orderItemRepository port.OrderItemRepository,
 ) *Order {
 	return &Order{
-		logger:              logger,
 		db:                  db,
 		config:              config,
 		orderRepository:     orderRepository,
@@ -61,7 +57,7 @@ func (s *Order) GetOrders() ([]entity.Order, error) {
 
 func (s *Order) PlaceOrder(itemNames []string) (entity.Order, error) {
 	creationDate := time.Now()
-	orderId := order.GenerateOrderId(
+	orderId := order.NewOrderId(
 		s.config.Region,
 		creationDate,
 		strconv.Itoa(rand.Int()),

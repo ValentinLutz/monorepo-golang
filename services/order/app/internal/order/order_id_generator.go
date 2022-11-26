@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func GenerateOrderId(region config.Region, timestamp time.Time, salt string) entity.OrderId {
+func NewOrderId(region config.Region, timestamp time.Time, salt string) entity.OrderId {
 	valueToHash := string(region) + timestamp.Format(time.RFC3339) + salt
 	md5Sum := md5.Sum([]byte(valueToHash))
 

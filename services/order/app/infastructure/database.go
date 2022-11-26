@@ -2,19 +2,19 @@ package infastructure
 
 import (
 	"app/config"
-	"app/internal/util"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/rs/zerolog"
 )
 
 type Database struct {
-	logger *util.Logger
 	config *config.Database
+	logger *zerolog.Logger
 }
 
-func NewDatabase(logger *util.Logger, config *config.Database) *Database {
-	return &Database{logger: logger, config: config}
+func NewDatabase(config *config.Database, logger *zerolog.Logger) *Database {
+	return &Database{config: config, logger: logger}
 }
 
 func (database *Database) Connect() *sqlx.DB {
@@ -25,8 +25,7 @@ func (database *Database) Connect() *sqlx.DB {
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-		database.logger.WithoutContext().
-			Fatal().
+		database.logger.Fatal().
 			Err(err).
 			Msg("Failed to connect to database")
 	}
@@ -36,8 +35,7 @@ func (database *Database) Connect() *sqlx.DB {
 
 	err = db.Ping()
 	if err != nil {
-		database.logger.WithoutContext().
-			Fatal().
+		database.logger.Fatal().
 			Err(err).
 			Msg("Failed to ping database")
 	}

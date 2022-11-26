@@ -2,17 +2,15 @@ package orderrepo
 
 import (
 	"app/core/entity"
-	"app/internal/util"
 	"github.com/jmoiron/sqlx"
 )
 
 type PostgreSQL struct {
-	logger   *util.Logger
 	database *sqlx.DB
 }
 
-func NewPostgreSQL(logger *util.Logger, database *sqlx.DB) PostgreSQL {
-	return PostgreSQL{logger: logger, database: database}
+func NewPostgreSQL(database *sqlx.DB) PostgreSQL {
+	return PostgreSQL{database: database}
 }
 
 func (orderRepository *PostgreSQL) FindAll() ([]entity.Order, error) {

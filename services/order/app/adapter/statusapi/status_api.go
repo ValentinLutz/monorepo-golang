@@ -2,41 +2,38 @@ package statusapi
 
 import (
 	"app/config"
-	"app/internal/util"
 	"fmt"
 	"github.com/hellofresh/health-go/v4"
 	psql "github.com/hellofresh/health-go/v4/checks/postgres"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/zerolog"
 	"net/http"
 	"time"
 )
 
 type API struct {
-	logger *util.Logger
 	db     *sqlx.DB
 	config *config.Database
 }
 
-func New(logger *util.Logger, db *sqlx.DB, config *config.Database) *API {
+func New(db *sqlx.DB, config *config.Database) *API {
 	return &API{
-		logger: logger,
 		db:     db,
 		config: config,
 	}
 }
 
-func (api *API) RegisterHandlers(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, "/api/status/health", api.registerHealthChecks())
+func (api *API) RegisterHandlers(router *httprouter.Router, logger *zerolog.Logger) {
+	router.HandlerFunc(http.MethodGet, "/api/status/health", api.registerHealthChecks(logger))
 	router.Handler(http.MethodGet, "/api/status/metrics", api.registerPrometheusMetrics())
 }
 
-func (api *API) registerHealthChecks() http.HandlerFunc {
+func (api *API) registerHealthChecks(logger *zerolog.Logger) http.HandlerFunc {
 	healthStatus, err := health.New()
 	if err != nil {
-		api.logger.WithoutContext().
-			Fatal().
+		logger.Fatal().
 			Err(err).
 			Msg("Failed to create health container")
 	}
@@ -54,8 +51,7 @@ func (api *API) registerHealthChecks() http.HandlerFunc {
 		}),
 	})
 	if err != nil {
-		api.logger.WithoutContext().
-			Fatal().
+		logger.Fatal().
 			Err(err).
 			Msg("Failed to create postgres health check")
 	}

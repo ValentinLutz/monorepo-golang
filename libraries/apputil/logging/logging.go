@@ -1,10 +1,9 @@
-package util
+package logging
 
 import (
-	"context"
 	"fmt"
-	"github.com/ValentinLutz/monrepo/libraries/api-helper"
 	"github.com/rs/zerolog"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -24,48 +23,30 @@ const (
 )
 
 type LoggerConfig struct {
-	Pretty bool     `yaml:"pretty"`
-	Level  LogLevel `yaml:"level"`
+	Json  bool     `yaml:"json"`
+	Level LogLevel `yaml:"level"`
 }
-
-var logger zerolog.Logger
 
 type Logger struct {
 	logger *zerolog.Logger
 }
 
-func New() *Logger {
-	consoleWriter := zerolog.ConsoleWriter{
-		Out:        os.Stdout,
-		TimeFormat: time.RFC3339,
+func NewLogger(config LoggerConfig) zerolog.Logger {
+	var writer io.Writer
+	if config.Json {
+		writer = os.Stdout
+	} else {
+		writer = zerolog.ConsoleWriter{
+			Out:        os.Stdout,
+			TimeFormat: time.RFC3339,
+		}
 	}
-	logger = zerolog.New(consoleWriter).
+
+	zerolog.SetGlobalLevel(config.Level.toZeroLogLevel())
+	return zerolog.New(writer).
 		With().
 		Timestamp().
 		Logger()
-
-	return &Logger{
-		logger: &logger,
-	}
-}
-
-func (logger *Logger) WithoutContext() *zerolog.Logger {
-	return logger.logger
-}
-
-type CorrelationIdKey struct {
-}
-
-func (logger *Logger) WithContext(context context.Context) *zerolog.Logger {
-	correlationId := context.Value(api.CorrelationIdKey{}).(string)
-	loggerWithContext := logger.logger.With().
-		Str("correlation_id", correlationId).
-		Logger()
-	return &loggerWithContext
-}
-
-func SetLogLevel(logLevel LogLevel) {
-	zerolog.SetGlobalLevel(logLevel.toZeroLogLevel())
 }
 
 func (logLevel *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -106,15 +87,15 @@ func (logLevel *LogLevel) toZeroLogLevel() zerolog.Level {
 }
 
 type LoggerWrapper struct {
-	logger *Logger
+	logger *zerolog.Logger
 }
 
-func NewLoggerWrapper(logger *Logger) *LoggerWrapper {
+func NewLoggerWrapper(logger *zerolog.Logger) *LoggerWrapper {
 	return &LoggerWrapper{logger: logger}
 }
 
 func (lw *LoggerWrapper) Write(p []byte) (n int, err error) {
-	lw.logger.logger.Error().Msg(strings.TrimSpace(string(p)))
+	lw.logger.Error().Msg(strings.TrimSpace(string(p)))
 	return len(p), nil
 }
 

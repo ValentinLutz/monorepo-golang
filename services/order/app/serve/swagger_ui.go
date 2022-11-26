@@ -1,7 +1,6 @@
 package serve
 
 import (
-	"app/internal/util"
 	"embed"
 	"github.com/julienschmidt/httprouter"
 	"io/fs"
@@ -15,11 +14,10 @@ var swaggerUIFiles embed.FS
 var openAPISchemaFiles embed.FS
 
 type SwaggerUI struct {
-	logger *util.Logger
 }
 
-func NewSwaggerUI(logger *util.Logger) *SwaggerUI {
-	return &SwaggerUI{logger: logger}
+func NewSwaggerUI() *SwaggerUI {
+	return &SwaggerUI{}
 }
 
 func (swaggerUI *SwaggerUI) RegisterSwaggerUI(router *httprouter.Router) {

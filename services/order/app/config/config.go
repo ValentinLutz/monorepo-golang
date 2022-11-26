@@ -1,18 +1,18 @@
 package config
 
 import (
-	"app/internal/util"
+	"github.com/ValentinLutz/monrepo/libraries/apputil/logging"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
 type Config struct {
-	Region      Region            `yaml:"region"`
-	Environment Environment       `yaml:"environment"`
-	Server      ServerConfig      `yaml:"server"`
-	Logger      util.LoggerConfig `yaml:"logger"`
-	Database    Database          `yaml:"database"`
-	Client      Client            `yaml:"client"`
+	Region      Region               `yaml:"region"`
+	Environment Environment          `yaml:"environment"`
+	Server      ServerConfig         `yaml:"server"`
+	Logger      logging.LoggerConfig `yaml:"logger"`
+	Database    Database             `yaml:"database"`
+	Client      Client               `yaml:"client"`
 }
 
 type ServerConfig struct {
