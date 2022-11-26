@@ -1,4 +1,4 @@
-package order_repo
+package orderrepo
 
 import (
 	"app/core/entity"

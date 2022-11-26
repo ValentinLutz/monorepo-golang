@@ -1,4 +1,4 @@
-package status_api
+package statusapi
 
 import (
 	"app/config"

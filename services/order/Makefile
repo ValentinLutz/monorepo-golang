@@ -25,15 +25,15 @@ app/adapter/order_api/order.gen.go: api-definition/order_api.yaml api-definition
 		oapi-codegen --config api-definition/oapi-codegen-app.yaml \
 		api-definition/order_api.yaml  > app/adapter/order_api/order.gen.go
 
-app.run:: app/config/app/config.yaml app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go ## Run the app
+app.run:: app/config/app/config.yaml app/serve/openapi/order_api.yaml app/adapter/orderapi/order.gen.go ## Run the app
 	cd app && \
 		go run main.go
 
-app.build:: app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go ## Build the app into an executable
+app.build:: app/serve/openapi/order_api.yaml app/adapter/orderapi/order.gen.go ## Build the app into an executable
 	cd app && \
 		go build
 
-app.lint:: app/adapter/order_api/order.gen.go ## Runs linters against go code
+app.lint:: app/adapter/orderapi/order.gen.go ## Runs linters against go code
 	cd app && \
 		golangci-lint run
 
@@ -44,7 +44,7 @@ test-integration/order_api/order.gen.go: api-definition/order_api.yaml api-defin
 		oapi-codegen --config api-definition/oapi-codegen-test.yaml \
 		api-definition/order_api.yaml  > test-integration/order_api/order.gen.go
 
-test.unit::  app/serve/openapi/order_api.yaml app/adapter/order_api/order.gen.go ## Run the unit tests
+test.unit::  app/serve/openapi/order_api.yaml app/adapter/orderapi/order.gen.go ## Run the unit tests
 	cd app && \
 		go test -cover ./...
 
@@ -52,7 +52,7 @@ test.smoke:: ## Run the smoke tests
 	cd test-smoke && \
 		go test -count=1 ./...
 
-test.integration:: test-integration/order_api/order.gen.go ## Run the integration tests
+test.integration:: test-integration/orderapi/order.gen.go ## Run the integration tests
 	cd test-integration && \
 		go test -count=1 ./...
 

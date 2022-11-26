@@ -1,4 +1,4 @@
-package order_api_test
+package orderapi_test
 
 import (
 	"bytes"
@@ -13,19 +13,19 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"test-integration/order_api"
+	"test-integration/orderapi"
 	"testing"
 	"time"
 )
 
 var config = testingutil.LoadConfig("../../config/test")
 
-func initClient() order_api.Client {
+func initClient() orderapi.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	return order_api.Client{
+	return orderapi.Client{
 		Server: config.BaseURL,
 		Client: client,
 	}
@@ -98,9 +98,9 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
-	var actualResponse order_api.OrdersResponse
+	var actualResponse orderapi.OrdersResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse order_api.OrdersResponse
+	var expectedResponse orderapi.OrdersResponse
 	readToObject(t, readFile(t, "ordersResponse.json"), &expectedResponse)
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
@@ -111,11 +111,11 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 func TestPostOrder(t *testing.T) {
 	// GIVEN
 	client := initClient()
-	orderItems := []order_api.OrderItemRequest{
+	orderItems := []orderapi.OrderItemRequest{
 		{Name: "caramel"},
 		{Name: "clementine"},
 	}
-	orderRequest := order_api.OrderRequest{Items: orderItems}
+	orderRequest := orderapi.OrderRequest{Items: orderItems}
 	var body bytes.Buffer
 	err := json.NewEncoder(&body).Encode(orderRequest)
 	if err != nil {
@@ -132,11 +132,11 @@ func TestPostOrder(t *testing.T) {
 	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
-	var actualResponse order_api.OrderResponse
+	var actualResponse orderapi.OrderResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
 	assert.Equal(t, 201, apiOrder.StatusCode)
-	assert.Equal(t, order_api.OrderPlaced, actualResponse.Status)
-	assert.Equal(t, []order_api.OrderItemResponse{
+	assert.Equal(t, orderapi.OrderPlaced, actualResponse.Status)
+	assert.Equal(t, []orderapi.OrderItemResponse{
 		{Name: "caramel"},
 		{Name: "clementine"},
 	}, actualResponse.Items)
@@ -173,9 +173,9 @@ VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
 	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
-	var actualResponse order_api.OrderResponse
+	var actualResponse orderapi.OrderResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse order_api.OrderResponse
+	var expectedResponse orderapi.OrderResponse
 	readToObject(t, readFile(t, "orderResponse.json"), &expectedResponse)
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
@@ -201,9 +201,9 @@ func TestGetOrderNotFound(t *testing.T) {
 	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
-	var actualResponse order_api.ErrorResponse
+	var actualResponse orderapi.ErrorResponse
 	readToObject(t, apiOrder.Body, &actualResponse)
-	var expectedResponse order_api.ErrorResponse
+	var expectedResponse orderapi.ErrorResponse
 	readToObject(t, readFile(t, "orderNotFoundResponse.json"), &expectedResponse)
 	expectedResponse.Timestamp = actualResponse.Timestamp
 

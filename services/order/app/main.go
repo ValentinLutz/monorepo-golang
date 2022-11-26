@@ -1,10 +1,10 @@
 package main
 
 import (
-	"app/adapter/order_api"
-	"app/adapter/order_item_repo"
-	"app/adapter/order_repo"
-	"app/adapter/status_api"
+	"app/adapter/orderapi"
+	"app/adapter/orderitemrepo"
+	"app/adapter/orderrepo"
+	"app/adapter/statusapi"
 	"app/api"
 	"app/config"
 	"app/core/service"
@@ -93,14 +93,14 @@ func shutdownServerGracefully(server *http.Server, logger *util.Logger) {
 func newServer(logger *util.Logger, config *config.Config, db *sqlx.DB) *http.Server {
 	router := httprouter.New()
 
-	orderRepository := order_repo.NewPostgreSQL(logger, db)
-	orderItemRepository := order_item_repo.NewPostgreSQL(logger, db)
+	orderRepository := orderrepo.NewPostgreSQL(logger, db)
+	orderItemRepository := orderitemrepo.NewPostgreSQL(logger, db)
 	ordersService := service.NewOrder(logger, db, config, &orderRepository, &orderItemRepository)
 
-	orderAPI := order_api.New(logger, config, ordersService)
+	orderAPI := orderapi.New(logger, config, ordersService)
 	orderAPI.RegisterHandlers(router)
 
-	statusAPI := status_api.New(logger, db, &config.Database)
+	statusAPI := statusapi.New(logger, db, &config.Database)
 	statusAPI.RegisterHandlers(router)
 
 	swaggerUI := serve.NewSwaggerUI(logger)
