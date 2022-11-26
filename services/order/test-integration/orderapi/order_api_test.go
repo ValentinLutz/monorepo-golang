@@ -15,7 +15,6 @@ import (
 	"os"
 	"test-integration/orderapi"
 	"testing"
-	"time"
 )
 
 var config = testingutil.LoadConfig("../../config/test")
@@ -89,13 +88,11 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 	exec(t, database, addOrders)
 
 	// WHEN
-	startTime := time.Now()
 	apiOrder, err := client.GetApiOrders(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer apiOrder.Body.Close()
-	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
 	var actualResponse orderapi.OrdersResponse
@@ -105,7 +102,6 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
-	assert.GreaterOrEqual(t, int64(10), responseTimeInMs, "Response time in milliseconds")
 }
 
 func TestPostOrder(t *testing.T) {
@@ -123,13 +119,11 @@ func TestPostOrder(t *testing.T) {
 	}
 
 	// WHEN
-	startTime := time.Now()
 	apiOrder, err := client.PostApiOrdersWithBody(context.Background(), "application/json", &body)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer apiOrder.Body.Close()
-	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
 	var actualResponse orderapi.OrderResponse
@@ -142,7 +136,6 @@ func TestPostOrder(t *testing.T) {
 	}, actualResponse.Items)
 	assert.NotEmpty(t, actualResponse.OrderId)
 	assert.NotEmpty(t, actualResponse.CreationDate)
-	assert.GreaterOrEqual(t, int64(50), responseTimeInMs, "Response time in milliseconds")
 }
 
 func TestGetOrder(t *testing.T) {
@@ -164,13 +157,11 @@ VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
 	exec(t, database, addOrder)
 
 	// WHEN
-	startTime := time.Now()
 	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "fdCDxjV9o!O-NONE-ZCTH5i6fWcA")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer apiOrder.Body.Close()
-	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
 	var actualResponse orderapi.OrderResponse
@@ -180,7 +171,6 @@ VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
 
 	assert.Equal(t, 200, apiOrder.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
-	assert.GreaterOrEqual(t, int64(50), responseTimeInMs)
 }
 
 func TestGetOrderNotFound(t *testing.T) {
@@ -188,7 +178,6 @@ func TestGetOrderNotFound(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	startTime := time.Now()
 	addCorrelationIdHeader := func(ctx context.Context, req *http.Request) error {
 		req.Header.Add("Correlation-ID", "2685342d-4888-4d74-9a57-aa5393fc8e35")
 		return nil
@@ -198,7 +187,6 @@ func TestGetOrderNotFound(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer apiOrder.Body.Close()
-	responseTimeInMs := time.Since(startTime).Milliseconds()
 
 	// THEN
 	var actualResponse orderapi.ErrorResponse
@@ -209,7 +197,6 @@ func TestGetOrderNotFound(t *testing.T) {
 
 	assert.Equal(t, 404, apiOrder.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
-	assert.GreaterOrEqual(t, int64(10), responseTimeInMs, "Response time in milliseconds")
 }
 
 func readToObject(t *testing.T, reader io.Reader, object interface{}) {
