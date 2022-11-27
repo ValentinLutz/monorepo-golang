@@ -3,7 +3,7 @@ package httpresponse
 import (
 	"encoding/json"
 	"github.com/ValentinLutz/monrepo/libraries/apputil/errors"
-	"github.com/ValentinLutz/monrepo/libraries/apputil/middleware"
+	"github.com/ValentinLutz/monrepo/libraries/apputil/logging"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
@@ -31,10 +31,17 @@ func StatusCreated(responseWriter http.ResponseWriter, request *http.Request, bo
 	Status(responseWriter, request, http.StatusCreated, body)
 }
 
+func StatusUnauthorized(responseWriter http.ResponseWriter, request *http.Request) {
+	responseWriter.Header().Set("WWW-Authenticate", `Basic realm="monke"`)
+	Status(responseWriter, request, http.StatusUnauthorized, nil)
+}
+
 func Status(responseWriter http.ResponseWriter, request *http.Request, statusCode int, body JSONWriter) {
-	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.WriteHeader(statusCode)
+
 	if body != nil {
+		responseWriter.Header().Set("Content-Type", "application/json")
+
 		err := body.ToJSON(responseWriter)
 		if err != nil {
 			Error(responseWriter, request, http.StatusInternalServerError, 9009, "panic it's over 9000")
@@ -56,7 +63,7 @@ func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode
 	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
 	responseWriter.WriteHeader(statusCode)
 
-	correlationId := request.Context().Value(middleware.CorrelationIdKey{})
+	correlationId := request.Context().Value(logging.CorrelationIdKey{})
 	if correlationId == nil {
 		correlationId = uuid.NewString()
 	}

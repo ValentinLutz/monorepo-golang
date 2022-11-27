@@ -3,6 +3,10 @@ package middleware
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"crypto/subtle"
+	"github.com/ValentinLutz/monrepo/libraries/apputil/httpresponse"
+	"github.com/ValentinLutz/monrepo/libraries/apputil/logging"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -11,7 +15,31 @@ import (
 	"time"
 )
 
-type CorrelationIdKey struct {
+type Authentication struct {
+	Username string
+	Password string
+}
+
+func (a Authentication) BasicAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
+		username, password, ok := request.BasicAuth()
+		if !ok {
+			httpresponse.StatusUnauthorized(responseWriter, request)
+			return
+		}
+
+		hashedAuthorization := sha256.Sum256([]byte(username + password))
+		hashedCredentials := sha256.Sum256([]byte(a.Username + a.Password))
+
+		isAuthorized := subtle.ConstantTimeCompare(hashedAuthorization[:], hashedCredentials[:]) == 1
+
+		if !isAuthorized {
+			httpresponse.StatusUnauthorized(responseWriter, request)
+			return
+		}
+
+		next.ServeHTTP(responseWriter, request)
+	})
 }
 
 func CorrelationId(next http.Handler) http.Handler {
@@ -21,7 +49,7 @@ func CorrelationId(next http.Handler) http.Handler {
 			correlationId = uuid.NewString()
 		}
 
-		requestContext := context.WithValue(request.Context(), CorrelationIdKey{}, correlationId)
+		requestContext := context.WithValue(request.Context(), logging.CorrelationIdKey{}, correlationId)
 		request = request.WithContext(requestContext)
 
 		logger := zerolog.Ctx(requestContext)

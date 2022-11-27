@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+type CorrelationIdKey struct {
+}
+
 type LogLevel string
 
 const (
