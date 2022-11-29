@@ -1,6 +1,6 @@
 version: 2
 updates:
   - package-ecosystem: gomod
-    directory: /
+    directory: /src/go
     schedule:
       interval: daily
