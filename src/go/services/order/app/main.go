@@ -108,11 +108,11 @@ func newServer(logger zerolog.Logger, config *config.Config, db *sqlx.DB) *http.
 
 	handlerChain := alice.New()
 	handlerChain = handlerChain.Append(hlog.NewHandler(logger))
-	//authentication := middleware.Authentication{
-	//	Username: "test",
-	//	Password: "test",
-	//}
-	//handlerChain = handlerChain.Append(authentication.BasicAuth)
+	authentication := middleware.Authentication{
+		Username: "test",
+		Password: "test",
+	}
+	handlerChain = handlerChain.Append(authentication.BasicAuth)
 	handlerChain = handlerChain.Append(middleware.CorrelationId)
 	handlerChain = handlerChain.Append(middleware.RequestLogging)
 

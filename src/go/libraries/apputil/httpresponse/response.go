@@ -23,29 +23,36 @@ type JSONWriter interface {
 	ToJSON(writer io.Writer) error
 }
 
+func Status(responseWriter http.ResponseWriter, statusCode int) {
+	responseWriter.WriteHeader(statusCode)
+}
+
+func StatusWithBody(responseWriter http.ResponseWriter, request *http.Request, statusCode int, body JSONWriter) {
+	responseWriter.Header().Set("Content-Type", "application/json")
+	responseWriter.WriteHeader(statusCode)
+
+	err := body.ToJSON(responseWriter)
+	if err != nil {
+		StatusInternalServerError(responseWriter, request, "panic it's over 9000")
+	}
+
+}
+
 func StatusOK(responseWriter http.ResponseWriter, request *http.Request, body JSONWriter) {
-	Status(responseWriter, request, http.StatusOK, body)
+	StatusWithBody(responseWriter, request, http.StatusOK, body)
 }
 
 func StatusCreated(responseWriter http.ResponseWriter, request *http.Request, body JSONWriter) {
-	Status(responseWriter, request, http.StatusCreated, body)
+	StatusWithBody(responseWriter, request, http.StatusCreated, body)
 }
 
-func StatusUnauthorized(responseWriter http.ResponseWriter, request *http.Request) {
+func StatusUnauthorized(responseWriter http.ResponseWriter) {
 	responseWriter.Header().Set("WWW-Authenticate", `Basic realm="monke"`)
-	Status(responseWriter, request, http.StatusUnauthorized, nil)
+	Status(responseWriter, http.StatusUnauthorized)
 }
 
-func Status(responseWriter http.ResponseWriter, request *http.Request, statusCode int, body JSONWriter) {
-	if body != nil {
-		responseWriter.Header().Set("Content-Type", "application/json")
-
-		err := body.ToJSON(responseWriter)
-		if err != nil {
-			Error(responseWriter, request, http.StatusInternalServerError, 9009, "panic it's over 9000")
-		}
-	}
-	responseWriter.WriteHeader(statusCode)
+func StatusInternalServerError(responseWriter http.ResponseWriter, request *http.Request, message string) {
+	Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, message)
 }
 
 func (error ErrorResponse) ToJSON(writer io.Writer) error {
@@ -53,13 +60,10 @@ func (error ErrorResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(error)
 }
 
-func InternalServerError(responseWriter http.ResponseWriter, request *http.Request, message string) {
-	Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, message)
-}
-
 func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, error errors.Error, message string) {
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
+	responseWriter.WriteHeader(statusCode)
 
 	correlationId := request.Context().Value(logging.CorrelationIdKey{})
 	if correlationId == nil {
@@ -76,5 +80,4 @@ func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode
 	}
 
 	_ = errorResponse.ToJSON(responseWriter)
-	responseWriter.WriteHeader(statusCode)
 }

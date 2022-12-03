@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
@@ -19,18 +20,30 @@ import (
 
 var config = testingutil.LoadConfig("../../config/test")
 
-func initClient() orderapi.Client {
+func newClient(t *testing.T) *orderapi.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	return orderapi.Client{
-		Server: config.BaseURL,
-		Client: client,
+
+	basicAuth, err := securityprovider.NewSecurityProviderBasicAuth("test", "test")
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	orderApiClient, err := orderapi.NewClient(
+		config.BaseURL,
+		orderapi.WithHTTPClient(client),
+		orderapi.WithRequestEditorFn(basicAuth.Intercept),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return orderApiClient
 }
 
-func initDatabase(t *testing.T) *sqlx.DB {
+func newDatabase(t *testing.T) *sqlx.DB {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Password, config.Database.Database,
@@ -60,8 +73,8 @@ func exec(t *testing.T, db *sqlx.DB, query string) {
 
 func Test_GetOrders(t *testing.T) {
 	// GIVEN
-	client := initClient()
-	database := initDatabase(t)
+	client := newClient(t)
+	database := newDatabase(t)
 
 	addOrders := `
 INSERT INTO order_service.order
@@ -106,8 +119,8 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 
 func Test_GetOrders_EmptyArray(t *testing.T) {
 	// GIVEN
-	client := initClient()
-	_ = initDatabase(t)
+	client := newClient(t)
+	_ = newDatabase(t)
 
 	// WHEN
 	apiOrder, err := client.GetApiOrders(context.Background(), &orderapi.GetApiOrdersParams{})
@@ -128,7 +141,7 @@ func Test_GetOrders_EmptyArray(t *testing.T) {
 
 func Test_PostOrder(t *testing.T) {
 	// GIVEN
-	client := initClient()
+	client := newClient(t)
 	orderItems := []orderapi.OrderItemRequest{
 		{Name: "caramel"},
 		{Name: "clementine"},
@@ -163,8 +176,8 @@ func Test_PostOrder(t *testing.T) {
 
 func Test_GetOrder(t *testing.T) {
 	// GIVEN
-	client := initClient()
-	database := initDatabase(t)
+	client := newClient(t)
+	database := newDatabase(t)
 
 	const addOrder = `
 INSERT INTO order_service.order
@@ -198,7 +211,7 @@ VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
 
 func Test_GetOrder_NotFound(t *testing.T) {
 	// GIVEN
-	client := initClient()
+	client := newClient(t)
 
 	// WHEN
 	addCorrelationIdHeader := func(ctx context.Context, req *http.Request) error {

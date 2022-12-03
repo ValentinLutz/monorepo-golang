@@ -90,6 +90,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/error_response"
 components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
   schemas:
     order_request:
       type: object

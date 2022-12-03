@@ -24,7 +24,7 @@ func (a Authentication) BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
 		username, password, ok := request.BasicAuth()
 		if !ok {
-			httpresponse.StatusUnauthorized(responseWriter, request)
+			httpresponse.StatusUnauthorized(responseWriter)
 			return
 		}
 
@@ -34,7 +34,7 @@ func (a Authentication) BasicAuth(next http.Handler) http.Handler {
 		isAuthorized := subtle.ConstantTimeCompare(hashedAuthorization[:], hashedCredentials[:]) == 1
 
 		if !isAuthorized {
-			httpresponse.StatusUnauthorized(responseWriter, request)
+			httpresponse.StatusUnauthorized(responseWriter)
 			return
 		}
 

@@ -9,18 +9,6 @@ import (
 	"time"
 )
 
-var testNewOrderId = func(region config.Region, timestamp time.Time, salt string, expected entity.OrderId) func(t *testing.T) {
-	return func(t *testing.T) {
-		t.Logf("Region: %v", region)
-		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
-		t.Logf("Salt: %v", salt)
-		// WHEN
-		actual := order.NewOrderId(region, timestamp, salt)
-		// THEN
-		assert.Equal(t, expected, actual)
-	}
-}
-
 func Test_NewOrderId(t *testing.T) {
 	// GIVEN
 	timestamp, err := time.Parse(time.RFC3339, "1980-01-01T00:00:00+00:00")
@@ -39,4 +27,16 @@ func Test_NewOrderId(t *testing.T) {
 	t.Run("US", testNewOrderId(config.US, timestamp, "101", "kv0Hbli7PTn-US-TvwK!socVFg"))
 	t.Run("US", testNewOrderId(config.US, timestamp, "10101", "MnWZUuMf7df-US-f9GUPjtFBdA"))
 	t.Run("US", testNewOrderId(config.US, timestamp, "1010101", "gATm85KNU5H-US-UF!dI1xtcog"))
+}
+
+func testNewOrderId(region config.Region, timestamp time.Time, salt string, expected entity.OrderId) func(t *testing.T) {
+	return func(t *testing.T) {
+		t.Logf("Region: %v", region)
+		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
+		t.Logf("Salt: %v", salt)
+		// WHEN
+		actual := order.NewOrderId(region, timestamp, salt)
+		// THEN
+		assert.Equal(t, expected, actual)
+	}
 }
