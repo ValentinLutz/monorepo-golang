@@ -37,8 +37,6 @@ func StatusUnauthorized(responseWriter http.ResponseWriter, request *http.Reques
 }
 
 func Status(responseWriter http.ResponseWriter, request *http.Request, statusCode int, body JSONWriter) {
-	responseWriter.WriteHeader(statusCode)
-
 	if body != nil {
 		responseWriter.Header().Set("Content-Type", "application/json")
 
@@ -47,6 +45,7 @@ func Status(responseWriter http.ResponseWriter, request *http.Request, statusCod
 			Error(responseWriter, request, http.StatusInternalServerError, 9009, "panic it's over 9000")
 		}
 	}
+	responseWriter.WriteHeader(statusCode)
 }
 
 func (error ErrorResponse) ToJSON(writer io.Writer) error {
@@ -61,7 +60,6 @@ func InternalServerError(responseWriter http.ResponseWriter, request *http.Reque
 func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, error errors.Error, message string) {
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
-	responseWriter.WriteHeader(statusCode)
 
 	correlationId := request.Context().Value(logging.CorrelationIdKey{})
 	if correlationId == nil {
@@ -78,4 +76,5 @@ func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode
 	}
 
 	_ = errorResponse.ToJSON(responseWriter)
+	responseWriter.WriteHeader(statusCode)
 }
