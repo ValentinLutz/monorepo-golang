@@ -1,9 +1,10 @@
 package order_test
 
 import (
-	"app/config"
-	"app/core/entity"
 	"github.com/stretchr/testify/assert"
+	"monorepo/services/order/app/config"
+	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/internal/order"
 	"testing"
 	"time"
 )
@@ -14,7 +15,7 @@ var testNewOrderId = func(region config.Region, timestamp time.Time, salt string
 		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
 		t.Logf("Salt: %v", salt)
 		// WHEN
-		actual := NewOrderId(region, timestamp, salt)
+		actual := order.NewOrderId(region, timestamp, salt)
 		// THEN
 		assert.Equal(t, expected, actual)
 	}
