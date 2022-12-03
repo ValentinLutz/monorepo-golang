@@ -3,6 +3,7 @@ module monorepo
 go 1.19
 
 require (
+	github.com/deepmap/oapi-codegen v1.12.1
 	github.com/google/uuid v1.3.0
 	github.com/hellofresh/health-go/v5 v5.0.0
 	github.com/jmoiron/sqlx v1.3.5
@@ -16,6 +17,7 @@ require (
 )
 
 require (
+	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
