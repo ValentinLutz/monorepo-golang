@@ -35,7 +35,7 @@ func (orderItemRepository *PostgreSQL) FindAllByOrderId(orderId entity.OrderId) 
 
 func (orderItemRepository *PostgreSQL) SaveAll(orderItemEntities []entity.OrderItem) error {
 	_, err := orderItemRepository.db.NamedExec(
-		`INSERT INTO order_service.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)`, orderItemEntities)
+		"INSERT INTO order_service.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)", orderItemEntities)
 	return err
 }
 

@@ -54,7 +54,7 @@ func (orderRepository *PostgreSQL) FindById(orderId entity.OrderId) (entity.Orde
 
 func (orderRepository *PostgreSQL) Save(orderEntity entity.Order) error {
 	_, err := orderRepository.database.NamedExec(
-		`INSERT INTO order_service.order (order_id, creation_date, order_status, workflow) VALUES (:order_id, :creation_date, :order_status, :workflow)`,
+		"INSERT INTO order_service.order (order_id, creation_date, order_status, workflow) VALUES (:order_id, :creation_date, :order_status, :workflow)",
 		orderEntity,
 	)
 	return err
