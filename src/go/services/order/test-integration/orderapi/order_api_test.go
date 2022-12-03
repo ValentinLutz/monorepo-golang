@@ -58,7 +58,7 @@ func exec(t *testing.T, db *sqlx.DB, query string) {
 	}
 }
 
-func TestGetOrders(t *testing.T) {
+func Test_GetOrders(t *testing.T) {
 	// GIVEN
 	client := initClient()
 	database := initDatabase(t)
@@ -104,7 +104,29 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 	assert.Equal(t, expectedResponse, actualResponse)
 }
 
-func TestPostOrder(t *testing.T) {
+func Test_GetOrders_EmptyArray(t *testing.T) {
+	// GIVEN
+	client := initClient()
+	_ = initDatabase(t)
+
+	// WHEN
+	apiOrder, err := client.GetApiOrders(context.Background(), &orderapi.GetApiOrdersParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer apiOrder.Body.Close()
+
+	// THEN
+	assert.Equal(t, 200, apiOrder.StatusCode)
+
+	var actualResponse orderapi.OrdersResponse
+	readToObject(t, apiOrder.Body, &actualResponse)
+	var expectedResponse orderapi.OrdersResponse
+	readToObject(t, readFile(t, "ordersEmptyResponse.json"), &expectedResponse)
+	assert.Equal(t, expectedResponse, actualResponse)
+}
+
+func Test_PostOrder(t *testing.T) {
 	// GIVEN
 	client := initClient()
 	orderItems := []orderapi.OrderItemRequest{
@@ -139,7 +161,7 @@ func TestPostOrder(t *testing.T) {
 	assert.NotEmpty(t, actualResponse.CreationDate)
 }
 
-func TestGetOrder(t *testing.T) {
+func Test_GetOrder(t *testing.T) {
 	// GIVEN
 	client := initClient()
 	database := initDatabase(t)
@@ -174,7 +196,7 @@ VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
 	assert.Equal(t, expectedResponse, actualResponse)
 }
 
-func TestGetOrderNotFound(t *testing.T) {
+func Test_GetOrder_NotFound(t *testing.T) {
 	// GIVEN
 	client := initClient()
 

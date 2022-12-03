@@ -46,7 +46,7 @@ func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	var ordersResponse OrdersResponse
+	ordersResponse := make(OrdersResponse, 0)
 	for _, orderEntity := range orderEntities {
 		orderEntity, err := FromOrderEntity(orderEntity)
 		if err != nil {
