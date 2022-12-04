@@ -1,6 +1,8 @@
 package: orderapi
 generate:
+  chi-server: true
   models: true
+  embedded-spec: true
 
 compatibility:
   old-aliasing: true

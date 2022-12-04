@@ -2,10 +2,10 @@ package statusapi
 
 import (
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"github.com/hellofresh/health-go/v5"
 	psql "github.com/hellofresh/health-go/v5/checks/postgres"
 	"github.com/jmoiron/sqlx"
-	"github.com/julienschmidt/httprouter"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"monorepo/services/order/app/config"
@@ -16,31 +16,35 @@ import (
 type API struct {
 	db     *sqlx.DB
 	config *config.Database
+	logger *zerolog.Logger
 }
 
-func New(db *sqlx.DB, config *config.Database) *API {
+func New(db *sqlx.DB, config *config.Database, logger *zerolog.Logger) *API {
 	return &API{
 		db:     db,
 		config: config,
+		logger: logger,
 	}
 }
 
-func (api *API) RegisterHandlers(router *httprouter.Router, logger *zerolog.Logger) {
-	router.HandlerFunc(http.MethodGet, "/api/status/health", api.registerHealthChecks(logger))
-	router.Handler(http.MethodGet, "/api/status/metrics", api.registerPrometheusMetrics())
+func (a *API) RegisterRoutes(router chi.Router) {
+	router.Group(func(r chi.Router) {
+		r.Get("/api/status/health", a.registerHealthChecks())
+		r.Method("GET", "/api/status/metrics", a.registerPrometheusMetrics())
+	})
 }
 
-func (api *API) registerHealthChecks(logger *zerolog.Logger) http.HandlerFunc {
+func (a *API) registerHealthChecks() http.HandlerFunc {
 	healthStatus, err := health.New()
 	if err != nil {
-		logger.Fatal().
+		a.logger.Fatal().
 			Err(err).
 			Msg("Failed to create health container")
 	}
 
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		api.config.Host, api.config.Port, api.config.Username, api.config.Password, api.config.Database,
+		a.config.Host, a.config.Port, a.config.Username, a.config.Password, a.config.Database,
 	)
 	err = healthStatus.Register(health.Config{
 		Name:      "postgresql",
@@ -51,7 +55,7 @@ func (api *API) registerHealthChecks(logger *zerolog.Logger) http.HandlerFunc {
 		}),
 	})
 	if err != nil {
-		logger.Fatal().
+		a.logger.Fatal().
 			Err(err).
 			Msg("Failed to create postgres health check")
 	}
@@ -59,6 +63,6 @@ func (api *API) registerHealthChecks(logger *zerolog.Logger) http.HandlerFunc {
 	return healthStatus.HandlerFunc
 }
 
-func (api *API) registerPrometheusMetrics() http.Handler {
+func (a *API) registerPrometheusMetrics() http.Handler {
 	return promhttp.Handler()
 }

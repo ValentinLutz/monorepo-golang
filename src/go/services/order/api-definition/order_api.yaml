@@ -2,8 +2,10 @@ openapi: "3.0.3"
 info:
   version: 0.1.2
   title: Order API
+servers:
+  - url: /api
 paths:
-  /api/orders:
+  /orders:
     get:
       summary: Get all orders
       tags:
@@ -58,7 +60,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error_response"
-  /api/orders/{orderId}:
+  /orders/{orderId}:
     get:
       summary: Info for a specific order_repo
       tags:

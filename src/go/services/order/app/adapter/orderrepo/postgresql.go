@@ -13,10 +13,10 @@ func NewPostgreSQL(database *sqlx.DB) PostgreSQL {
 	return PostgreSQL{database: database}
 }
 
-func (orderRepository *PostgreSQL) FindAll(limit int, offset int) ([]entity.Order, error) {
+func (orderRepository *PostgreSQL) FindAll(offset int, limit int) ([]entity.Order, error) {
 	rows, err := orderRepository.database.Query(
-		"SELECT order_id, creation_date, order_status FROM order_service.order ORDER BY creation_date LIMIT $1 OFFSET $2",
-		limit, offset,
+		"SELECT order_id, creation_date, order_status FROM order_service.order ORDER BY creation_date OFFSET $1 LIMIT $2",
+		offset, limit,
 	)
 	if err != nil {
 		return nil, err

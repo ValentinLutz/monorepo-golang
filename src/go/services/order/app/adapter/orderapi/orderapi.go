@@ -1,14 +1,12 @@
 package orderapi
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"monorepo/libraries/apputil/errors"
 	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/entity"
 	"monorepo/services/order/app/core/port"
 	"net/http"
-	"strconv"
 )
 
 type API struct {
@@ -23,24 +21,17 @@ func New(config *config.Config, service port.OrderService) *API {
 	}
 }
 
-func (a *API) RegisterHandlers(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, "/api/orders", a.getOrders)
-	router.HandlerFunc(http.MethodPost, "/api/orders", a.postOrder)
-	router.HandlerFunc(http.MethodGet, "/api/orders/:orderId", a.getOrder)
-}
-
-func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Request) {
-	queryParams := request.URL.Query()
-	limit, err := strconv.Atoi(queryParams.Get("limit"))
-	if err != nil {
-		limit = 50
+func (a *API) GetOrders(responseWriter http.ResponseWriter, request *http.Request, params GetOrdersParams) {
+	offset := 0
+	if params.Offset != nil {
+		offset = *params.Offset
 	}
-	offset, err := strconv.Atoi(queryParams.Get("offset"))
-	if err != nil {
-		offset = 0
+	limit := 50
+	if params.Limit != nil {
+		limit = *params.Limit
 	}
 
-	orderEntities, err := a.service.GetOrders(limit, offset)
+	orderEntities, err := a.service.GetOrders(offset, limit)
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
@@ -59,7 +50,7 @@ func (a *API) getOrders(responseWriter http.ResponseWriter, request *http.Reques
 	httpresponse.StatusOK(responseWriter, request, &ordersResponse)
 }
 
-func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Request) {
+func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Request) {
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, err.Error())
@@ -80,11 +71,8 @@ func (a *API) postOrder(responseWriter http.ResponseWriter, request *http.Reques
 	httpresponse.StatusCreated(responseWriter, request, response)
 }
 
-func (a *API) getOrder(responseWriter http.ResponseWriter, request *http.Request) {
-	params := httprouter.ParamsFromContext(request.Context())
-	orderId := entity.OrderId(params.ByName("orderId"))
-
-	orderEntity, err := a.service.GetOrder(orderId)
+func (a *API) GetOrdersOrderId(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
+	orderEntity, err := a.service.GetOrder(entity.OrderId(orderId))
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusNotFound, errors.OrderNotFound, err.Error())
 		return

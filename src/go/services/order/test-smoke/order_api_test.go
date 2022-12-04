@@ -63,7 +63,7 @@ func TestSwaggerUI(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get(config.BaseURL + "/swagger")
+	response, err := client.Get(config.BaseURL + "/swagger/")
 	if err != nil {
 		t.Fatal(err)
 	}

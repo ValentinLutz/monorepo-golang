@@ -3,7 +3,7 @@ package port
 import "monorepo/services/order/app/core/entity"
 
 type OrderRepository interface {
-	FindAll(limit int, offset int) ([]entity.Order, error)
+	FindAll(offset int, limit int) ([]entity.Order, error)
 	FindById(orderId entity.OrderId) (entity.Order, error)
 	Save(orderEntity entity.Order) error
 }

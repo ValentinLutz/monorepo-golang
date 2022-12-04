@@ -17,19 +17,16 @@ export DOCKER_REPOSITORY ?= valentinlutz
 app/config/app/config.yaml: config/app/config.none-local.yaml ## Copy none-local config to app directory
 	install -D config/app/config.none-local.yaml app/config/config.yaml
 
-app/serve/openapi/order_api.yaml: api-definition/order_api.yaml ## Copy orders open api definition to app
-	install -D api-definition/order_api.yaml app/serve/openapi/order_api.yaml
-
 app/adapter/orderapi/order.gen.go: api-definition/order_api.yaml api-definition/oapi-codegen-app.yaml ## Generate orders server from open api definition
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.1 && \
 		oapi-codegen --config api-definition/oapi-codegen-app.yaml \
 		api-definition/order_api.yaml  > app/adapter/orderapi/order.gen.go
 
-app.run:: app/config/app/config.yaml app/serve/openapi/order_api.yaml app/adapter/orderapi/order.gen.go ## Run the app
+app.run:: app/config/app/config.yaml app/adapter/orderapi/order.gen.go ## Run the app
 	cd app && \
 		go run main.go
 
-app.build:: app/serve/openapi/order_api.yaml app/adapter/orderapi/order.gen.go ## Build the app into an executable
+app.build:: app/adapter/orderapi/order.gen.go ## Build the app into an executable
 	cd app && \
 		go build
 
@@ -44,7 +41,7 @@ test-integration/orderapi/order.gen.go: api-definition/order_api.yaml api-defini
 		oapi-codegen --config api-definition/oapi-codegen-test.yaml \
 		api-definition/order_api.yaml  > test-integration/orderapi/order.gen.go
 
-test.unit::  app/serve/openapi/order_api.yaml app/adapter/orderapi/order.gen.go ## Run the unit tests
+test.unit::  app/adapter/orderapi/order.gen.go ## Run the unit tests
 	cd app && \
 		go test -cover ./...
 
@@ -78,7 +75,7 @@ database.migrate:: ## Migrate database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 
 
 
-docker.build:: app/serve/openapi/order_api.yaml app/adapter/orderapi/order.gen.go ## Build container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
+docker.build:: app/adapter/orderapi/order.gen.go ## Build container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
 ifneq ($(findstring SNAPSHOT,$(VERSION)),SNAPSHOT)
 	docker build \
 		-f ./app/Dockerfile \

@@ -35,7 +35,6 @@ func StatusWithBody(responseWriter http.ResponseWriter, request *http.Request, s
 	if err != nil {
 		StatusInternalServerError(responseWriter, request, "panic it's over 9000")
 	}
-
 }
 
 func StatusOK(responseWriter http.ResponseWriter, request *http.Request, body JSONWriter) {

@@ -32,7 +32,7 @@ func newClient(t *testing.T) *orderapi.Client {
 	}
 
 	orderApiClient, err := orderapi.NewClient(
-		config.BaseURL,
+		config.BaseURL+"/api",
 		orderapi.WithHTTPClient(client),
 		orderapi.WithRequestEditorFn(basicAuth.Intercept),
 	)
@@ -101,7 +101,7 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 	exec(t, database, addOrders)
 
 	// WHEN
-	apiOrder, err := client.GetApiOrders(context.Background(), &orderapi.GetApiOrdersParams{})
+	apiOrder, err := client.GetOrders(context.Background(), &orderapi.GetOrdersParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func Test_GetOrders_EmptyArray(t *testing.T) {
 	_ = newDatabase(t)
 
 	// WHEN
-	apiOrder, err := client.GetApiOrders(context.Background(), &orderapi.GetApiOrdersParams{})
+	apiOrder, err := client.GetOrders(context.Background(), &orderapi.GetOrdersParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,7 +154,7 @@ func Test_PostOrder(t *testing.T) {
 	}
 
 	// WHEN
-	apiOrder, err := client.PostApiOrdersWithBody(context.Background(), "application/json", &body)
+	apiOrder, err := client.PostOrdersWithBody(context.Background(), "application/json", &body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -193,7 +193,7 @@ VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
 	exec(t, database, addOrder)
 
 	// WHEN
-	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "fdCDxjV9o!O-NONE-ZCTH5i6fWcA")
+	apiOrder, err := client.GetOrdersOrderId(context.Background(), "fdCDxjV9o!O-NONE-ZCTH5i6fWcA")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,7 +218,7 @@ func Test_GetOrder_NotFound(t *testing.T) {
 		req.Header.Add("Correlation-ID", "2685342d-4888-4d74-9a57-aa5393fc8e35")
 		return nil
 	}
-	apiOrder, err := client.GetApiOrdersOrderId(context.Background(), "NOPE", addCorrelationIdHeader)
+	apiOrder, err := client.GetOrdersOrderId(context.Background(), "NOPE", addCorrelationIdHeader)
 	if err != nil {
 		t.Fatal(err)
 	}

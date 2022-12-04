@@ -32,8 +32,8 @@ func NewOrder(
 	}
 }
 
-func (s *Order) GetOrders(limit int, offset int) ([]entity.Order, error) {
-	orderEntities, err := s.orderRepository.FindAll(limit, offset)
+func (s *Order) GetOrders(offset int, limit int) ([]entity.Order, error) {
+	orderEntities, err := s.orderRepository.FindAll(offset, limit)
 	if err != nil {
 		return nil, err
 	}
