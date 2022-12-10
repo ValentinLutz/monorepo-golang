@@ -1,5 +1,7 @@
 # Config for local development
-**/app/config/config.yaml
+**/app/config/*.crt
+**/app/config/*.key
+**/app/config/*.yaml
 **/app/serve/openapi/**
 
 # Generated GO clients

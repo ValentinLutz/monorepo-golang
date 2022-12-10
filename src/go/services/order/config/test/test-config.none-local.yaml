@@ -1,5 +1,5 @@
 # Global config
-base_url: http://localhost:8080
+base_url: https://localhost:8433
 
 # Database config
 database:

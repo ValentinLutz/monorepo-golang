@@ -4,7 +4,7 @@ environment: TEST
 
 # Server config
 server:
-  port: 8080
+  port: 8433
   timeout:
     read: 10
     write: 10

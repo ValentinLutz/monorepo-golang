@@ -14,7 +14,7 @@ services:
     volumes:
       - ../config/app/config.none-container.yaml:/app/config/config.yaml:ro
     ports:
-      - '9080:8080'
+      - '9433:8433'
 
   prometheus:
     image: prom/prometheus:v2.38.0

@@ -14,15 +14,21 @@ export DOCKER_REPOSITORY ?= valentinlutz
 
 
 
-app/config/app/config.yaml: config/app/config.none-local.yaml ## Copy none-local config to app directory
+app/config/config.yaml: config/app/config.none-local.yaml ## Copy none-local config to app directory
 	install -D config/app/config.none-local.yaml app/config/config.yaml
+
+app/config/app.key: config/app.key ## Copy none-local private key to app directory
+	install -D config/app.key app/config/app.key
+
+app/config/app.crt: config/app.crt ## Copy none-local certificate to app directory
+	install -D config/app.crt app/config/app.crt
 
 app/adapter/orderapi/order.gen.go: api-definition/order_api.yaml api-definition/oapi-codegen-app.yaml ## Generate orders server from open api definition
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.1 && \
 		oapi-codegen --config api-definition/oapi-codegen-app.yaml \
 		api-definition/order_api.yaml  > app/adapter/orderapi/order.gen.go
 
-app.run:: app/config/app/config.yaml app/adapter/orderapi/order.gen.go ## Run the app
+app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/adapter/orderapi/order.gen.go ## Run the app
 	cd app && \
 		go run main.go
 
