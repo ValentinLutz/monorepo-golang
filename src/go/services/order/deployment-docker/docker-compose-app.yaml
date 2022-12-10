@@ -13,6 +13,8 @@ services:
     container_name: app
     volumes:
       - ../config/app/config.none-container.yaml:/app/config/config.yaml:ro
+      - ../config/app.crt:/app/config/app.crt:ro
+      - ../config/app.key:/app/config/app.key:ro
     ports:
       - '9433:8433'
 
