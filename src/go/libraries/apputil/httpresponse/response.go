@@ -46,7 +46,8 @@ func StatusCreated(responseWriter http.ResponseWriter, request *http.Request, bo
 }
 
 func StatusUnauthorized(responseWriter http.ResponseWriter) {
-	responseWriter.Header().Set("WWW-Authenticate", `Basic realm="monke"`)
+	// do not set header 'WWW-Authenticate' to disable browser basic auth popup
+	//responseWriter.Header().Set("WWW-Authenticate", `Basic realm="monke"`)
 	Status(responseWriter, http.StatusUnauthorized)
 }
 
