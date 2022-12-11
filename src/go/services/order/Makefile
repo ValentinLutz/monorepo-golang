@@ -111,7 +111,7 @@ docker.down:: ## Shutdown containers | PROJECT_NAME
 		-f deployment-docker/docker-compose.yaml \
 		down
 
-docker.app.up:: docker.up docker.build ## Start containers | PROJECT_NAME
+docker.app.up:: docker.up docker.build database.migrate ## Start containers | PROJECT_NAME
 	docker compose -p ${PROJECT_NAME} \
     		-f deployment-docker/docker-compose-app.yaml \
     		up -d --force-recreate
