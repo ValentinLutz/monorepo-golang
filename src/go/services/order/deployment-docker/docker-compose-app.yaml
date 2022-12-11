@@ -16,7 +16,7 @@ services:
       - ../config/app.crt:/app/config/app.crt:ro
       - ../config/app.key:/app/config/app.key:ro
     ports:
-      - '9433:8433'
+      - '9443:8443'
 
   prometheus:
     image: prom/prometheus:v2.38.0

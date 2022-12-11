@@ -2,7 +2,7 @@ import http from 'k6/http';
 import encoding from 'k6/encoding';
 import {check} from "k6";
 
-export const BASE_URI = 'https://app:8433'
+export const BASE_URI = 'https://app:8443'
 export const VIRTUAL_USERS = 100
 export const ITERATIONS = 100
 

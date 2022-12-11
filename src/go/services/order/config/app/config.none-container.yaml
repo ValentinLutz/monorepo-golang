@@ -4,7 +4,7 @@ environment: CONTAINER
 
 # Server config
 server:
-  port: 8433
+  port: 8443
   timeout:
     read: 10
     write: 10
