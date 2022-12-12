@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
@@ -103,12 +104,23 @@ func newServer(logger zerolog.Logger, config *config.Config, db *sqlx.DB) *http.
 		Password: "test",
 	}
 
+	responseTimeHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace: "namespace",
+		Name:      "http_server_request_duration_seconds",
+		Help:      "Histogram of response time for handler in seconds",
+		Buckets:   prometheus.DefBuckets,
+	}, []string{"method", "route", "status_code"})
+	prometheus.MustRegister(responseTimeHistogram)
+
+	histogram := middleware.Histogram{Histogram: responseTimeHistogram}
+
 	orderAPI := orderapi.New(config, ordersService)
 	router.Group(func(r chi.Router) {
 		r.Use(hlog.NewHandler(logger))
 		r.Use(middleware.CorrelationId)
 		r.Use(authentication.BasicAuth)
 		r.Use(middleware.RequestLogging)
+		r.Use(histogram.Prometheus)
 		r.Mount("/api", orderapi.Handler(orderAPI))
 
 		statusAPI := statusapi.New(db, &config.Database, &logger)

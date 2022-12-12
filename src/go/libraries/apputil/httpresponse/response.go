@@ -33,7 +33,7 @@ func StatusWithBody(responseWriter http.ResponseWriter, request *http.Request, s
 
 	err := body.ToJSON(responseWriter)
 	if err != nil {
-		StatusInternalServerError(responseWriter, request, "panic it's over 9000")
+		StatusInternalServerError(responseWriter, request, err.Error())
 	}
 }
 

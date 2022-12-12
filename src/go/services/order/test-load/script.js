@@ -3,8 +3,7 @@ import encoding from 'k6/encoding';
 import {check} from "k6";
 
 export const BASE_URI = 'https://app:8443'
-export const VIRTUAL_USERS = 100
-export const ITERATIONS = 100
+export const ITERATIONS = 1000
 
 export const options = {
     insecureSkipTLSVerify: true,
@@ -12,13 +11,13 @@ export const options = {
         getOrders: {
             executor: 'per-vu-iterations',
             exec: 'getOrders',
-            vus: VIRTUAL_USERS,
+            vus: 100,
             iterations: ITERATIONS,
         },
         postOrder_getOrder: {
             executor: 'per-vu-iterations',
             exec: 'postOrder_getOrder',
-            vus: VIRTUAL_USERS,
+            vus: 100,
             iterations: ITERATIONS,
         },
     },

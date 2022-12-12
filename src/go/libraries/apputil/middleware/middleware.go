@@ -5,13 +5,16 @@ import (
 	"context"
 	"crypto/sha256"
 	"crypto/subtle"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"io"
 	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/libraries/apputil/logging"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -60,6 +63,33 @@ func CorrelationId(next http.Handler) http.Handler {
 		responseWriter.Header().Set("Correlation-Id", correlationId)
 		next.ServeHTTP(responseWriter, request)
 	})
+}
+
+type Histogram struct {
+	Histogram *prometheus.HistogramVec
+}
+
+func (h Histogram) Prometheus(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
+		startTime := time.Now()
+
+		responseWriterContainer := newResponseWriterContainer(responseWriter)
+
+		next.ServeHTTP(responseWriterContainer, request)
+
+		duration := time.Since(startTime)
+		statusCode := strconv.Itoa(responseWriterContainer.statusCode)
+		route := getRoutePattern(request)
+		h.Histogram.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
+	})
+}
+
+func getRoutePattern(r *http.Request) string {
+	reqContext := chi.RouteContext(r.Context())
+	if pattern := reqContext.RoutePattern(); pattern != "" {
+		return pattern
+	}
+	return "undefined"
 }
 
 func RequestLogging(next http.Handler) http.Handler {
