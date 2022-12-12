@@ -8,6 +8,9 @@ CREATE TABLE order_service.order
     PRIMARY KEY (order_id)
 );
 
+CREATE INDEX order_creation_date_idx
+    ON order_service.order (creation_date);
+
 CREATE TRIGGER update_order_modified_date
     BEFORE UPDATE
     ON order_service.order
