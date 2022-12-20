@@ -1,0 +1,63 @@
+name: "build-app"
+
+on:
+  workflow_call:
+    inputs:
+      app-path:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+jobs:
+
+  build-app:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    defaults:
+      run:
+        working-directory: ${{ inputs.app-path }}
+    env:
+      DOCKER_REGISTRY: ghcr.io
+      DOCKER_REPOSITORY: valentinlutz
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Set up GO
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Run unit tests
+        run: make test.unit
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.49.0
+          working-directory: ./app
+          skip-pkg-cache: true
+
+      - name: Build the container image
+        run: make docker.build
+
+      - name: Login to GitHub container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push the container image
+        run: make docker.push
