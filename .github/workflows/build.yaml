@@ -17,9 +17,9 @@ jobs:
         run: |
           if [ 'master' == "$BRANCH"  ]
           then
-            echo "::set-output name=version::$(date +"%y.%m.%d.%H%M%S")"
+            echo "version=$(date +"%y.%m.%d.%H%M%S")" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=version::$(date +"%y.%m.%d.%H%M%S")-SNAPSHOT"
+            echo "version=$(date +"%y.%m.%d.%H%M%S")-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
 
   build-order-service:

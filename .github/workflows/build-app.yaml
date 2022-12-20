@@ -46,7 +46,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.49.0
-          working-directory: ./app
+          working-directory: ${{ inputs.app-path }}/app
           skip-pkg-cache: true
 
       - name: Build the container image
