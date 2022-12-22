@@ -1,5 +1,3 @@
-name: "build-app"
-
 on:
   workflow_call:
     inputs:
@@ -11,7 +9,6 @@ on:
         type: string
 
 jobs:
-
   build-app:
     runs-on: ubuntu-latest
     permissions:
