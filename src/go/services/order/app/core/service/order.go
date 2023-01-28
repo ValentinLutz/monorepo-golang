@@ -1,68 +1,55 @@
 package service
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
 	"math/rand"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/entity"
 	"monorepo/services/order/app/core/port"
-	"monorepo/services/order/app/internal/order"
 	"strconv"
 	"time"
 )
 
 type Order struct {
-	db                  *sqlx.DB
-	config              *config.Config
-	orderRepository     port.OrderRepository
-	orderItemRepository port.OrderItemRepository
+	db              *sqlx.DB
+	config          *config.Config
+	orderRepository port.OrderRepository
 }
 
 func NewOrder(
 	db *sqlx.DB,
 	config *config.Config,
 	orderRepository port.OrderRepository,
-	orderItemRepository port.OrderItemRepository,
 ) *Order {
 	return &Order{
-		db:                  db,
-		config:              config,
-		orderRepository:     orderRepository,
-		orderItemRepository: orderItemRepository,
+		db:              db,
+		config:          config,
+		orderRepository: orderRepository,
 	}
 }
 
-func (s *Order) GetOrders(offset int, limit int) ([]entity.Order, error) {
-	orderEntities, err := s.orderRepository.FindAll(offset, limit)
+func (service *Order) GetOrders(ctx context.Context, offset int, limit int) ([]entity.Order, error) {
+	orders, orderItems, err := service.orderRepository.FindAll(ctx, offset, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	var orderIds []entity.OrderId
-	for _, orderEntity := range orderEntities {
-		orderIds = append(orderIds, orderEntity.OrderId)
-	}
-
-	orderItemEntities, err := s.orderItemRepository.FindAllByOrderIds(orderIds)
-	if err != nil {
-		return nil, err
-	}
-
-	for i, orderEntity := range orderEntities {
-		for _, orderItem := range orderItemEntities {
+	for i, orderEntity := range orders {
+		for _, orderItem := range orderItems {
 			if orderEntity.OrderId == orderItem.OrderId {
 				orderEntity.Items = append(orderEntity.Items, orderItem)
-				orderEntities[i] = orderEntity
+				orders[i] = orderEntity
 			}
 		}
 	}
-	return orderEntities, nil
+	return orders, nil
 }
 
-func (s *Order) PlaceOrder(itemNames []string) (entity.Order, error) {
+func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (entity.Order, error) {
 	creationDate := time.Now()
-	orderId := order.NewOrderId(
-		s.config.Region,
+	orderId := NewOrderId(
+		service.config.Region,
 		creationDate,
 		strconv.Itoa(rand.Int()),
 	)
@@ -85,23 +72,19 @@ func (s *Order) PlaceOrder(itemNames []string) (entity.Order, error) {
 		Items:        orderItems,
 	}
 
-	err := s.orderRepository.Save(orderEntity)
+	err := service.orderRepository.Save(ctx, orderEntity, orderItems)
 	if err != nil {
 		return entity.Order{}, err
 	}
-	err = s.orderItemRepository.SaveAll(orderEntity.Items)
 	return orderEntity, err
 }
 
-func (s *Order) GetOrder(orderId entity.OrderId) (entity.Order, error) {
-	orderEntity, err := s.orderRepository.FindById(orderId)
+func (service *Order) GetOrder(ctx context.Context, orderId entity.OrderId) (entity.Order, error) {
+	order, orderItems, err := service.orderRepository.FindById(ctx, orderId)
 	if err != nil {
 		return entity.Order{}, err
 	}
-	orderItemEntities, err := s.orderItemRepository.FindAllByOrderId(orderId)
-	if err != nil {
-		return entity.Order{}, err
-	}
-	orderEntity.Items = orderItemEntities
-	return orderEntity, nil
+
+	order.Items = orderItems
+	return order, nil
 }

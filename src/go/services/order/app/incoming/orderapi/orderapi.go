@@ -31,7 +31,7 @@ func (a *API) GetOrders(responseWriter http.ResponseWriter, request *http.Reques
 		limit = *params.Limit
 	}
 
-	orderEntities, err := a.service.GetOrders(offset, limit)
+	orderEntities, err := a.service.GetOrders(request.Context(), offset, limit)
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
@@ -57,7 +57,7 @@ func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	orderEntity, err := a.service.PlaceOrder(orderRequest.ToOrderItemNames())
+	orderEntity, err := a.service.PlaceOrder(request.Context(), orderRequest.ToOrderItemNames())
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
 		return
@@ -72,7 +72,7 @@ func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Reque
 }
 
 func (a *API) GetOrdersOrderId(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
-	orderEntity, err := a.service.GetOrder(entity.OrderId(orderId))
+	orderEntity, err := a.service.GetOrder(request.Context(), entity.OrderId(orderId))
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusNotFound, errors.OrderNotFound, err.Error())
 		return

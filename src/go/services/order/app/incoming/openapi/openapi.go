@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"io/fs"
 	"monorepo/libraries/apputil/httpresponse"
-	"monorepo/services/order/app/adapter/orderapi"
+	"monorepo/services/order/app/incoming/orderapi"
 	"net/http"
 )
 

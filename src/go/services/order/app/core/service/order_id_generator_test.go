@@ -1,10 +1,10 @@
-package order_test
+package service_test
 
 import (
 	"github.com/stretchr/testify/assert"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/entity"
-	"monorepo/services/order/app/internal/order"
+	"monorepo/services/order/app/core/service"
 	"testing"
 	"time"
 )
@@ -35,7 +35,7 @@ func testNewOrderId(region config.Region, timestamp time.Time, salt string, expe
 		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
 		t.Logf("Salt: %v", salt)
 		// WHEN
-		actual := order.NewOrderId(region, timestamp, salt)
+		actual := service.NewOrderId(region, timestamp, salt)
 		// THEN
 		assert.Equal(t, expected, actual)
 	}

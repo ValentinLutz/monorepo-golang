@@ -12,14 +12,13 @@ import (
 	"github.com/rs/zerolog/log"
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/middleware"
-	"monorepo/services/order/app/adapter/openapi"
-	"monorepo/services/order/app/adapter/orderapi"
-	"monorepo/services/order/app/adapter/orderitemrepo"
-	"monorepo/services/order/app/adapter/orderrepo"
-	"monorepo/services/order/app/adapter/statusapi"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/service"
+	"monorepo/services/order/app/incoming/openapi"
+	"monorepo/services/order/app/incoming/orderapi"
+	"monorepo/services/order/app/incoming/statusapi"
 	"monorepo/services/order/app/infastructure"
+	"monorepo/services/order/app/outgoing/orderrepo"
 	"net/http"
 	"os"
 	"os/signal"
@@ -96,8 +95,7 @@ func newServer(logger zerolog.Logger, config *config.Config, db *sqlx.DB) *http.
 	router := chi.NewRouter()
 
 	orderRepository := orderrepo.NewPostgreSQL(db)
-	orderItemRepository := orderitemrepo.NewPostgreSQL(db)
-	ordersService := service.NewOrder(db, config, &orderRepository, &orderItemRepository)
+	ordersService := service.NewOrder(db, config, &orderRepository)
 
 	authentication := middleware.Authentication{
 		Username: "test",
@@ -105,11 +103,11 @@ func newServer(logger zerolog.Logger, config *config.Config, db *sqlx.DB) *http.
 	}
 
 	responseTimeHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "namespace",
+		Namespace: "app",
 		Name:      "http_server_request_duration_seconds",
-		Help:      "Histogram of response time for handler in seconds",
+		Help:      "Histogram of response time in seconds",
 		Buckets:   prometheus.DefBuckets,
-	}, []string{"method", "route", "status_code"})
+	}, []string{"method", "route", "code"})
 	prometheus.MustRegister(responseTimeHistogram)
 
 	histogram := middleware.Histogram{Histogram: responseTimeHistogram}
@@ -117,10 +115,10 @@ func newServer(logger zerolog.Logger, config *config.Config, db *sqlx.DB) *http.
 	orderAPI := orderapi.New(config, ordersService)
 	router.Group(func(r chi.Router) {
 		r.Use(hlog.NewHandler(logger))
-		r.Use(middleware.CorrelationId)
-		r.Use(authentication.BasicAuth)
-		r.Use(middleware.RequestLogging)
 		r.Use(histogram.Prometheus)
+		r.Use(middleware.CorrelationId)
+		r.Use(middleware.RequestLogging)
+		r.Use(authentication.BasicAuth)
 		r.Mount("/api", orderapi.Handler(orderAPI))
 
 		statusAPI := statusapi.New(db, &config.Database, &logger)

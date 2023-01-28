@@ -1,4 +1,4 @@
-package order
+package service
 
 import (
 	"crypto/md5"

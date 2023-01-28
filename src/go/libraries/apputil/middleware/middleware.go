@@ -3,7 +3,6 @@ package middleware
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
 	"crypto/subtle"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -31,12 +30,7 @@ func (a Authentication) BasicAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		hashedAuthorization := sha256.Sum256([]byte(username + password))
-		hashedCredentials := sha256.Sum256([]byte(a.Username + a.Password))
-
-		isAuthorized := subtle.ConstantTimeCompare(hashedAuthorization[:], hashedCredentials[:]) == 1
-
-		if !isAuthorized {
+		if subtle.ConstantTimeCompare([]byte(username+password), []byte(a.Username+a.Password)) != 1 {
 			httpresponse.StatusUnauthorized(responseWriter)
 			return
 		}

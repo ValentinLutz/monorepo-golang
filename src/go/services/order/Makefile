@@ -23,20 +23,20 @@ app/config/app.key: config/app.key ## Copy none-local private key to app directo
 app/config/app.crt: config/app.crt ## Copy none-local certificate to app directory
 	install -D config/app.crt app/config/app.crt
 
-app/adapter/orderapi/order.gen.go: api-definition/order_api.yaml api-definition/oapi-codegen-app.yaml ## Generate orders server from open api definition
+app/incoming/orderapi/order.gen.go: api-definition/order_api.yaml api-definition/oapi-codegen-app.yaml ## Generate orders server from open api definition
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.1 && \
 		oapi-codegen --config api-definition/oapi-codegen-app.yaml \
-		api-definition/order_api.yaml  > app/adapter/orderapi/order.gen.go
+		api-definition/order_api.yaml > app/incoming/orderapi/order.gen.go
 
-app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/adapter/orderapi/order.gen.go ## Run the app
+app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/incoming/orderapi/order.gen.go ## Run the app
 	cd app && \
 		go run main.go
 
-app.build:: app/adapter/orderapi/order.gen.go ## Build the app into an executable
+app.build:: app/incoming/orderapi/order.gen.go ## Build the app into an executable
 	cd app && \
 		go build
 
-app.lint:: app/adapter/orderapi/order.gen.go ## Runs linters against go code
+app.lint:: app/incoming/orderapi/order.gen.go ## Runs linters against go code
 	cd app && \
 		golangci-lint run
 
@@ -47,7 +47,7 @@ test-integration/orderapi/order.gen.go: api-definition/order_api.yaml api-defini
 		oapi-codegen --config api-definition/oapi-codegen-test.yaml \
 		api-definition/order_api.yaml  > test-integration/orderapi/order.gen.go
 
-test.unit::  app/adapter/orderapi/order.gen.go ## Run the unit tests
+test.unit::  app/incoming/orderapi/order.gen.go ## Run the unit tests
 	cd app && \
 		go test -cover ./...
 
@@ -81,7 +81,7 @@ database.migrate:: ## Migrate database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 
 
 
-docker.build:: app/adapter/orderapi/order.gen.go ## Build container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
+docker.build:: app/incoming/orderapi/order.gen.go ## Build container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
 ifneq ($(findstring SNAPSHOT,$(VERSION)),SNAPSHOT)
 	docker build \
 		-f ./app/Dockerfile \
