@@ -5,10 +5,8 @@ environment: TEST
 # Server config
 server:
   port: 8443
-  timeout:
-    read: 10
-    write: 10
-    idle: 10
+  certificate_path: config/app.crt
+  key_path: config/app.key
 
 # Logger config
 logger:

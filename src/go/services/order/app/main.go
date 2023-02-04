@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"flag"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
@@ -24,13 +22,10 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 )
 
 var (
-	configFile         = *flag.String("config", "config/config.yaml", "config file")
-	tlsCertificateFile = *flag.String("tls_cert", "config/app.crt", "tls certificate file")
-	tlsPrivateKeyFile  = *flag.String("tls_key", "config/app.key", "tls private key file")
+	configFile = *flag.String("config", "config/config.yaml", "config file")
 )
 
 func main() {
@@ -49,49 +44,19 @@ func main() {
 	newDatabase := infastructure.NewDatabase(&appConfig.Database, &logger)
 	db := newDatabase.Connect()
 
-	server := newServer(logger, appConfig, db)
+	handler := newHandler(logger, appConfig, db)
+	server := infastructure.NewServer(&logger, &appConfig.Server, handler)
 
-	go startServer(server, &logger)
-	shutdownServerGracefully(server, &logger)
+	go server.Start()
+
+	stopChannel := make(chan os.Signal, 1)
+	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGTERM)
+	logger.Info().Str("signal", (<-stopChannel).String()).Msg("received signal")
+
+	server.Stop()
 }
 
-func startServer(server *http.Server, logger *zerolog.Logger) {
-	logger.Info().
-		Str("address", server.Addr).
-		Msg("Starting server")
-	err := server.ListenAndServeTLS(tlsCertificateFile, tlsPrivateKeyFile)
-	if err != http.ErrServerClosed {
-		logger.Fatal().
-			Err(err).
-			Msg("Failed to start server")
-	}
-
-}
-
-func shutdownServerGracefully(server *http.Server, logger *zerolog.Logger) {
-	osSignal := make(chan os.Signal, 1)
-	signal.Notify(osSignal, os.Interrupt, syscall.SIGTERM)
-	<-osSignal
-
-	timeout := time.Second * 20
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	logger.Info().
-		Float64("timeout", timeout.Seconds()).
-		Msg("Stopping server")
-	err := server.Shutdown(ctx)
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("Failed to shutdown server")
-	} else {
-		logger.Info().
-			Msg("Server stopped")
-	}
-}
-
-func newServer(logger zerolog.Logger, config *config.Config, db *sqlx.DB) *http.Server {
+func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.Handler {
 	router := chi.NewRouter()
 
 	orderRepository := orderrepo.NewPostgreSQL(db)
@@ -135,15 +100,7 @@ func newServer(logger zerolog.Logger, config *config.Config, db *sqlx.DB) *http.
 
 	logRoutes(logger, router)
 
-	serverConfig := config.Server
-	return &http.Server{
-		Addr:         fmt.Sprintf(":%d", serverConfig.Port),
-		Handler:      router,
-		ErrorLog:     logging.NewLoggerWrapper(&logger).ToLogger(),
-		ReadTimeout:  time.Second * time.Duration(serverConfig.Timeout.Read),
-		WriteTimeout: time.Second * time.Duration(serverConfig.Timeout.Write),
-		IdleTimeout:  time.Second * time.Duration(serverConfig.Timeout.Idle),
-	}
+	return router
 }
 
 func logRoutes(logger zerolog.Logger, router *chi.Mux) {
@@ -152,13 +109,13 @@ func logRoutes(logger zerolog.Logger, router *chi.Mux) {
 		logger.Info().
 			Str("method", method).
 			Str("route", route).
-			Msg("Register")
+			Msg("register")
 		return nil
 	}
 
 	if err := chi.Walk(router, walkFunc); err != nil {
 		logger.Error().
 			Err(err).
-			Msg("Failed to walk")
+			Msg("failed to walk")
 	}
 }

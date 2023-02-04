@@ -16,8 +16,9 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port    int           `yaml:"port"`
-	Timeout TimeoutConfig `yaml:"timeout"`
+	Port            int    `yaml:"port"`
+	CertificatePath string `yaml:"certificate_path"`
+	KeyPath         string `yaml:"key_path"`
 }
 
 type TimeoutConfig struct {
