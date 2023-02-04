@@ -14,10 +14,10 @@ import (
 type Server struct {
 	logger *zerolog.Logger
 	server *http.Server
-	config *config.ServerConfig
+	config *config.Server
 }
 
-func NewServer(logger *zerolog.Logger, serverConfig *config.ServerConfig, handler http.Handler) *Server {
+func NewServer(logger *zerolog.Logger, serverConfig *config.Server, handler http.Handler) *Server {
 	httpServer := &http.Server{
 		Addr:     fmt.Sprintf(":%d", serverConfig.Port),
 		Handler:  handler,

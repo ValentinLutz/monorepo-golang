@@ -9,26 +9,15 @@ import (
 type Config struct {
 	Region      Region               `yaml:"region"`
 	Environment Environment          `yaml:"environment"`
-	Server      ServerConfig         `yaml:"server"`
-	Logger      logging.LoggerConfig `yaml:"logger"`
+	Server      Server               `yaml:"server"`
 	Database    Database             `yaml:"database"`
-	Client      Client               `yaml:"client"`
+	Logger      logging.LoggerConfig `yaml:"logger"`
 }
 
-type ServerConfig struct {
+type Server struct {
 	Port            int    `yaml:"port"`
 	CertificatePath string `yaml:"certificate_path"`
 	KeyPath         string `yaml:"key_path"`
-}
-
-type TimeoutConfig struct {
-	Read  int `yaml:"read"`
-	Write int `yaml:"write"`
-	Idle  int `yaml:"idle"`
-}
-
-type Client struct {
-	PaymentClient ClientConfig `yaml:"payment"`
 }
 
 type ClientConfig struct {
