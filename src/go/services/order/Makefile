@@ -47,6 +47,9 @@ test-integration/orderapi/order.gen.go: api-definition/order_api.yaml api-defini
 		oapi-codegen --config api-definition/oapi-codegen-test.yaml \
 		api-definition/order_api.yaml  > test-integration/orderapi/order.gen.go
 
+test.spectral:: api-definition/order_api.yaml api-definition/ruleset.spectral.yaml
+	docker run --rm -it -v ./api-definition/:/tmp stoplight/spectral --ruleset "/tmp/ruleset.spectral.yaml" lint "/tmp/order_api.yaml"
+
 test.unit::  app/incoming/orderapi/order.gen.go ## Run the unit tests
 	cd app && \
 		go test -cover ./...
@@ -117,3 +120,13 @@ docker.app.up:: docker.up docker.build database.migrate ## Start containers | PR
     		up -d --force-recreate
 	docker logs app \
 		--follow
+
+
+deployment-kubernetes/base/config.yaml: config/app/config.${PROFILE}.yaml ## Copy config to kubernetes deployment directory
+	install -D config/app/config.${PROFILE}.yaml deployment-kubernetes/base/config.yaml
+
+kubernetes.build:: deployment-kubernetes/base/config.yaml ## Build kubernetes deployment
+	kubectl kustomize deployment-kubernetes/base > deployment-kubernetes/${PROFILE}.yaml
+
+kubernetes.deploy:: kubernetes.build ## Deploy app to kubernetes
+	kubectl apply -f deployment-kubernetes/${PROFILE}.yaml

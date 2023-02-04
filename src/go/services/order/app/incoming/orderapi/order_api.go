@@ -71,7 +71,7 @@ func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Reque
 	httpresponse.StatusCreated(responseWriter, request, response)
 }
 
-func (a *API) GetOrdersOrderId(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
+func (a *API) GetOrder(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
 	orderEntity, err := a.service.GetOrder(request.Context(), entity.OrderId(orderId))
 	if err != nil {
 		httpresponse.Error(responseWriter, request, http.StatusNotFound, errors.OrderNotFound, err.Error())

@@ -20,6 +20,7 @@ window.onload = function() {
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
     ],
+    displayRequestDuration: true,
     layout: "StandaloneLayout"
   });
 
