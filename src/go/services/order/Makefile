@@ -13,7 +13,7 @@ export DOCKER_REGISTRY ?= ghcr.io
 export DOCKER_REPOSITORY ?= valentinlutz
 
 dep.oapi-codegen:: # Install oapi-codegen with go install
-	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.1
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4
 
 
 
