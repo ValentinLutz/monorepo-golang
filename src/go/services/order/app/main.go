@@ -92,7 +92,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 	})
 
 	router.Group(func(r chi.Router) {
-		statusAPI := statusapi.New(db, &config.Database, &logger)
+		statusAPI := statusapi.New(&logger, config, db)
 		statusAPI.RegisterRoutes(r)
 
 		openAPI := openapi.New()

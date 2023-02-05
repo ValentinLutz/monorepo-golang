@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 	"math/rand"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/entity"
@@ -82,7 +83,7 @@ func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (entit
 func (service *Order) GetOrder(ctx context.Context, orderId entity.OrderId) (entity.Order, error) {
 	order, orderItems, err := service.orderRepository.FindById(ctx, orderId)
 	if err != nil {
-		return entity.Order{}, err
+		return entity.Order{}, errors.Wrapf(err, "order id is '%v'", orderId)
 	}
 
 	order.Items = orderItems

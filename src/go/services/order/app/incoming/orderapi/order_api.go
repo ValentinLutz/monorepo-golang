@@ -1,7 +1,8 @@
 package orderapi
 
 import (
-	"monorepo/libraries/apputil/errors"
+	"errors"
+	"monorepo/libraries/apputil/apierrors"
 	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/services/order/app/core/entity"
 	"monorepo/services/order/app/core/port"
@@ -31,7 +32,7 @@ func (a *API) GetOrders(responseWriter http.ResponseWriter, request *http.Reques
 
 	orderEntities, err := a.service.GetOrders(request.Context(), offset, limit)
 	if err != nil {
-		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 		return
 	}
 
@@ -39,7 +40,7 @@ func (a *API) GetOrders(responseWriter http.ResponseWriter, request *http.Reques
 	for _, orderEntity := range orderEntities {
 		orderEntity, err := FromOrderEntity(orderEntity)
 		if err != nil {
-			httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+			httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 		}
 		ordersResponse = append(ordersResponse, orderEntity)
 
@@ -51,19 +52,19 @@ func (a *API) GetOrders(responseWriter http.ResponseWriter, request *http.Reques
 func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Request) {
 	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
-		httpresponse.Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, err.Error())
+		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 		return
 	}
 
 	orderEntity, err := a.service.PlaceOrder(request.Context(), orderRequest.ToOrderItemNames())
 	if err != nil {
-		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 		return
 	}
 
 	response, err := FromOrderEntity(orderEntity)
 	if err != nil {
-		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 	}
 
 	httpresponse.StatusCreated(responseWriter, request, response)
@@ -71,14 +72,18 @@ func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Reque
 
 func (a *API) GetOrder(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
 	orderEntity, err := a.service.GetOrder(request.Context(), entity.OrderId(orderId))
+	if errors.Is(err, port.OrderNotFound) {
+		httpresponse.Error(responseWriter, request, http.StatusNotFound, apierrors.OrderNotFound, err.Error())
+		return
+	}
 	if err != nil {
-		httpresponse.Error(responseWriter, request, http.StatusNotFound, errors.OrderNotFound, err.Error())
+		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 		return
 	}
 
 	response, err := FromOrderEntity(orderEntity)
 	if err != nil {
-		httpresponse.Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, err.Error())
+		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 	}
 	httpresponse.StatusOK(responseWriter, request, &response)
 }

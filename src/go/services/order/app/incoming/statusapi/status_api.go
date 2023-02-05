@@ -14,16 +14,16 @@ import (
 )
 
 type API struct {
-	db     *sqlx.DB
-	config *config.Database
 	logger *zerolog.Logger
+	config *config.Config
+	db     *sqlx.DB
 }
 
-func New(db *sqlx.DB, config *config.Database, logger *zerolog.Logger) *API {
+func New(logger *zerolog.Logger, config *config.Config, db *sqlx.DB) *API {
 	return &API{
-		db:     db,
-		config: config,
 		logger: logger,
+		config: config,
+		db:     db,
 	}
 }
 
@@ -35,16 +35,20 @@ func (a *API) RegisterRoutes(router chi.Router) {
 }
 
 func (a *API) registerHealthChecks() http.HandlerFunc {
-	healthStatus, err := health.New()
+	healthStatus, err := health.New(health.WithComponent(health.Component{
+		Name:    a.config.ServiceName,
+		Version: a.config.Version,
+	}))
 	if err != nil {
 		a.logger.Fatal().
 			Err(err).
 			Msg("Failed to create health container")
 	}
 
+	databaseConfig := a.config.Database
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		a.config.Host, a.config.Port, a.config.Username, a.config.Password, a.config.Database,
+		databaseConfig.Host, databaseConfig.Port, databaseConfig.Username, databaseConfig.Password, databaseConfig.Database,
 	)
 	err = healthStatus.Register(health.Config{
 		Name:      "postgresql",

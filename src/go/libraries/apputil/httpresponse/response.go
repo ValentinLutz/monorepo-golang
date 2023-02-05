@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"io"
-	"monorepo/libraries/apputil/errors"
+	"monorepo/libraries/apputil/apierrors"
 	"monorepo/libraries/apputil/logging"
 	"net/http"
 	"time"
@@ -46,7 +46,7 @@ func StatusCreated(responseWriter http.ResponseWriter, request *http.Request, bo
 }
 
 func StatusBadRequest(responseWriter http.ResponseWriter, request *http.Request, message string) {
-	Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, message)
+	Error(responseWriter, request, http.StatusBadRequest, apierrors.BadRequest, message)
 }
 
 func StatusUnauthorized(responseWriter http.ResponseWriter) {
@@ -55,7 +55,7 @@ func StatusUnauthorized(responseWriter http.ResponseWriter) {
 }
 
 func StatusInternalServerError(responseWriter http.ResponseWriter, request *http.Request, message string) {
-	Error(responseWriter, request, http.StatusInternalServerError, errors.Panic, message)
+	Error(responseWriter, request, http.StatusInternalServerError, apierrors.Panic, message)
 }
 
 func (error ErrorResponse) ToJSON(writer io.Writer) error {
@@ -63,7 +63,7 @@ func (error ErrorResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(error)
 }
 
-func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, error errors.Error, message string) {
+func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, error apierrors.Error, message string) {
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
 	responseWriter.WriteHeader(statusCode)

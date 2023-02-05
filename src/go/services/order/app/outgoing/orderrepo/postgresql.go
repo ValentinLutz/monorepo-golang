@@ -2,9 +2,12 @@ package orderrepo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/port"
 )
 
 type PostgreSQL struct {
@@ -66,6 +69,9 @@ func (orderRepository *PostgreSQL) FindById(ctx context.Context, orderId entity.
 	)
 	var order entity.Order
 	err := row.StructScan(&order)
+	if errors.Is(err, sql.ErrNoRows) {
+		return entity.Order{}, nil, port.OrderNotFound
+	}
 	if err != nil {
 		return entity.Order{}, nil, err
 	}

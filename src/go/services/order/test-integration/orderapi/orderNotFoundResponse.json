@@ -1,6 +1,6 @@
 {
   "code": 4004,
-  "message": "sql: no rows in result set",
+  "message": "order id is 'NOPE': no order was found",
   "method": "GET",
   "path": "/api/orders/NOPE",
   "timestamp": "2022-09-04T19:43:56.0185708Z",
