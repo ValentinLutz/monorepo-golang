@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
+	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/middleware"
 	"monorepo/services/order/app/config"
@@ -77,26 +78,26 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 
 	histogram := middleware.Histogram{Histogram: responseTimeHistogram}
 
-	orderAPI := orderapi.New(config, ordersService)
+	errorHandler := func(rw http.ResponseWriter, r *http.Request, err error) {
+		httpresponse.StatusBadRequest(rw, r, err.Error())
+	}
+
 	router.Group(func(r chi.Router) {
 		r.Use(hlog.NewHandler(logger))
 		r.Use(histogram.Prometheus)
 		r.Use(middleware.CorrelationId)
-		r.Use(middleware.RequestLogging)
+		r.Use(middleware.RequestResponseLogging)
 		r.Use(authentication.BasicAuth)
-		r.Mount("/api", orderapi.Handler(orderAPI))
-
-		statusAPI := statusapi.New(db, &config.Database, &logger)
-		statusAPI.RegisterRoutes(r)
+		r.Mount("/api", orderapi.New(ordersService, errorHandler))
 	})
 
 	router.Group(func(r chi.Router) {
 		statusAPI := statusapi.New(db, &config.Database, &logger)
 		statusAPI.RegisterRoutes(r)
-	})
 
-	openAPI := openapi.New()
-	openAPI.RegisterRoutes(router)
+		openAPI := openapi.New()
+		openAPI.RegisterRoutes(r)
+	})
 
 	logRoutes(logger, router)
 

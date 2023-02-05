@@ -193,7 +193,7 @@ VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
 	exec(t, database, addOrder)
 
 	// WHEN
-	apiOrder, err := client.GetOrdersOrderId(context.Background(), "fdCDxjV9o!O-NONE-ZCTH5i6fWcA")
+	apiOrder, err := client.GetOrder(context.Background(), "fdCDxjV9o!O-NONE-ZCTH5i6fWcA")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,7 +218,7 @@ func Test_GetOrder_NotFound(t *testing.T) {
 		req.Header.Add("Correlation-ID", "2685342d-4888-4d74-9a57-aa5393fc8e35")
 		return nil
 	}
-	apiOrder, err := client.GetOrdersOrderId(context.Background(), "NOPE", addCorrelationIdHeader)
+	apiOrder, err := client.GetOrder(context.Background(), "NOPE", addCorrelationIdHeader)
 	if err != nil {
 		t.Fatal(err)
 	}

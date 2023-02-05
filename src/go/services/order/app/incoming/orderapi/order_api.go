@@ -3,22 +3,20 @@ package orderapi
 import (
 	"monorepo/libraries/apputil/errors"
 	"monorepo/libraries/apputil/httpresponse"
-	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/entity"
 	"monorepo/services/order/app/core/port"
 	"net/http"
 )
 
 type API struct {
-	config  *config.Config
 	service port.OrderService
 }
 
-func New(config *config.Config, service port.OrderService) *API {
-	return &API{
-		config:  config,
+func New(service port.OrderService, errorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)) http.Handler {
+	api := &API{
 		service: service,
 	}
+	return HandlerWithOptions(api, ChiServerOptions{ErrorHandlerFunc: errorHandlerFunc})
 }
 
 func (a *API) GetOrders(responseWriter http.ResponseWriter, request *http.Request, params GetOrdersParams) {

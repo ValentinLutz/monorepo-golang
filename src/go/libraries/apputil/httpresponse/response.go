@@ -45,6 +45,10 @@ func StatusCreated(responseWriter http.ResponseWriter, request *http.Request, bo
 	StatusWithBody(responseWriter, request, http.StatusCreated, body)
 }
 
+func StatusBadRequest(responseWriter http.ResponseWriter, request *http.Request, message string) {
+	Error(responseWriter, request, http.StatusBadRequest, errors.BadRequest, message)
+}
+
 func StatusUnauthorized(responseWriter http.ResponseWriter) {
 	responseWriter.Header().Set("WWW-Authenticate", `Basic realm="order-service"`)
 	Status(responseWriter, http.StatusUnauthorized)

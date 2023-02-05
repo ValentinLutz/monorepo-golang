@@ -1,4 +1,0 @@
-package: orderapi
-generate:
-  client: true
-  models: true
