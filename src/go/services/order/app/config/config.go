@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"gopkg.in/yaml.v3"
+	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
 	"os"
 )
@@ -10,21 +11,11 @@ import (
 type Config struct {
 	Version     string
 	ServiceName string
-	Region      Region               `yaml:"region"`
-	Environment Environment          `yaml:"environment"`
-	Server      Server               `yaml:"server"`
-	Database    Database             `yaml:"database"`
-	Logger      logging.LoggerConfig `yaml:"logger"`
-}
-
-type Server struct {
-	Port            int    `yaml:"port"`
-	CertificatePath string `yaml:"certificate_path"`
-	KeyPath         string `yaml:"key_path"`
-}
-
-type ClientConfig struct {
-	Url string `yaml:"url"`
+	Region      Region                       `yaml:"region"`
+	Environment Environment                  `yaml:"environment"`
+	Server      infastructure.ServerConfig   `yaml:"server"`
+	Database    infastructure.DatabaseConfig `yaml:"database"`
+	Logger      logging.LoggerConfig         `yaml:"logger"`
 }
 
 func New(path string) (*Config, error) {

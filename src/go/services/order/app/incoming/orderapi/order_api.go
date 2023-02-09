@@ -2,7 +2,6 @@ package orderapi
 
 import (
 	"errors"
-	"monorepo/libraries/apputil/apierrors"
 	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/services/order/app/core/entity"
 	"monorepo/services/order/app/core/port"
@@ -73,7 +72,7 @@ func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Reque
 func (a *API) GetOrder(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
 	orderEntity, err := a.service.GetOrder(request.Context(), entity.OrderId(orderId))
 	if errors.Is(err, port.OrderNotFound) {
-		httpresponse.Error(responseWriter, request, http.StatusNotFound, apierrors.OrderNotFound, err.Error())
+		httpresponse.StatusNotFound(responseWriter, request, err.Error())
 		return
 	}
 	if err != nil {

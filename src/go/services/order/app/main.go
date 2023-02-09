@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 	"monorepo/libraries/apputil/httpresponse"
+	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/middleware"
 	"monorepo/services/order/app/config"
@@ -16,7 +17,6 @@ import (
 	"monorepo/services/order/app/incoming/openapi"
 	"monorepo/services/order/app/incoming/orderapi"
 	"monorepo/services/order/app/incoming/statusapi"
-	"monorepo/services/order/app/infastructure"
 	"monorepo/services/order/app/outgoing/orderrepo"
 	"net/http"
 	"os"
@@ -42,7 +42,7 @@ func main() {
 
 	logger := logging.NewLogger(appConfig.Logger)
 
-	newDatabase := infastructure.NewDatabase(&appConfig.Database, &logger)
+	newDatabase := infastructure.NewDatabase(&logger, &appConfig.Database)
 	db := newDatabase.Connect()
 
 	handler := newHandler(logger, appConfig, db)

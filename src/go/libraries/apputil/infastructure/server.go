@@ -6,28 +6,33 @@ import (
 	"fmt"
 	"github.com/rs/zerolog"
 	"monorepo/libraries/apputil/logging"
-	"monorepo/services/order/app/config"
 	"net/http"
 	"time"
 )
 
-type Server struct {
-	logger *zerolog.Logger
-	server *http.Server
-	config *config.Server
+type ServerConfig struct {
+	Port            int    `yaml:"port"`
+	CertificatePath string `yaml:"certificate_path"`
+	KeyPath         string `yaml:"key_path"`
 }
 
-func NewServer(logger *zerolog.Logger, serverConfig *config.Server, handler http.Handler) *Server {
-	httpServer := &http.Server{
-		Addr:     fmt.Sprintf(":%d", serverConfig.Port),
+type Server struct {
+	logger *zerolog.Logger
+	config *ServerConfig
+	server *http.Server
+}
+
+func NewServer(logger *zerolog.Logger, config *ServerConfig, handler http.Handler) *Server {
+	server := &http.Server{
+		Addr:     fmt.Sprintf(":%d", config.Port),
 		Handler:  handler,
 		ErrorLog: logging.NewLoggerWrapper(logger).ToLogger(),
 	}
 
 	return &Server{
 		logger: logger,
-		server: httpServer,
-		config: serverConfig,
+		server: server,
+		config: config,
 	}
 }
 

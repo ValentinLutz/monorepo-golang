@@ -5,16 +5,28 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
-	"monorepo/services/order/app/config"
 )
 
-type Database struct {
-	config *config.Database
-	logger *zerolog.Logger
+type DatabaseConfig struct {
+	Host               string `yaml:"host"`
+	Port               int    `yaml:"port"`
+	Username           string `yaml:"user"`
+	Password           string `yaml:"password"`
+	Database           string `yaml:"database"`
+	MaxIdleConnections int    `yaml:"max_idle_connections"`
+	MaxOpenConnections int    `yaml:"max_open_connections"`
 }
 
-func NewDatabase(config *config.Database, logger *zerolog.Logger) *Database {
-	return &Database{config: config, logger: logger}
+type Database struct {
+	logger *zerolog.Logger
+	config *DatabaseConfig
+}
+
+func NewDatabase(logger *zerolog.Logger, config *DatabaseConfig) *Database {
+	return &Database{
+		config: config,
+		logger: logger,
+	}
 }
 
 func (database *Database) Connect() *sqlx.DB {
@@ -27,7 +39,7 @@ func (database *Database) Connect() *sqlx.DB {
 	if err != nil {
 		database.logger.Fatal().
 			Err(err).
-			Msg("Failed to connect to database")
+			Msg("failed to connect to database")
 	}
 
 	db.SetMaxIdleConns(database.config.MaxIdleConnections)
@@ -37,7 +49,7 @@ func (database *Database) Connect() *sqlx.DB {
 	if err != nil {
 		database.logger.Fatal().
 			Err(err).
-			Msg("Failed to ping database")
+			Msg("failed to ping database")
 	}
 
 	return db

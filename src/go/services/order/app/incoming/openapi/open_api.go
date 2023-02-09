@@ -26,28 +26,25 @@ func (a *API) RegisterRoutes(router chi.Router) {
 	})
 }
 
-func (a *API) GetSwaggerUI(responseWriter http.ResponseWriter, request *http.Request) {
+func (a *API) GetSwaggerUI(rw http.ResponseWriter, r *http.Request) {
 	subtree, _ := fs.Sub(swaggerUIFiles, "swagger-ui")
 
 	server := http.StripPrefix("/swagger", http.FileServer(http.FS(subtree)))
-	server.ServeHTTP(responseWriter, request)
+	server.ServeHTTP(rw, r)
 }
 
-func (a *API) GetOrderAPISpec(responseWriter http.ResponseWriter, request *http.Request) {
+func (a *API) GetOrderAPISpec(rw http.ResponseWriter, r *http.Request) {
 	swagger, err := orderapi.GetSwagger()
 	if err != nil {
-		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
+		httpresponse.StatusInternalServerError(rw, r, err.Error())
 	}
-
-	responseWriter.Header().Set("Content-Type", "application/json")
-	responseWriter.WriteHeader(200)
 
 	json, err := swagger.MarshalJSON()
 	if err != nil {
-		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
+		httpresponse.StatusInternalServerError(rw, r, err.Error())
 	}
-	_, err = responseWriter.Write(json)
+	_, err = rw.Write(json)
 	if err != nil {
-		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
+		httpresponse.StatusInternalServerError(rw, r, err.Error())
 	}
 }
