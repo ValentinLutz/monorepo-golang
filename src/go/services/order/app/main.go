@@ -11,6 +11,7 @@ import (
 	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
+	"monorepo/libraries/apputil/metrics"
 	"monorepo/libraries/apputil/middleware"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/service"
@@ -68,6 +69,12 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 		Password: "test",
 	}
 
+	databaseStats := metrics.NewDatabaseStats(db, metrics.DatabaseOpts{
+		Namespace: "app",
+		Subsystem: "order",
+	})
+	prometheus.MustRegister(databaseStats)
+
 	responseTimeHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "app",
 		Name:      "http_server_request_duration_seconds",
@@ -117,6 +124,6 @@ func logRoutes(logger zerolog.Logger, router *chi.Mux) {
 	if err := chi.Walk(router, walkFunc); err != nil {
 		logger.Error().
 			Err(err).
-			Msg("failed to walk")
+			Msg("failed to walk the routing tree")
 	}
 }
