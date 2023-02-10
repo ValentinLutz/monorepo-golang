@@ -18,6 +18,9 @@ dep.oapi-codegen:: # Install oapi-codegen with go install
 dep.golangci-lint:: # Install golangci-lint with go install
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.1
 
+dep.kustomize:: # Install kustomize with go install
+	go install sigs.k8s.io/kustomize/kustomize/v4@v4.5.6
+
 
 
 app/config/config.yaml: config/app/config.none-local.yaml ## Copy none-local config to app directory
@@ -36,6 +39,9 @@ app/incoming/orderapi/server.gen.go: dep.oapi-codegen api-definition/order_api.y
 test-integration/orderapi/client.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/client.test.yaml ## Generate integration test orders client from open api definition
 	oapi-codegen --config api-definition/client.test.yaml \
 		api-definition/order_api.yaml
+
+deployment-kubernetes/base/config.yaml: config/app/config.${PROFILE}.yaml ## Copy config to kubernetes deployment directory
+	install -D config/app/config.${PROFILE}.yaml deployment-kubernetes/base/config.yaml
 
 
 
@@ -128,11 +134,13 @@ docker.app.up:: docker.up docker.build database.migrate ## Start containers | PR
 		--follow
 
 
-deployment-kubernetes/base/config.yaml: config/app/config.${PROFILE}.yaml ## Copy config to kubernetes deployment directory
-	install -D config/app/config.${PROFILE}.yaml deployment-kubernetes/base/config.yaml
 
-kubernetes.build:: deployment-kubernetes/base/config.yaml ## Build kubernetes deployment
-	kubectl kustomize deployment-kubernetes/base > deployment-kubernetes/${PROFILE}.yaml
+kubernetes.image:: dep.kustomize ## Update app image version
+	cd deployment-kubernetes/base && \
+		kustomize edit set image ghcr.io/valentinlutz/order-service=ghcr.io/valentinlutz/order-service:${VERSION}
+
+kubernetes.build:: dep.kustomize deployment-kubernetes/base/config.yaml ## Build kubernetes deployment
+	kustomize build deployment-kubernetes/base > deployment-kubernetes/${PROFILE}.yaml
 
 kubernetes.deploy:: kubernetes.build ## Deploy app to kubernetes
 	kubectl apply -f deployment-kubernetes/${PROFILE}.yaml
