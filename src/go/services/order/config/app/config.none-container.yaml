@@ -17,8 +17,8 @@ logger:
 database:
   host: postgresql
   port: 5432
-  user: "test"
-  password: "test"
-  database: "dev_db"
+  user: test
+  password: test
+  database: dev_db
   max_idle_connections: 10
-  max_open_connections: 90
+  max_open_connections: 80
