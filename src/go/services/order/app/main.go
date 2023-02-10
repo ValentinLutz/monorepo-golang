@@ -38,7 +38,7 @@ func main() {
 		log.Fatal().
 			Err(err).
 			Str("path", configFile).
-			Msg("Failed to load config file")
+			Msg("failed to load config file")
 	}
 
 	logger := logging.NewLogger(appConfig.Logger)
@@ -78,7 +78,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 	responseTimeHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "app",
 		Name:      "http_server_request_duration_seconds",
-		Help:      "Histogram of response time in seconds",
+		Help:      "Histogram of response time in seconds.",
 		Buckets:   prometheus.DefBuckets,
 	}, []string{"method", "route", "code"})
 	prometheus.MustRegister(responseTimeHistogram)

@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"math/rand"
 	"monorepo/services/order/app/config"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/port"
 	"strconv"
 	"time"
@@ -30,24 +30,16 @@ func NewOrder(
 	}
 }
 
-func (service *Order) GetOrders(ctx context.Context, offset int, limit int) ([]entity.Order, error) {
-	orders, orderItems, err := service.orderRepository.FindAll(ctx, offset, limit)
+func (service *Order) GetOrders(ctx context.Context, offset int, limit int) ([]model.Order, error) {
+	orders, err := service.orderRepository.FindAllOrders(ctx, offset, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	for i, orderEntity := range orders {
-		for _, orderItem := range orderItems {
-			if orderEntity.OrderId == orderItem.OrderId {
-				orderEntity.Items = append(orderEntity.Items, orderItem)
-				orders[i] = orderEntity
-			}
-		}
-	}
 	return orders, nil
 }
 
-func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (entity.Order, error) {
+func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (model.Order, error) {
 	creationDate := time.Now()
 	orderId := NewOrderId(
 		service.config.Region,
@@ -55,37 +47,35 @@ func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (entit
 		strconv.Itoa(rand.Int()),
 	)
 
-	var orderItems []entity.OrderItem
+	var orderItems []model.OrderItem
 	for _, itemName := range itemNames {
-		orderItems = append(orderItems, entity.OrderItem{
+		orderItems = append(orderItems, model.OrderItem{
 			OrderItemId:  0,
-			OrderId:      orderId,
 			Name:         itemName,
 			CreationDate: creationDate,
 		})
 	}
 
-	orderEntity := entity.Order{
+	orderEntity := model.Order{
 		OrderId:      orderId,
 		Workflow:     "default_workflow",
 		CreationDate: creationDate,
-		Status:       entity.OrderPlaced,
+		Status:       model.OrderPlaced,
 		Items:        orderItems,
 	}
 
-	err := service.orderRepository.Save(ctx, orderEntity, orderItems)
+	err := service.orderRepository.SaveOrder(ctx, orderEntity)
 	if err != nil {
-		return entity.Order{}, err
+		return model.Order{}, err
 	}
 	return orderEntity, err
 }
 
-func (service *Order) GetOrder(ctx context.Context, orderId entity.OrderId) (entity.Order, error) {
-	order, orderItems, err := service.orderRepository.FindById(ctx, orderId)
+func (service *Order) GetOrder(ctx context.Context, orderId model.OrderId) (model.Order, error) {
+	order, err := service.orderRepository.FindOrderById(ctx, orderId)
 	if err != nil {
-		return entity.Order{}, errors.Wrapf(err, "order id is '%v'", orderId)
+		return model.Order{}, errors.Wrapf(err, "order id is '%v'", orderId)
 	}
 
-	order.Items = orderItems
 	return order, nil
 }

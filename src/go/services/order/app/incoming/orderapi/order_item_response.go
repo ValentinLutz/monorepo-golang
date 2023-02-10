@@ -3,7 +3,7 @@ package orderapi
 import (
 	"encoding/json"
 	"io"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 )
 
 func (orderItemResponse OrderItemResponse) ToJSON(writer io.Writer) error {
@@ -11,7 +11,7 @@ func (orderItemResponse OrderItemResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(orderItemResponse)
 }
 
-func FromOrderItemEntity(orderItem entity.OrderItem) OrderItemResponse {
+func FromOrderItemEntity(orderItem model.OrderItem) OrderItemResponse {
 	return OrderItemResponse{
 		Name: orderItem.Name,
 	}

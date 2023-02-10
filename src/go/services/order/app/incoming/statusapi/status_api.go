@@ -42,7 +42,7 @@ func (a *API) registerHealthChecks() http.HandlerFunc {
 	if err != nil {
 		a.logger.Fatal().
 			Err(err).
-			Msg("Failed to create health container")
+			Msg("failed to create health container")
 	}
 
 	databaseConfig := a.config.Database
@@ -61,7 +61,7 @@ func (a *API) registerHealthChecks() http.HandlerFunc {
 	if err != nil {
 		a.logger.Fatal().
 			Err(err).
-			Msg("Failed to create postgres health check")
+			Msg("failed to create postgres health check")
 	}
 
 	return healthStatus.HandlerFunc

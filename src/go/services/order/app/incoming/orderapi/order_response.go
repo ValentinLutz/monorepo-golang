@@ -3,7 +3,7 @@ package orderapi
 import (
 	"encoding/json"
 	"io"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 )
 
 func (orderResponse OrderResponse) ToJSON(writer io.Writer) error {
@@ -11,7 +11,7 @@ func (orderResponse OrderResponse) ToJSON(writer io.Writer) error {
 	return encoder.Encode(orderResponse)
 }
 
-func FromOrderEntity(order entity.Order) (OrderResponse, error) {
+func FromOrder(order model.Order) (OrderResponse, error) {
 	var orderItems []OrderItemResponse
 	for _, item := range order.Items {
 		orderItems = append(orderItems, FromOrderItemEntity(item))

@@ -3,7 +3,7 @@ package service_test
 import (
 	"github.com/stretchr/testify/assert"
 	"monorepo/services/order/app/config"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/service"
 	"testing"
 	"time"
@@ -29,7 +29,7 @@ func Test_NewOrderId(t *testing.T) {
 	t.Run("US", testNewOrderId(config.US, timestamp, "1010101", "gATm85KNU5H-US-UF!dI1xtcog"))
 }
 
-func testNewOrderId(region config.Region, timestamp time.Time, salt string, expected entity.OrderId) func(t *testing.T) {
+func testNewOrderId(region config.Region, timestamp time.Time, salt string, expected model.OrderId) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Logf("Region: %v", region)
 		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))

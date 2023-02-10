@@ -3,7 +3,7 @@ package orderapi
 import (
 	"errors"
 	"monorepo/libraries/apputil/httpresponse"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/port"
 	"net/http"
 )
@@ -37,7 +37,7 @@ func (a *API) GetOrders(responseWriter http.ResponseWriter, request *http.Reques
 
 	ordersResponse := make(OrdersResponse, 0)
 	for _, orderEntity := range orderEntities {
-		orderEntity, err := FromOrderEntity(orderEntity)
+		orderEntity, err := FromOrder(orderEntity)
 		if err != nil {
 			httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 		}
@@ -61,7 +61,7 @@ func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	response, err := FromOrderEntity(orderEntity)
+	response, err := FromOrder(orderEntity)
 	if err != nil {
 		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 	}
@@ -70,7 +70,7 @@ func (a *API) PostOrders(responseWriter http.ResponseWriter, request *http.Reque
 }
 
 func (a *API) GetOrder(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
-	orderEntity, err := a.service.GetOrder(request.Context(), entity.OrderId(orderId))
+	order, err := a.service.GetOrder(request.Context(), model.OrderId(orderId))
 	if errors.Is(err, port.OrderNotFound) {
 		httpresponse.StatusNotFound(responseWriter, request, err.Error())
 		return
@@ -80,7 +80,7 @@ func (a *API) GetOrder(responseWriter http.ResponseWriter, request *http.Request
 		return
 	}
 
-	response, err := FromOrderEntity(orderEntity)
+	response, err := FromOrder(order)
 	if err != nil {
 		httpresponse.StatusInternalServerError(responseWriter, request, err.Error())
 	}

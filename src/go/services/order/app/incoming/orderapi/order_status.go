@@ -2,18 +2,18 @@ package orderapi
 
 import (
 	"fmt"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 )
 
-func FromOrderStatus(orderStatus entity.Status) (OrderStatus, error) {
+func FromOrderStatus(orderStatus model.OrderStatus) (OrderStatus, error) {
 	switch orderStatus {
-	case entity.OrderPlaced:
+	case model.OrderPlaced:
 		return OrderPlaced, nil
-	case entity.OrderCompleted:
+	case model.OrderCompleted:
 		return OrderCompleted, nil
-	case entity.OrderCanceled:
+	case model.OrderCanceled:
 		return OrderCanceled, nil
-	case entity.OrderInProgress:
+	case model.OrderInProgress:
 		return OrderInProgress, nil
 	default:
 		return "", fmt.Errorf("failed to map order status '%v'", orderStatus)

@@ -239,14 +239,14 @@ func readToObject(t *testing.T, reader io.Reader, object interface{}) {
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(object)
 	if err != nil {
-		t.Fatalf("Failed to decode input, %v", err)
+		t.Fatalf("failed to decode input, %v", err)
 	}
 }
 
 func readFile(t *testing.T, path string) *os.File {
 	file, err := os.Open(path)
 	if err != nil {
-		t.Fatalf("Failed to read file from path %v, %v", path, err)
+		t.Fatalf("failed to read file from path %v, %v", path, err)
 	}
 	return file
 }

@@ -5,12 +5,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"monorepo/services/order/app/config"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 	"strings"
 	"time"
 )
 
-func NewOrderId(region config.Region, timestamp time.Time, salt string) entity.OrderId {
+func NewOrderId(region config.Region, timestamp time.Time, salt string) model.OrderId {
 	valueToHash := string(region) + timestamp.Format(time.RFC3339) + salt
 	md5Sum := md5.Sum([]byte(valueToHash))
 
@@ -20,7 +20,7 @@ func NewOrderId(region config.Region, timestamp time.Time, salt string) entity.O
 	regionIdentifier := fmt.Sprintf("-%s-", region)
 
 	base64StringHalfLength := len(base64WithoutUnderscore) / 2
-	return entity.OrderId(base64WithoutUnderscore[0:base64StringHalfLength] + regionIdentifier + base64WithoutUnderscore[base64StringHalfLength:])
+	return model.OrderId(base64WithoutUnderscore[0:base64StringHalfLength] + regionIdentifier + base64WithoutUnderscore[base64StringHalfLength:])
 }
 
 func replaceHyphenAndUnderscore(input string) string {

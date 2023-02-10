@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"monorepo/services/order/app/core/entity"
+	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/port"
 )
 
@@ -18,108 +18,98 @@ func NewPostgreSQL(database *sqlx.DB) PostgreSQL {
 	return PostgreSQL{database: database}
 }
 
-func (orderRepository *PostgreSQL) FindAll(ctx context.Context, offset int, limit int) ([]entity.Order, []entity.OrderItem, error) {
-	rows, err := orderRepository.database.QueryxContext(
+func (orderRepository *PostgreSQL) FindAllOrders(ctx context.Context, offset int, limit int) ([]model.Order, error) {
+	var orderEntities []OrderEntity
+	err := orderRepository.database.SelectContext(
 		ctx,
+		&orderEntities,
 		"SELECT order_id, creation_date, order_status FROM order_service.order ORDER BY creation_date OFFSET $1 LIMIT $2",
 		offset, limit,
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	var orders []entity.Order
-	for rows.Next() {
-		var order entity.Order
-		err := rows.StructScan(&order)
-		if err != nil {
-			return nil, nil, err
-		}
-		orders = append(orders, order)
-	}
-
-	var orderIds []entity.OrderId
-	for _, order := range orders {
+	var orderIds []model.OrderId
+	for _, order := range orderEntities {
 		orderIds = append(orderIds, order.OrderId)
 	}
 
-	rows, err = orderRepository.database.QueryxContext(
+	var orderItemEntities []OrderItemEntity
+	err = orderRepository.database.SelectContext(
 		ctx,
+		&orderItemEntities,
 		"SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item WHERE order_id = ANY($1)",
 		pq.Array(orderIds),
 	)
-	var orderItems []entity.OrderItem
-	for rows.Next() {
-		var orderItem entity.OrderItem
-		err := rows.StructScan(&orderItem)
-		if err != nil {
-			return nil, nil, err
-		}
-		orderItems = append(orderItems, orderItem)
+	if err != nil {
+		return nil, err
 	}
 
-	return orders, orderItems, nil
+	return NewOrders(orderEntities, orderItemEntities), nil
 }
 
-func (orderRepository *PostgreSQL) FindById(ctx context.Context, orderId entity.OrderId) (entity.Order, []entity.OrderItem, error) {
-	row := orderRepository.database.QueryRowxContext(
+func (orderRepository *PostgreSQL) FindOrderById(ctx context.Context, orderId model.OrderId) (model.Order, error) {
+	var orderEntity OrderEntity
+	err := orderRepository.database.GetContext(
 		ctx,
+		&orderEntity,
 		"SELECT order_id, creation_date, order_status FROM order_service.order WHERE order_id = $1",
 		orderId,
 	)
-	var order entity.Order
-	err := row.StructScan(&order)
 	if errors.Is(err, sql.ErrNoRows) {
-		return entity.Order{}, nil, port.OrderNotFound
+		return model.Order{}, port.OrderNotFound
 	}
 	if err != nil {
-		return entity.Order{}, nil, err
+		return model.Order{}, err
 	}
 
-	rows, err := orderRepository.database.QueryxContext(
+	var orderItemEntities []OrderItemEntity
+	err = orderRepository.database.SelectContext(
 		ctx,
+		&orderItemEntities,
 		"SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item WHERE order_id = $1",
 		orderId,
 	)
 	if err != nil {
-		return entity.Order{}, nil, err
-	}
-	var orderItems []entity.OrderItem
-	for rows.Next() {
-		var orderItem entity.OrderItem
-		err := rows.StructScan(&orderItem)
-		if err != nil {
-			return entity.Order{}, nil, err
-		}
-		orderItems = append(orderItems, orderItem)
+		return model.Order{}, err
 	}
 
-	return order, orderItems, nil
+	return NewOrder(orderEntity, orderItemEntities), nil
 }
 
-func (orderRepository *PostgreSQL) Save(ctx context.Context, order entity.Order, orderItems []entity.OrderItem) error {
+func (orderRepository *PostgreSQL) SaveOrder(ctx context.Context, order model.Order) error {
 	txx, err := orderRepository.database.BeginTxx(ctx, nil)
-	defer txx.Commit()
+	defer func(txx *sqlx.Tx) {
+		err := txx.Commit()
+		if err != nil {
+			_ = txx.Rollback()
+		}
+	}(txx)
 	if err != nil {
 		return err
 	}
 
 	_, err = txx.NamedExec(
 		"INSERT INTO order_service.order (order_id, creation_date, order_status, workflow) VALUES (:order_id, :creation_date, :order_status, :workflow)",
-		order,
+		NewOrderEntity(order),
 	)
 	if err != nil {
-		txx.Rollback()
-		return err
+		err := txx.Rollback()
+		if err != nil {
+			return err
+		}
 	}
 
 	_, err = txx.NamedExec(
 		"INSERT INTO order_service.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)",
-		orderItems,
+		NewOrderItemEntities(order.OrderId, order.Items),
 	)
 	if err != nil {
-		txx.Rollback()
-		return err
+		err := txx.Rollback()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

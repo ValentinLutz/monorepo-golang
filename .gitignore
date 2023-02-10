@@ -4,6 +4,8 @@
 **/app/config/*.yaml
 **/app/serve/openapi/**
 
+**/deployment-kubernetes/base/config.yaml
+
 # Generated GO clients
 *.gen.go
 

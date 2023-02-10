@@ -15,6 +15,9 @@ export DOCKER_REPOSITORY ?= valentinlutz
 dep.oapi-codegen:: # Install oapi-codegen with go install
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4
 
+dep.golangci-lint:: # Install golangci-lint with go install
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.1
+
 
 
 app/config/config.yaml: config/app/config.none-local.yaml ## Copy none-local config to app directory
@@ -44,7 +47,7 @@ app.build:: app/incoming/orderapi/server.gen.go ## Build the app into an executa
 	cd app && \
 		go build
 
-app.lint:: app/incoming/orderapi/server.gen.go ## Runs linters against go code
+app.lint:: dep.golangci-lint app/incoming/orderapi/server.gen.go ## Runs linters against go code
 	cd app && \
 		golangci-lint run
 
