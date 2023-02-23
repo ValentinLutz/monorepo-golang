@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog"
 	"monorepo/libraries/apputil/logging"
 	"net/http"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
 type ServerConfig struct {

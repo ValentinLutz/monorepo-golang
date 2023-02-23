@@ -11,7 +11,7 @@ const (
 	PROD      Environment = "PROD"
 )
 
-func (env *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (e *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var environmentString string
 	err := unmarshal(&environmentString)
 	if err != nil {
@@ -22,7 +22,7 @@ func (env *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	switch environment {
 	case LOCAL, CONTAINER, TEST, PROD:
-		*env = environment
+		*e = environment
 		return nil
 	}
 	return fmt.Errorf("environment '%v' is invalid", environment)

@@ -2,12 +2,6 @@ package main
 
 import (
 	"flag"
-	"github.com/go-chi/chi/v5"
-	"github.com/jmoiron/sqlx"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/hlog"
-	"github.com/rs/zerolog/log"
 	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
@@ -22,8 +16,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/jmoiron/sqlx"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/hlog"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -106,24 +106,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 		openAPI.RegisterRoutes(r)
 	})
 
-	logRoutes(logger, router)
+	logging.LogRoutes(logger, router)
 
 	return router
-}
-
-func logRoutes(logger zerolog.Logger, router *chi.Mux) {
-	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		route = strings.Replace(route, "/*/", "/", -1)
-		logger.Info().
-			Str("method", method).
-			Str("route", route).
-			Msg("register")
-		return nil
-	}
-
-	if err := chi.Walk(router, walkFunc); err != nil {
-		logger.Error().
-			Err(err).
-			Msg("failed to walk the routing tree")
-	}
 }
