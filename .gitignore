@@ -2,15 +2,16 @@
 **/app/config/*.crt
 **/app/config/*.key
 **/app/config/*.yaml
-**/app/serve/openapi/**
+
+**/openapi/spec/*.yaml
 
 **/deployment-kubernetes/base/config.yaml
 
 # Generated GO clients
 *.gen.go
 
+# Rust
+target
+
 # JetBrains IDEs
 .idea
-
-# Bazel
-bazel-*
