@@ -54,6 +54,99 @@
               "viz": false
             },
             "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 35,
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "builder",
+          "expr": "sum by(method, route) (rate(app_http_server_request_duration_seconds_sum[$__rate_interval])) / sum by (method, route) (rate(app_http_server_request_duration_seconds_count[$__rate_interval]))",
+          "hide": false,
+          "legendFormat": "{{mehtod}}{{route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Average Response Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
             },
@@ -85,43 +178,12 @@
           },
           "unit": "none"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "app"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "goroutines"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 9,
         "w": 12,
-        "x": 0,
+        "x": 12,
         "y": 0
       },
       "id": 27,
@@ -147,7 +209,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "go_goroutines{job=\"$job\"}",
+          "expr": "go_goroutines{job=\"app\"}",
           "format": "time_series",
           "instant": false,
           "intervalFactor": 1,
@@ -157,361 +219,6 @@
         }
       ],
       "title": "Number of Goroutines",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "dashed"
-            }
-          },
-          "links": [],
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "purple",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "time"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{instance=\"app:8443\", job=\"app\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 4,
-      "links": [],
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "9.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "rate(go_gc_duration_seconds_count{job=\"$job\"}[$__rate_interval])",
-          "format": "time_series",
-          "instant": false,
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Garbage Collection Time",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "links": [],
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "decbytes"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "go_memstats_heap_alloc_bytes"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 9
-      },
-      "id": 28,
-      "links": [],
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "go_memstats_heap_alloc_bytes{job=\"$job\"}",
-          "format": "time_series",
-          "instant": false,
-          "intervalFactor": 1,
-          "legendFormat": "{{__name__}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Heap Memory",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "links": [],
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{instance=\"app:8443\", job=\"app\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 9
-      },
-      "id": 22,
-      "links": [],
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
-          "editorMode": "code",
-          "expr": "go_memstats_mallocs_total{job=\"$job\"} - go_memstats_frees_total{job=\"$job\"}",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Number of Heap Live Objects",
       "type": "timeseries"
     },
     {
@@ -576,7 +283,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 18
+        "y": 9
       },
       "id": 29,
       "links": [],
@@ -599,9 +306,9 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "editorMode": "code",
+          "editorMode": "builder",
           "exemplar": false,
-          "expr": "histogram_quantile(0.5, sum(rate(namespace_http_server_request_duration_seconds_bucket[$__rate_interval])) by (le, method, route))",
+          "expr": "histogram_quantile(0.99, sum by(le, method, route) (rate(app_http_server_request_duration_seconds_bucket[$__rate_interval])))",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -611,7 +318,100 @@
           "refId": "A"
         }
       ],
-      "title": "Response Times",
+      "title": "99 Percentile Response Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 22,
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "code",
+          "expr": "go_memstats_mallocs_total{job=\"app\"} - go_memstats_frees_total{job=\"app\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Number of Heap Live Objects",
       "type": "timeseries"
     },
     {
@@ -675,10 +475,10 @@
       "gridPos": {
         "h": 9,
         "w": 12,
-        "x": 12,
+        "x": 0,
         "y": 18
       },
-      "id": 30,
+      "id": 31,
       "links": [],
       "options": {
         "legend": {
@@ -701,17 +501,217 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "sum by(method, route) (rate(namespace_http_server_request_duration_seconds_count[$__rate_interval]))",
+          "expr": "sum by(method, route) (rate(app_http_server_request_duration_seconds_count[$__rate_interval]))",
           "format": "time_series",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{method}} {{route}}",
+          "legendFormat": "{{mehtod}} {{route}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Number of Requests",
+      "title": "Requests per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 28,
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "go_memstats_heap_alloc_bytes{job=\"app\"}",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 1,
+          "legendFormat": "{{__name__}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Heap Memory",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 27
+      },
+      "id": 4,
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "builder",
+          "exemplar": false,
+          "expr": "rate(go_gc_duration_seconds_sum{job=\"app\"}[$__rate_interval]) / rate(go_gc_duration_seconds_count{job=\"app\"}[$__rate_interval])",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Average Garbage Collection Time",
       "type": "timeseries"
     },
     {
@@ -780,7 +780,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 27
+        "y": 36
       },
       "id": 26,
       "links": [],
@@ -806,9 +806,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_mspan_inuse_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_mspan_inuse_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "A"
         },
         {
@@ -816,9 +818,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_mspan_sys_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_mspan_sys_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "B"
         },
         {
@@ -826,9 +830,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_mcache_inuse_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_mcache_inuse_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "C"
         },
         {
@@ -836,9 +842,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_mcache_sys_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_mcache_sys_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "D"
         },
         {
@@ -846,9 +854,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_buck_hash_sys_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_buck_hash_sys_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "E"
         },
         {
@@ -856,9 +866,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_gc_sys_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_gc_sys_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "F"
         },
         {
@@ -883,7 +895,7 @@
           "refId": "H"
         }
       ],
-      "title": "Memory in Off-Heap",
+      "title": "Off-Heap Memory",
       "type": "timeseries"
     },
     {
@@ -907,7 +919,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 48
       },
       "hiddenSeries": false,
       "id": 12,
@@ -942,9 +954,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_heap_alloc_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_heap_alloc_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "B"
         },
         {
@@ -952,9 +966,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_heap_sys_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_heap_sys_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "A"
         },
         {
@@ -962,9 +978,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_heap_idle_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_heap_idle_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "C"
         },
         {
@@ -972,10 +990,12 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_heap_inuse_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_heap_inuse_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",
+          "range": true,
           "refId": "D"
         },
         {
@@ -983,9 +1003,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_heap_released_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_heap_released_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "E"
         }
       ],
@@ -1040,7 +1062,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 51
+        "y": 60
       },
       "hiddenSeries": false,
       "id": 24,
@@ -1075,9 +1097,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_stack_inuse_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_stack_inuse_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "A"
         },
         {
@@ -1085,9 +1109,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_stack_sys_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_stack_sys_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "B"
         }
       ],
@@ -1142,7 +1168,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 51
+        "y": 60
       },
       "hiddenSeries": false,
       "id": 16,
@@ -1177,9 +1203,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "go_memstats_sys_bytes{job=\"$job\", instance=~\"$instance\"}",
+          "editorMode": "code",
+          "expr": "go_memstats_sys_bytes{job=\"app\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1235,7 +1263,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 59
+        "y": 68
       },
       "hiddenSeries": false,
       "id": 18,
@@ -1270,9 +1298,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "rate(go_memstats_lookups_total{job=\"$job\", instance=~\"$instance\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(go_memstats_lookups_total{job=\"app\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1328,7 +1358,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 59
+        "y": 68
       },
       "hiddenSeries": false,
       "id": 20,
@@ -1363,9 +1393,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "rate(go_memstats_mallocs_total{job=\"$job\", instance=~\"$instance\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(go_memstats_mallocs_total{job=\"app\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1420,7 +1452,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 67
+        "y": 76
       },
       "hiddenSeries": false,
       "id": 14,
@@ -1455,9 +1487,11 @@
             "type": "prometheus",
             "uid": "P1809F7CD0C75ACF3"
           },
-          "expr": "rate(go_memstats_alloc_bytes_total{job=\"$job\", instance=~\"$instance\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(go_memstats_alloc_bytes_total{job=\"app\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1500,41 +1534,10 @@
     "golang"
   ],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "selected": false,
-          "text": "app",
-          "value": "app"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "P1809F7CD0C75ACF3"
-        },
-        "definition": "label_values(job)",
-        "hide": 0,
-        "includeAll": false,
-        "label": "job",
-        "multi": false,
-        "name": "job",
-        "options": [],
-        "query": {
-          "query": "label_values(job)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      }
-    ]
+    "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {

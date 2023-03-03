@@ -3,22 +3,27 @@ import encoding from 'k6/encoding';
 import {check} from "k6";
 
 export const BASE_URI = 'https://app:8443'
-export const ITERATIONS = 1000
 
 export const options = {
     insecureSkipTLSVerify: true,
     scenarios: {
         getOrders: {
-            executor: 'per-vu-iterations',
+            executor: 'constant-arrival-rate',
             exec: 'getOrders',
-            vus: 100,
-            iterations: ITERATIONS,
+            timeUnit: '1s',
+            rate: 100,
+            duration: '5m',
+            preAllocatedVUs: 1,
+            maxVUs: 100
         },
         postOrder_getOrder: {
-            executor: 'per-vu-iterations',
+            executor: 'constant-arrival-rate',
             exec: 'postOrder_getOrder',
-            vus: 100,
-            iterations: ITERATIONS,
+            timeUnit: '1s',
+            rate: 100,
+            duration: '5m',
+            preAllocatedVUs: 1,
+            maxVUs: 100
         },
     },
 };

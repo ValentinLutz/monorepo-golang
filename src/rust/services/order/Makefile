@@ -12,3 +12,7 @@ app/src/incoming/openapi/spec/order_api.yaml: api-definition/order_api.yaml ## C
 app.run:: app/src/incoming/openapi/spec/order_api.yaml ## Run the app
 	cd app && \
 		cargo run
+
+app.test:: app/src/incoming/openapi/spec/order_api.yaml ## Test the app
+	cd app && \
+		cargo test
