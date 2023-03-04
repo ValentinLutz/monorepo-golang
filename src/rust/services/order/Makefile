@@ -1,5 +1,11 @@
 .DEFAULT_GOAL := help
 
+export DATABASE_URL ?= postgres://test:test@localhost:9432/dev_db
+export PROFILE ?= none-local
+export FLYWAY_USER ?= test
+export FLYWAY_PASSWORD ?= test
+
+
 help::
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) \
 		| awk -F':.*?## | \\| ' '{printf "\033[36m%-38s \033[37m %-68s \033[35m%s \n", $$1, $$2, $$3}'
@@ -16,3 +22,20 @@ app.run:: app/src/incoming/openapi/spec/order_api.yaml ## Run the app
 app.test:: app/src/incoming/openapi/spec/order_api.yaml ## Test the app
 	cd app && \
 		cargo test
+
+
+
+database.migrate:: ## Migrate database | PFOFILE, FLYWAY_USER, FLYWAY_PASSWORD
+	cd migration-database && \
+		flyway clean \
+		migrate \
+		-configFiles=${PROFILE}.properties \
+		-user=${FLYWAY_USER} \
+		-password=${FLYWAY_PASSWORD}
+
+
+
+docker.up:: ## Start containers
+	docker compose \
+		-f deployment-docker/docker-compose.yaml \
+		up -d --force-recreate

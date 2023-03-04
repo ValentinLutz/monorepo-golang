@@ -1,25 +1,26 @@
-use core::port::outgoing::OrderRepoitory;
-
 use actix_web::{web, App, HttpServer};
+use incoming::{
+    openapi::routes::{dist, index, spec},
+    orderapi::routes::{get_order, get_orders, post_orders},
+};
+use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
-use incoming::openapi::routes::{dist, index, spec};
-use incoming::orderapi::routes::{get_order, get_orders, post_orders};
-
-mod core;
 mod incoming;
-mod outgoing;
+mod core;
 
-struct AppState {
-    order_repository: dyn OrderRepoitory,
-}
+pub type DatabasePool = Pool<Postgres>;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let postgres_pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect("postgres://test:test@localhost:9432/dev_db")
+        .await
+        .expect("failed to build postgres connection pool");
+
+    HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(AppState {
-                order_repository: String::from("Order Service"),
-            }))
+            .app_data(web::Data::new(postgres_pool.clone()))
             .service(index)
             .service(dist)
             .service(spec)

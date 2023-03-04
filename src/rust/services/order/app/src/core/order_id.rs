@@ -1,4 +1,5 @@
 use base64::{engine::general_purpose, Engine};
+use serde::{Serialize, Deserialize};
 use std::{borrow::Borrow, fmt};
 use time::OffsetDateTime;
 
@@ -26,7 +27,7 @@ enum Environment {
     PROD,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct OrderId(pub String);
 
 pub fn generate_order_id(region: Region, timestamp: OffsetDateTime, salt: &str) -> OrderId {
@@ -53,7 +54,7 @@ pub fn generate_order_id(region: Region, timestamp: OffsetDateTime, salt: &str) 
 mod tests {
     use test_case::test_case;
     use time::{format_description::well_known::Rfc3339, OffsetDateTime};
-    use crate::core::service::order_id::{generate_order_id, OrderId, Region};
+    use crate::core::order_id::{generate_order_id, OrderId, Region};
     
     #[test_case(Region::NONE,  "1",  OrderId(String::from("eBdsGMJzvCr-NONE-*2YpETWfUnA")))]
     #[test_case(Region::NONE,  "101",  OrderId(String::from("*kNJT1sDk5G-NONE-seQgT4znBAw")))]
