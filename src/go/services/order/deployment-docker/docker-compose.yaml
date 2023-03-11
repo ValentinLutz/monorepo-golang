@@ -1,25 +1,17 @@
-version: '3.9'
-
-networks:
-  default:
-    name: order-service
+version: '3.8'
 
 services:
-  postgresql:
-    image: postgres:14.2
-    container_name: postgresql
+  app:
+    image: ghcr.io/valentinlutz/order-service:latest
+    build:
+      context: ../../../
+      dockerfile: ./services/order/app/Dockerfile
+    container_name: app
+    network_mode: host
     environment:
-      POSTGRES_DB: dev_db
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-    ports:
-      - '9432:5432'
-
-  wiremock:
-    image: wiremock/wiremock:2.33.2
-    container_name: wiremock
-    command: --no-request-journal --global-response-templating
+      PROJECT_NAME: order-service
+      VERSION: docker-container
     volumes:
-      - ./wiremock/:/home/wiremock:ro
-    ports:
-      - '9080:8080'
+      - ../config/app/config.none-container.yaml:/app/config/config.yaml:ro
+      - ../config/app.crt:/app/config/app.crt:ro
+      - ../config/app.key:/app/config/app.key:ro
