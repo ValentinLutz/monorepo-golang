@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  app:
+    image: ghcr.io/valentinlutz/order-service:latest
+    build:
+      context: ../../../
+      dockerfile: ./services/order/app/Dockerfile
+    container_name: app
+    network_mode: host

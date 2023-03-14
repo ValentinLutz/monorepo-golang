@@ -21,6 +21,10 @@
 	// Configure tool-specific properties.
 	"customizations": {},
 
+	"containerEnv": {
+		"DATABASE_URL": "postgres://test:test@localhost:5432/test"
+	},
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 		8080, // app

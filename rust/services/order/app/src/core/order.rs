@@ -49,17 +49,7 @@ pub async fn get_orders(
     offset: isize,
     limit: isize,
 ) -> Result<Vec<Order>, OrderError> {
-    return sqlx::query_as!(
-        Order,
-        r#"
-        SELECT order_id, creation_date, status, workflow, items
-        FROM orders
-        OFFSET $1
-        LIMIT $2
-        "#,
-        offset,
-        limit
-    )
+    return sqlx::query_as!(Order,"SELECT order_id, creation_date, order_status FROM order_service.order ORDER BY creation_date OFFSET $1 LIMIT $2",offset,limit)
     .fetch_all(&database_pool)
     .await?;
 }

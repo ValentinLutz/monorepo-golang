@@ -14,7 +14,7 @@ pub type DatabasePool = Pool<Postgres>;
 async fn main() -> std::io::Result<()> {
     let postgres_pool = PgPoolOptions::new()
         .max_connections(5)
-        .connect("postgres://test:test@localhost:9432/dev_db")
+        .connect("postgres://test:test@localhost:5432/test")
         .await
         .expect("failed to build postgres connection pool");
 

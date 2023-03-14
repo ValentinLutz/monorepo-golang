@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-export DATABASE_URL ?= postgres://test:test@localhost:9432/dev_db
+export DATABASE_URL ?= postgres://test:test@localhost:5432/test
 export PROFILE ?= none-local
 export FLYWAY_USER ?= test
 export FLYWAY_PASSWORD ?= test
@@ -19,7 +19,8 @@ app.run:: app/src/incoming/openapi/spec/order_api.yaml ## Run the app
 	cd app && \
 		cargo run
 
-app.test:: app/src/incoming/openapi/spec/order_api.yaml ## Test the app
+
+test.unit:: app/src/incoming/openapi/spec/order_api.yaml ## Test the app
 	cd app && \
 		cargo test
 
@@ -38,4 +39,4 @@ database.migrate:: ## Migrate database | PFOFILE, FLYWAY_USER, FLYWAY_PASSWORD
 docker.up:: ## Start containers
 	docker compose \
 		-f deployment-docker/docker-compose.yaml \
-		up -d --force-recreate
+		--force-recreate
