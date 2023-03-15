@@ -19,7 +19,14 @@
 		}
 	},
 	// Configure tool-specific properties.
-	"customizations": {},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"usernamehw.errorlens",
+				"GitHub.copilot"
+			]
+		}
+	},
 
 	"containerEnv": {
 		"DATABASE_URL": "postgres://test:test@localhost:5432/test"

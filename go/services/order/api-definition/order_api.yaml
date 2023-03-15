@@ -190,7 +190,7 @@ components:
           example: 9009
         message:
           type: string
-          example: panic it's over 9000
+          example: panic it's over 9000!
         correlation_id:
           type: string
           example: 864f8731-9bbf-46e3-b84e-fda43a910fe4

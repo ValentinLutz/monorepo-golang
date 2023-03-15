@@ -5,8 +5,9 @@ use incoming::{
 };
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
-mod incoming;
 mod core;
+mod incoming;
+mod outgoing;
 
 pub type DatabasePool = Pool<Postgres>;
 
