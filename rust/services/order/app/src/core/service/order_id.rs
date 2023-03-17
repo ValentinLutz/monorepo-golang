@@ -8,7 +8,6 @@ pub enum Region {
     EU,
     US,
 }
-
 impl fmt::Display for Region {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match *self {

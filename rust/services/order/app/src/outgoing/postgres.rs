@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use sqlx::PgPool;
 
 use crate::core::{
@@ -5,27 +6,28 @@ use crate::core::{
 };
 
 pub struct PostgresOrderRepository {
-    postgres_pool: Box<PgPool>,
+    postgres_pool: PgPool,
 }
 
 impl PostgresOrderRepository {
-    pub fn new(postgres_pool: Box<PgPool>) -> Self {
+    pub fn new(postgres_pool: PgPool) -> Self {
         return PostgresOrderRepository {
             postgres_pool: postgres_pool,
         };
     }
 }
 
+#[async_trait]
 impl OrderRepository for PostgresOrderRepository {
-    fn find_all_orders(&self, offset: i32, limit: i32) -> Result<Vec<Order>, String> {
+    async fn find_all_orders(&self, offset: i32, limit: i32) -> Result<Vec<Order>, String> {
         todo!()
     }
 
-    fn find_order_by_id(&self, order_id: OrderId) -> Result<Order, String> {
+    async fn find_order_by_id(&self, order_id: OrderId) -> Result<Order, String> {
         todo!()
     }
 
-    fn save_order(&self, order: Order) -> Result<Order, String> {
+    async fn save_order(&self, order: Order) -> Result<Order, String> {
         todo!()
     }
 }

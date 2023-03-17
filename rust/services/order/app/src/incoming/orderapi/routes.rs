@@ -1,13 +1,35 @@
-use actix_web::{HttpResponse, Responder};
+use axum::{extract::State, http::StatusCode, Json};
 
-#[actix_web::get("/orders")]
-pub async fn get_orders() -> impl Responder {
-    let orders = vec!["order1", "order2"];
-    return HttpResponse::Ok().json(orders);
+use crate::{
+    core::port::incoming::DynOrderService,
+    incoming::orderapi::models::{OrderItemResponse, OrderResponse},
+};
+
+pub async fn get_orders(
+    State(order_service): State<DynOrderService>,
+) -> (StatusCode, Json<Vec<OrderResponse>>) {
+    let orders: Vec<OrderResponse> = order_service
+        .get_orders(0, 10)
+        .await
+        .unwrap()
+        .iter()
+        .map(|order| OrderResponse {
+            order_id: order.order_id.to_string(),
+            creation_date: order.creation_date,
+            status: order.status.to_string(),
+            items: order
+                .items
+                .iter()
+                .map(|order_item| OrderItemResponse {
+                    name: order_item.name.to_string(),
+                })
+                .collect(),
+        })
+        .collect();
+    return (StatusCode::OK, Json(orders));
 }
 
-#[actix_web::post("/orders")]
-pub async fn post_orders() -> impl Responder {
+pub async fn post_orders() -> (StatusCode, Json<Vec<&'static str>>) {
     // let timestamp = OffsetDateTime::now_utc();
     // let order_id = generate_order_id(
     //     Region::NONE,
@@ -29,11 +51,10 @@ pub async fn post_orders() -> impl Responder {
     // return HttpResponse::Ok().json(orders);
 
     let orders = vec!["order1", "order2"];
-    return HttpResponse::Ok().json(orders);
+    return (StatusCode::OK, Json(orders));
 }
 
-#[actix_web::get("/orders/{order_id}")]
-pub async fn get_order() -> impl Responder {
+pub async fn get_order() -> (StatusCode, Json<Vec<&'static str>>) {
     let orders = vec!["order1", "order2"];
-    return HttpResponse::Ok().json(orders);
+    return (StatusCode::OK, Json(orders));
 }

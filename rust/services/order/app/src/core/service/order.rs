@@ -1,34 +1,37 @@
+use async_trait::async_trait;
 use time::OffsetDateTime;
 
 use crate::core::{
     model::order::{Order, OrderItem, OrderStatus},
-    port::{incoming, outgoing::OrderRepository},
+    port::{incoming::OrderService, outgoing::DynOrderRepository},
 };
 
 use rand::{thread_rng, Rng};
 
 use super::order_id::{generate_order_id, OrderId, Region};
 
-pub struct OrderService {
-    order_repository: Box<dyn OrderRepository>,
+#[derive(Clone)]
+pub struct OrderServiceImpl {
+    order_repository: DynOrderRepository,
     region: Region,
 }
 
-impl OrderService {
-    pub fn new(order_repository: Box<dyn OrderRepository>, region: Region) -> Self {
-        return OrderService {
+impl OrderServiceImpl {
+    pub fn new(order_repository: DynOrderRepository, region: Region) -> Self {
+        return OrderServiceImpl {
             order_repository: order_repository,
             region: region,
         };
     }
 }
 
-impl incoming::OrderService for OrderService {
-    fn get_orders(&self, offset: i32, limit: i32) -> Result<Vec<Order>, String> {
-        return self.order_repository.find_all_orders(offset, limit);
+#[async_trait]
+impl OrderService for OrderServiceImpl {
+    async fn get_orders(&self, offset: i32, limit: i32) -> Result<Vec<Order>, String> {
+        return self.order_repository.find_all_orders(offset, limit).await;
     }
 
-    fn place_order(&self, item_names: Vec<String>) -> Result<Order, String> {
+    async fn place_order(&self, item_names: Vec<String>) -> Result<Order, String> {
         let creation_date = OffsetDateTime::now_utc();
 
         let order_id = generate_order_id(
@@ -53,10 +56,10 @@ impl incoming::OrderService for OrderService {
                 .collect(),
         };
 
-        return self.order_repository.save_order(order);
+        return self.order_repository.save_order(order).await;
     }
 
-    fn get_order(&self, order_id: OrderId) -> Result<Order, String> {
-        return self.order_repository.find_order_by_id(order_id);
+    async fn get_order(&self, order_id: OrderId) -> Result<Order, String> {
+        return self.order_repository.find_order_by_id(order_id).await;
     }
 }
