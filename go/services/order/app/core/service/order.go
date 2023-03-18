@@ -2,29 +2,26 @@ package service
 
 import (
 	"context"
-	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 	"math/rand"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/port"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type Order struct {
-	db              *sqlx.DB
 	config          *config.Config
 	orderRepository port.OrderRepository
 }
 
 func NewOrder(
-	db *sqlx.DB,
 	config *config.Config,
 	orderRepository port.OrderRepository,
 ) *Order {
 	return &Order{
-		db:              db,
 		config:          config,
 		orderRepository: orderRepository,
 	}

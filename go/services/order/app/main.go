@@ -62,7 +62,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 	router := chi.NewRouter()
 
 	orderRepository := orderrepo.NewPostgreSQL(db)
-	ordersService := service.NewOrder(db, config, &orderRepository)
+	ordersService := service.NewOrder(config, &orderRepository)
 
 	authentication := middleware.Authentication{
 		Username: "test",
