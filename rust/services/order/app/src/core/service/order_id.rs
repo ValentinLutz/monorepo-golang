@@ -1,38 +1,13 @@
 use base64::{engine::general_purpose, Engine};
-use std::{borrow::Borrow, fmt};
+use std::borrow::Borrow;
+use strum_macros::Display;
 use time::OffsetDateTime;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Display)]
 pub enum Region {
     NONE,
     EU,
     US,
-}
-impl fmt::Display for Region {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Region::NONE => write!(formatter, "NONE"),
-            Region::EU => write!(formatter, "EU"),
-            Region::US => write!(formatter, "US"),
-        }
-    }
-}
-
-enum Environment {
-    LOCAL,
-    CONTAINER,
-    TEST,
-    PROD,
-}
-impl fmt::Display for Environment {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Environment::LOCAL => write!(formatter, "LOCAL"),
-            Environment::CONTAINER => write!(formatter, "CONTAINER"),
-            Environment::TEST => write!(formatter, "TEST"),
-            Environment::PROD => write!(formatter, "PROD"),
-        }
-    }
 }
 
 pub type OrderId = String;

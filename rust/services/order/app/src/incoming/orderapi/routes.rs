@@ -1,8 +1,9 @@
-use axum::{extract::State, http::StatusCode, Json};
-
-use crate::{
-    core::port::incoming::DynOrderService,
-    incoming::orderapi::models::{OrderItemResponse, OrderResponse},
+use super::models::{OrderItemResponse, OrderRequest, OrderResponse};
+use crate::core::port::incoming::DynOrderService;
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    Json,
 };
 
 pub async fn get_orders(
@@ -29,32 +30,51 @@ pub async fn get_orders(
     return (StatusCode::OK, Json(orders));
 }
 
-pub async fn post_orders() -> (StatusCode, Json<Vec<&'static str>>) {
-    // let timestamp = OffsetDateTime::now_utc();
-    // let order_id = generate_order_id(
-    //     Region::NONE,
-    //     timestamp,
-    //     String::from(rand::thread_rng().gen()).as_str(),
-    // );
+pub async fn post_orders(
+    State(order_service): State<DynOrderService>,
+    Json(order_request): Json<OrderRequest>,
+) -> (StatusCode, Json<OrderResponse>) {
+    let order_items: Vec<String> = order_request
+        .items
+        .iter()
+        .map(|order_item_request| order_item_request.name.clone())
+        .collect();
 
-    // let orders = Order {
-    //     order_id: order_id,
-    //     creation_date: timestamp,
-    //     status: OrderStatus::OrderPlaced,
-    //     items: vec![],
-    // };
+    let order = order_service.place_order(order_items).await.unwrap();
+    let order_response = OrderResponse {
+        order_id: order.order_id.to_string(),
+        creation_date: order.creation_date,
+        status: order.status.to_string(),
+        items: order
+            .items
+            .iter()
+            .map(|order_item| OrderItemResponse {
+                name: order_item.name.to_string(),
+            })
+            .collect(),
+    };
 
-    // let order = place_order(orders)
-    //     .await
-    //     .unwrap();
-
-    // return HttpResponse::Ok().json(orders);
-
-    let orders = vec!["order1", "order2"];
-    return (StatusCode::OK, Json(orders));
+    return (StatusCode::CREATED, Json(order_response));
 }
 
-pub async fn get_order() -> (StatusCode, Json<Vec<&'static str>>) {
-    let orders = vec!["order1", "order2"];
-    return (StatusCode::OK, Json(orders));
+pub async fn get_order(
+    State(order_service): State<DynOrderService>,
+    Path(order_id): Path<String>,
+) -> (StatusCode, Json<OrderResponse>) {
+    let order = order_service.get_order(order_id).await.unwrap();
+
+    let order_response = OrderResponse {
+        order_id: order.order_id.to_string(),
+        creation_date: order.creation_date,
+        status: order.status.to_string(),
+        items: order
+            .items
+            .iter()
+            .map(|order_item| OrderItemResponse {
+                name: order_item.name.to_string(),
+            })
+            .collect(),
+    };
+
+    return (StatusCode::OK, Json(order_response));
 }

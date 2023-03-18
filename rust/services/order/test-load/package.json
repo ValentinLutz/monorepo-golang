@@ -1,0 +1,8 @@
+{
+  "name": "test-load",
+  "version": "1.0.0",
+  "dependencies": {
+    "@types/k6": "^0.41.0",
+    "k6": "^0.0.0"
+  }
+}

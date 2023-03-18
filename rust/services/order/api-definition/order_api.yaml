@@ -12,14 +12,6 @@ paths:
       security:
         - basic_auth: [ ]
       parameters:
-        - name: customer_id
-          in: query
-          required: false
-          description: The customer id determines the customer of orders returned
-          schema:
-            type: string
-            format: uuid
-            example: 6af7fd58-c92e-4b26-9eb7-1942f6ea9aee
         - name: limit
           in: query
           required: false

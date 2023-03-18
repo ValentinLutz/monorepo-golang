@@ -1,14 +1,11 @@
-use async_trait::async_trait;
-use time::OffsetDateTime;
-
+use super::order_id::{generate_order_id, OrderId, Region};
 use crate::core::{
     model::order::{Order, OrderItem, OrderStatus},
     port::{incoming::OrderService, outgoing::DynOrderRepository},
 };
-
+use async_trait::async_trait;
 use rand::{thread_rng, Rng};
-
-use super::order_id::{generate_order_id, OrderId, Region};
+use time::OffsetDateTime;
 
 #[derive(Clone)]
 pub struct OrderServiceImpl {
@@ -27,7 +24,7 @@ impl OrderServiceImpl {
 
 #[async_trait]
 impl OrderService for OrderServiceImpl {
-    async fn get_orders(&self, offset: i32, limit: i32) -> Result<Vec<Order>, String> {
+    async fn get_orders(&self, offset: i64, limit: i64) -> Result<Vec<Order>, String> {
         return self.order_repository.find_all_orders(offset, limit).await;
     }
 

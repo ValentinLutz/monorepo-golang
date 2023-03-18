@@ -24,6 +24,8 @@ test.unit:: app/src/incoming/openapi/spec/order_api.yaml ## Test the app
 	cd app && \
 		cargo test
 
+test.load:: ## Run load tests
+	k6 run test-load/script.js
 
 
 database.migrate:: ## Migrate database | PFOFILE, FLYWAY_USER, FLYWAY_PASSWORD

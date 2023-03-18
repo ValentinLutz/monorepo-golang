@@ -1,10 +1,9 @@
-use serde::Serialize;
-use strum_macros::Display;
+use strum_macros::{Display, EnumString};
 use time::OffsetDateTime;
 
 use crate::core::service::order_id::OrderId;
 
-#[derive(Debug, Display)]
+#[derive(Debug, Display, EnumString)]
 pub enum OrderStatus {
     OrderPlaced,
     // OrderInProgress,
@@ -20,7 +19,7 @@ pub struct Order {
 }
 
 pub struct OrderItem {
-    pub order_item_id: isize,
+    pub order_item_id: i32,
     pub name: String,
     pub creation_date: OffsetDateTime,
 }

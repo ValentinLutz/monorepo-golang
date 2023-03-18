@@ -23,7 +23,9 @@ async fn main() {
         .expect("failed to build postgres connection pool");
 
     let order_service = Arc::new(OrderServiceImpl::new(
-        Arc::new(PostgresOrderRepository::new(postgres_pool.clone())),
+        Arc::new(PostgresOrderRepository::new(Arc::new(
+            postgres_pool.clone(),
+        ))),
         Region::NONE,
     )) as DynOrderService;
 
