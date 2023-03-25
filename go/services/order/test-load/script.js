@@ -1,35 +1,32 @@
 import http from 'k6/http';
 import encoding from 'k6/encoding';
-import {check} from "k6";
+import { check } from "k6";
 
-export const BASE_URI = 'https://app:8443'
+export const BASE_URI = 'https://localhost:8443'
 
 export const options = {
     insecureSkipTLSVerify: true,
+    thresholds: {
+        http_req_duration: ['p(90) < 400', 'p(95) < 800'],
+    },
     scenarios: {
-        getOrders: {
-            executor: 'constant-arrival-rate',
-            exec: 'getOrders',
-            timeUnit: '1s',
-            rate: 100,
-            duration: '5m',
-            preAllocatedVUs: 1,
-            maxVUs: 100
-        },
-        postOrder_getOrder: {
-            executor: 'constant-arrival-rate',
-            exec: 'postOrder_getOrder',
-            timeUnit: '1s',
-            rate: 100,
-            duration: '5m',
-            preAllocatedVUs: 1,
-            maxVUs: 100
+        full_scenario: {
+            executor: 'constant-vus',
+            exec: 'fullScenario',
+            vus: 100,
+            duration: '30s',
         },
     },
 };
 
 const credentials = `test:test`;
 const encodedCredentials = encoding.b64encode(credentials);
+
+export function fullScenario() {
+    const order_id = postOrder().order_id;
+    getOrder(order_id);
+    getOrders();
+}
 
 export function getOrders() {
     const response = http.get(BASE_URI + '/api/orders', {
@@ -68,13 +65,11 @@ export function postOrder() {
         'postOrder is status 201': (r) => r.status === 201,
     });
 
-    return response.json().order_id
+    return response.json()
 }
 
-export function postOrder_getOrder() {
-    let orderId = postOrder()
-
-    const response = http.get(BASE_URI + '/api/orders/' + orderId, {
+export function getOrder(order_id) {
+    const response = http.get(BASE_URI + '/api/orders/' + order_id, {
         headers: {
             Authorization: `Basic ${encodedCredentials}`,
         },

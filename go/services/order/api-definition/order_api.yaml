@@ -10,7 +10,7 @@ paths:
       operationId: get_orders
       summary: Get all orders
       security:
-        - basic_auth: [ ]
+        - basic_auth: []
       parameters:
         - name: customer_id
           in: query
@@ -35,43 +35,47 @@ paths:
             type: integer
             default: 0
       responses:
-        '200':
+        "200":
           description: An array of orders
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/orders_response'
-        '401':
-          $ref: '#/components/responses/unauthorized_error'
-        '5XX':
-          $ref: '#/components/responses/unexpected_error'
+                $ref: "#/components/schemas/orders_response"
+        "400":
+          $ref: "#/components/responses/bad_request_error"
+        "401":
+          $ref: "#/components/responses/unauthorized_error"
+        "5XX":
+          $ref: "#/components/responses/unexpected_error"
     post:
       operationId: post_orders
       summary: Place a new order
       security:
-        - basic_auth: [ ]
+        - basic_auth: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/order_request'
+              $ref: "#/components/schemas/order_request"
       responses:
-        '201':
+        "201":
           description: Order created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/order_response"
-        '401':
-          $ref: '#/components/responses/unauthorized_error'
-        '5XX':
-          $ref: '#/components/responses/unexpected_error'
+        "400":
+          $ref: "#/components/responses/bad_request_error"
+        "401":
+          $ref: "#/components/responses/unauthorized_error"
+        "5XX":
+          $ref: "#/components/responses/unexpected_error"
   /orders/{order_id}:
     get:
       operationId: get_order
       summary: Get information about a specific order
       security:
-        - basic_auth: [ ]
+        - basic_auth: []
       parameters:
         - name: order_id
           in: path
@@ -80,28 +84,36 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Information about a single order
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/order_response'
-        '401':
-          $ref: '#/components/responses/unauthorized_error'
-        '404':
+                $ref: "#/components/schemas/order_response"
+        "400":
+          $ref: "#/components/responses/bad_request_error"
+        "401":
+          $ref: "#/components/responses/unauthorized_error"
+        "404":
           description: Order not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error_response'
-        '5XX':
-          $ref: '#/components/responses/unexpected_error'
+                $ref: "#/components/schemas/error_response"
+        "5XX":
+          $ref: "#/components/responses/unexpected_error"
 components:
   securitySchemes:
     basic_auth:
       type: http
       scheme: basic
   responses:
+    bad_request_error:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error_response"
     unauthorized_error:
       description: Unauthorized Error
     unexpected_error:
@@ -109,7 +121,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/error_response'
+            $ref: "#/components/schemas/error_response"
   schemas:
     order_request:
       type: object
@@ -119,7 +131,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/order_item_request'
+            $ref: "#/components/schemas/order_item_request"
     order_item_request:
       type: object
       required:
@@ -143,11 +155,11 @@ components:
           type: string
           format: date-time
         status:
-          $ref: '#/components/schemas/order_status'
+          $ref: "#/components/schemas/order_status"
         items:
           type: array
           items:
-            $ref: '#/components/schemas/order_item_response'
+            $ref: "#/components/schemas/order_item_response"
     order_status:
       type: string
       enum:
@@ -158,7 +170,7 @@ components:
     orders_response:
       type: array
       items:
-        $ref: '#/components/schemas/order_response'
+        $ref: "#/components/schemas/order_response"
     order_item_response:
       type: object
       required:

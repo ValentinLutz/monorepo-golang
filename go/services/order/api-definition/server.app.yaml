@@ -4,6 +4,3 @@ generate:
   embedded-spec: true
   models: true
 output: app/incoming/orderapi/server.gen.go
-
-compatibility:
-  old-aliasing: true

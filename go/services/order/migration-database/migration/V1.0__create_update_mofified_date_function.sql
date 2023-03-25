@@ -1,4 +1,4 @@
-CREATE FUNCTION update_modified_date() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION update_modified_date() RETURNS TRIGGER
     LANGUAGE plpgsql AS
 $$
 BEGIN

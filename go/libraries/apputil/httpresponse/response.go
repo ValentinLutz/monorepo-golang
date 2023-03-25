@@ -2,9 +2,6 @@ package httpresponse
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
-	"io"
-	"monorepo/libraries/apputil/logging"
 	"net/http"
 	"time"
 )
@@ -18,72 +15,39 @@ type ErrorResponse struct {
 	CorrelationId string    `json:"correlation_id"`
 }
 
-type JSONWriter interface {
-	ToJSON(writer io.Writer) error
+func Status(w http.ResponseWriter, statusCode int) {
+	w.WriteHeader(statusCode)
 }
 
-func Status(responseWriter http.ResponseWriter, statusCode int) {
-	responseWriter.WriteHeader(statusCode)
-}
-
-func StatusWithBody(responseWriter http.ResponseWriter, request *http.Request, statusCode int, body JSONWriter) {
-	responseWriter.Header().Set("Content-Type", "application/json")
-	responseWriter.WriteHeader(statusCode)
-
-	err := body.ToJSON(responseWriter)
+func StatusWithBody(w http.ResponseWriter, statusCode int, body any) {
+	bytes, err := json.Marshal(body)
 	if err != nil {
-		StatusInternalServerError(responseWriter, request, err.Error())
+		Status(w, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	_, err = w.Write(bytes)
+	if err != nil {
+		Status(w, http.StatusInternalServerError)
+		return
 	}
 }
 
-func StatusOK(responseWriter http.ResponseWriter, request *http.Request, body JSONWriter) {
-	StatusWithBody(responseWriter, request, http.StatusOK, body)
-}
-
-func StatusCreated(responseWriter http.ResponseWriter, request *http.Request, body JSONWriter) {
-	StatusWithBody(responseWriter, request, http.StatusCreated, body)
-}
-
-func StatusBadRequest(responseWriter http.ResponseWriter, request *http.Request, message string) {
-	Error(responseWriter, request, http.StatusBadRequest, message)
-}
-
-func StatusNotFound(responseWriter http.ResponseWriter, request *http.Request, message string) {
-	Error(responseWriter, request, http.StatusNotFound, message)
-}
-
-func StatusUnauthorized(responseWriter http.ResponseWriter) {
-	responseWriter.Header().Set("WWW-Authenticate", `Basic realm="order-service"`)
-	Status(responseWriter, http.StatusUnauthorized)
-}
-
-func StatusInternalServerError(responseWriter http.ResponseWriter, request *http.Request, message string) {
-	Error(responseWriter, request, http.StatusInternalServerError, message)
-}
-
-func (error ErrorResponse) ToJSON(writer io.Writer) error {
-	encoder := json.NewEncoder(writer)
-	return encoder.Encode(error)
-}
-
-func Error(responseWriter http.ResponseWriter, request *http.Request, statusCode int, message string) {
-	responseWriter.Header().Set("Content-Type", "application/json")
-	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
-	responseWriter.WriteHeader(statusCode)
-
-	correlationId := request.Context().Value(logging.CorrelationIdKey{})
-	if correlationId == nil {
-		correlationId = uuid.NewString()
+func ErrorWithBody(w http.ResponseWriter, statusCode int, body any) {
+	bytes, err := json.Marshal(body)
+	if err != nil {
+		Status(w, http.StatusInternalServerError)
+		return
 	}
 
-	errorResponse := ErrorResponse{
-		Code:          statusCode,
-		Message:       &message,
-		Method:        request.Method,
-		Path:          request.RequestURI,
-		Timestamp:     time.Now().UTC(),
-		CorrelationId: correlationId.(string),
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(statusCode)
+	_, err = w.Write(bytes)
+	if err != nil {
+		Status(w, http.StatusInternalServerError)
+		return
 	}
-
-	_ = errorResponse.ToJSON(responseWriter)
 }

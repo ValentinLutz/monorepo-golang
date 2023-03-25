@@ -16,9 +16,9 @@ logger:
 # Database config
 database:
   host: localhost
-  port: 9432
+  port: 5432
   user: test
   password: test
-  database: dev_db
+  database: test
   max_idle_connections: 10
   max_open_connections: 80

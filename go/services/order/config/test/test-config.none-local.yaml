@@ -4,7 +4,7 @@ base_url: https://localhost:8443
 # Database config
 database:
   host: localhost
-  port: 9432
+  port: 5432
   user: "test"
   password: "test"
-  database: "dev_db"
+  database: "test"

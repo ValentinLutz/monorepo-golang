@@ -64,7 +64,7 @@ test.spectral:: api-definition/order_api.yaml api-definition/ruleset.spectral.ya
 
 test.unit::  app/incoming/orderapi/server.gen.go ## Run the unit tests
 	cd app && \
-		go test -cover ./...
+		go test -race -cover ./...
 
 test.smoke:: ## Run the smoke tests
 	cd test-smoke && \
@@ -75,14 +75,7 @@ test.integration:: test-integration/orderapi/client.gen.go ## Run the integratio
 		go test -count=1 ./...
 
 test.load:: ## Run load tests
-	docker run -it \
-		--rm \
-		--volume ${PWD}/test-load:/k6 \
-		--network order-service \
-        grafana/k6:0.39.0 \
-		run /k6/script.js \
-
-test:: test.unit test.smoke test.integration test.load ## Run all tests
+	k6 run test-load/script.js 
 
 
 

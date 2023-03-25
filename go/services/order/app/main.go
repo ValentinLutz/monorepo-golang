@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/metrics"
@@ -85,17 +84,13 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 
 	histogram := middleware.Histogram{Histogram: responseTimeHistogram}
 
-	errorHandler := func(rw http.ResponseWriter, r *http.Request, err error) {
-		httpresponse.StatusBadRequest(rw, r, err.Error())
-	}
-
 	router.Group(func(r chi.Router) {
 		r.Use(hlog.NewHandler(logger))
 		r.Use(histogram.Prometheus)
 		r.Use(middleware.CorrelationId)
 		r.Use(middleware.RequestResponseLogging)
 		r.Use(authentication.BasicAuth)
-		r.Mount("/api", orderapi.New(ordersService, errorHandler))
+		r.Mount("/api", orderapi.New(ordersService))
 	})
 
 	router.Group(func(r chi.Router) {

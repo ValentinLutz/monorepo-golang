@@ -1,15 +1,8 @@
 package orderapi
 
 import (
-	"encoding/json"
-	"io"
 	"monorepo/services/order/app/core/model"
 )
-
-func (orderResponse OrderResponse) ToJSON(writer io.Writer) error {
-	encoder := json.NewEncoder(writer)
-	return encoder.Encode(orderResponse)
-}
 
 func FromOrder(order model.Order) (OrderResponse, error) {
 	var orderItems []OrderItemResponse

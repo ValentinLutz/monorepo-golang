@@ -1,5 +1,5 @@
 {
-  "code": 404,
+  "code": 4004,
   "message": "order id is 'NOPE': no order was found",
   "method": "GET",
   "path": "/api/orders/NOPE",

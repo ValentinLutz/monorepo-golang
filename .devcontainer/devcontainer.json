@@ -22,8 +22,9 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"GitHub.copilot",
 				"usernamehw.errorlens",
-				"GitHub.copilot"
+				"42crunch.vscode-openapi"
 			]
 		}
 	},

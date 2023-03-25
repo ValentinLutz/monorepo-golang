@@ -2,11 +2,12 @@ package openapi
 
 import (
 	"embed"
-	"github.com/go-chi/chi/v5"
 	"io/fs"
 	"monorepo/libraries/apputil/httpresponse"
 	"monorepo/services/order/app/incoming/orderapi"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 //go:embed swagger-ui
@@ -26,25 +27,28 @@ func (a *API) RegisterRoutes(router chi.Router) {
 	})
 }
 
-func (a *API) GetSwaggerUI(rw http.ResponseWriter, r *http.Request) {
+func (a *API) GetSwaggerUI(w http.ResponseWriter, r *http.Request) {
 	subtree, _ := fs.Sub(swaggerUIFiles, "swagger-ui")
 
 	server := http.StripPrefix("/swagger", http.FileServer(http.FS(subtree)))
-	server.ServeHTTP(rw, r)
+	server.ServeHTTP(w, r)
 }
 
-func (a *API) GetOrderAPISpec(rw http.ResponseWriter, r *http.Request) {
+func (a *API) GetOrderAPISpec(w http.ResponseWriter, r *http.Request) {
 	swagger, err := orderapi.GetSwagger()
 	if err != nil {
-		httpresponse.StatusInternalServerError(rw, r, err.Error())
+		httpresponse.Status(w, http.StatusInternalServerError)
+		return
 	}
 
 	json, err := swagger.MarshalJSON()
 	if err != nil {
-		httpresponse.StatusInternalServerError(rw, r, err.Error())
+		httpresponse.Status(w, http.StatusInternalServerError)
+		return
 	}
-	_, err = rw.Write(json)
+	_, err = w.Write(json)
 	if err != nil {
-		httpresponse.StatusInternalServerError(rw, r, err.Error())
+		httpresponse.Status(w, http.StatusInternalServerError)
+		return
 	}
 }

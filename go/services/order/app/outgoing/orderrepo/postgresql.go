@@ -4,10 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
 	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/port"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type PostgreSQL struct {
@@ -30,7 +31,7 @@ func (orderRepository *PostgreSQL) FindAllOrders(ctx context.Context, offset int
 		return nil, err
 	}
 
-	var orderIds []model.OrderId
+	var orderIds []string
 	for _, order := range orderEntities {
 		orderIds = append(orderIds, order.OrderId)
 	}
@@ -39,7 +40,7 @@ func (orderRepository *PostgreSQL) FindAllOrders(ctx context.Context, offset int
 	err = orderRepository.database.SelectContext(
 		ctx,
 		&orderItemEntities,
-		"SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item WHERE order_id = ANY($1)",
+		"SELECT order_item_id, order_id, creation_date, order_item_name FROM order_service.order_item WHERE order_id = ANY($1)",
 		pq.Array(orderIds),
 	)
 	if err != nil {
@@ -68,7 +69,7 @@ func (orderRepository *PostgreSQL) FindOrderById(ctx context.Context, orderId mo
 	err = orderRepository.database.SelectContext(
 		ctx,
 		&orderItemEntities,
-		"SELECT order_item_id, order_id, creation_date, item_name FROM order_service.order_item WHERE order_id = $1",
+		"SELECT order_item_id, order_id, creation_date, order_item_name FROM order_service.order_item WHERE order_id = $1",
 		orderId,
 	)
 	if err != nil {
@@ -83,7 +84,7 @@ func (orderRepository *PostgreSQL) SaveOrder(ctx context.Context, order model.Or
 	defer func(txx *sqlx.Tx) {
 		err := txx.Commit()
 		if err != nil {
-			_ = txx.Rollback()
+			txx.Rollback()
 		}
 	}(txx)
 	if err != nil {
@@ -91,25 +92,21 @@ func (orderRepository *PostgreSQL) SaveOrder(ctx context.Context, order model.Or
 	}
 
 	_, err = txx.NamedExec(
-		"INSERT INTO order_service.order (order_id, creation_date, order_status, workflow) VALUES (:order_id, :creation_date, :order_status, :workflow)",
+		"INSERT INTO order_service.order (order_id, creation_date, order_status, order_workflow) VALUES (:order_id, :creation_date, :order_status, :order_workflow)",
 		NewOrderEntity(order),
 	)
 	if err != nil {
-		err := txx.Rollback()
-		if err != nil {
-			return err
-		}
+		txx.Rollback()
+		return err
 	}
 
 	_, err = txx.NamedExec(
-		"INSERT INTO order_service.order_item (order_id, creation_date, item_name) VALUES (:order_id, :creation_date, :item_name)",
+		"INSERT INTO order_service.order_item (order_id, creation_date, order_item_name) VALUES (:order_id, :creation_date, :order_item_name)",
 		NewOrderItemEntities(order.OrderId, order.Items),
 	)
 	if err != nil {
-		err := txx.Rollback()
-		if err != nil {
-			return err
-		}
+		txx.Rollback()
+		return err
 	}
 
 	return nil

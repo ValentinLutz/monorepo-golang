@@ -2,15 +2,16 @@ package statusapi
 
 import (
 	"fmt"
+	"monorepo/services/order/app/config"
+	"net/http"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/hellofresh/health-go/v5"
 	psql "github.com/hellofresh/health-go/v5/checks/postgres"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
-	"monorepo/services/order/app/config"
-	"net/http"
-	"time"
 )
 
 type API struct {

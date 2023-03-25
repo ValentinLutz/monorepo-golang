@@ -6,18 +6,18 @@ import (
 )
 
 type OrderEntity struct {
-	OrderId      model.OrderId     `db:"order_id"`
-	CreationDate time.Time         `db:"creation_date"`
-	Status       model.OrderStatus `db:"order_status"`
-	Workflow     string            `db:"workflow"`
+	OrderId       string    `db:"order_id"`
+	CreationDate  time.Time `db:"creation_date"`
+	OrderStatus   string    `db:"order_status"`
+	OrderWorkflow string    `db:"order_workflow"`
 }
 
 func NewOrderEntity(order model.Order) OrderEntity {
 	return OrderEntity{
-		OrderId:      order.OrderId,
-		CreationDate: order.CreationDate,
-		Status:       order.Status,
-		Workflow:     order.Workflow,
+		OrderId:       string(order.OrderId),
+		CreationDate:  order.CreationDate,
+		OrderStatus:   string(order.Status),
+		OrderWorkflow: order.Workflow,
 	}
 }
 
@@ -26,26 +26,26 @@ func NewOrder(orderEntity OrderEntity, orderItemEntities []OrderItemEntity) mode
 	for _, orderItemEntity := range orderItemEntities {
 		orderItems = append(orderItems, model.OrderItem{
 			OrderItemId:  orderItemEntity.OrderItemId,
-			Name:         orderItemEntity.Name,
+			Name:         orderItemEntity.ItemName,
 			CreationDate: orderItemEntity.CreationDate,
 		})
 	}
 
 	return model.Order{
-		OrderId:      orderEntity.OrderId,
+		OrderId:      model.OrderId(orderEntity.OrderId),
 		CreationDate: orderEntity.CreationDate,
-		Status:       orderEntity.Status,
-		Workflow:     orderEntity.Workflow,
+		Status:       model.OrderStatus(orderEntity.OrderStatus),
+		Workflow:     orderEntity.OrderWorkflow,
 		Items:        orderItems,
 	}
 }
 
 func NewOrders(orderEntities []OrderEntity, orderItemEntities []OrderItemEntity) []model.Order {
-	orderIdToOrderItems := make(map[model.OrderId][]model.OrderItem)
+	orderIdToOrderItems := make(map[string][]model.OrderItem)
 	for _, orderItemEntity := range orderItemEntities {
 		orderIdToOrderItems[orderItemEntity.OrderId] = append(orderIdToOrderItems[orderItemEntity.OrderId], model.OrderItem{
 			OrderItemId:  orderItemEntity.OrderItemId,
-			Name:         orderItemEntity.Name,
+			Name:         orderItemEntity.ItemName,
 			CreationDate: orderItemEntity.CreationDate,
 		})
 	}
@@ -53,10 +53,10 @@ func NewOrders(orderEntities []OrderEntity, orderItemEntities []OrderItemEntity)
 	orders := make([]model.Order, 0)
 	for _, orderEntity := range orderEntities {
 		orders = append(orders, model.Order{
-			OrderId:      orderEntity.OrderId,
+			OrderId:      model.OrderId(orderEntity.OrderId),
 			CreationDate: orderEntity.CreationDate,
-			Status:       orderEntity.Status,
-			Workflow:     orderEntity.Workflow,
+			Status:       model.OrderStatus(orderEntity.OrderStatus),
+			Workflow:     orderEntity.OrderWorkflow,
 			Items:        orderIdToOrderItems[orderEntity.OrderId],
 		})
 	}
@@ -65,17 +65,17 @@ func NewOrders(orderEntities []OrderEntity, orderItemEntities []OrderItemEntity)
 }
 
 type OrderItemEntity struct {
-	OrderItemId  int           `db:"order_item_id"`
-	OrderId      model.OrderId `db:"order_id"`
-	Name         string        `db:"item_name"`
-	CreationDate time.Time     `db:"creation_date"`
+	OrderItemId  int       `db:"order_item_id"`
+	OrderId      string    `db:"order_id"`
+	ItemName     string    `db:"order_item_name"`
+	CreationDate time.Time `db:"creation_date"`
 }
 
 func NewOrderItemEntity(orderId model.OrderId, orderItem model.OrderItem) OrderItemEntity {
 	return OrderItemEntity{
 		OrderItemId:  orderItem.OrderItemId,
-		OrderId:      orderId,
-		Name:         orderItem.Name,
+		OrderId:      string(orderId),
+		ItemName:     orderItem.Name,
 		CreationDate: orderItem.CreationDate,
 	}
 }

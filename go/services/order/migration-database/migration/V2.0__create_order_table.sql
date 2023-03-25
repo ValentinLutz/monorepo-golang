@@ -1,10 +1,10 @@
-CREATE TABLE order_service.order
+CREATE TABLE IF NOT EXISTS order_service.order
 (
-    order_id      VARCHAR     NOT NULL UNIQUE,
-    creation_date TIMESTAMPTZ NOT NULL,
-    modified_date TIMESTAMPTZ NOT NULL DEFAULT now(),
-    workflow      VARCHAR     NOT NULL,
-    order_status  VARCHAR     NOT NULL,
+    order_id       VARCHAR     NOT NULL UNIQUE,
+    creation_date  TIMESTAMPTZ NOT NULL,
+    modified_date  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    order_workflow VARCHAR     NOT NULL,
+    order_status   VARCHAR     NOT NULL,
     PRIMARY KEY (order_id)
 );
 

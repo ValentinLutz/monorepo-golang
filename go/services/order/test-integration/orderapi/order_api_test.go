@@ -6,16 +6,17 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"monorepo/libraries/testingutil"
 	"monorepo/services/order/test-integration/orderapi"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
 )
 
 var config = testingutil.LoadConfig("../../config/test")
@@ -49,7 +50,7 @@ func newDatabase(t *testing.T) *sqlx.DB {
 		config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Password, config.Database.Database,
 	)
 
-	db, err := sqlx.Connect("postgres", psqlInfo)
+	db, err := sqlx.Connect("pgx", psqlInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +79,7 @@ func Test_GetOrders(t *testing.T) {
 
 	addOrders := `
 INSERT INTO order_service.order
-(order_id, workflow, creation_date, order_status)
+(order_id, order_workflow, creation_date, order_status)
 VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed'),
 
 	   ('Fs2VoM7ZhrK-NONE-vzTf7kaHbRA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_in_progress'),
@@ -88,7 +89,7 @@ VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', 'default_workflow', '1980-01-01 00:00:00
 	   ('F2P!criGu2L-NONE-fJ7bBFx1vHg', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_completed');
 
 INSERT INTO order_service.order_item
-	(order_id, creation_date, item_name)
+	(order_id, creation_date, order_item_name)
 VALUES ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'orange'),
 	   ('IsQah2TkaqS-NONE-JewgL0Ye73g', '1980-01-01 00:00:00 +00:00', 'banana'),
 
@@ -181,11 +182,11 @@ func Test_GetOrder(t *testing.T) {
 
 	const addOrder = `
 INSERT INTO order_service.order
-(order_id, workflow, creation_date, order_status)
+(order_id, order_workflow, creation_date, order_status)
 VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', 'default_workflow', '1980-01-01 00:00:00 +00:00', 'order_placed');
 
 INSERT INTO order_service.order_item
-    (order_id, creation_date, item_name)
+    (order_id, creation_date, order_item_name)
 VALUES ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'orange'),
        ('fdCDxjV9o!O-NONE-ZCTH5i6fWcA', '1980-01-01 00:00:00 +00:00', 'banana');
 `
