@@ -24,6 +24,13 @@ jobs:
     needs:
       - create-version
     with:
-      app-path: ./src/go/services/order
+      app-path: ./go/services/order
       version: ${{ needs.create-version.outputs.version }}
+      src: |
+        src:
+          - 'go/go.mod'
+          - 'go/go.sum'
+          - 'go/libraries/**'
+          - 'go/services/order/**'
+
     secrets: inherit
