@@ -1,18 +1,25 @@
 package middleware
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-type Histogram struct {
+type ResponseTimeMetric struct {
 	Histogram *prometheus.HistogramVec
 }
 
-func (h Histogram) Prometheus(next http.Handler) http.Handler {
+func NewResponseTimeMetric(histogram *prometheus.HistogramVec) *ResponseTimeMetric {
+	return &ResponseTimeMetric{
+		Histogram: histogram,
+	}
+}
+
+func (metric ResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
 		startTime := time.Now()
 
@@ -23,7 +30,7 @@ func (h Histogram) Prometheus(next http.Handler) http.Handler {
 		duration := time.Since(startTime)
 		statusCode := strconv.Itoa(responseWriterContainer.statusCode)
 		route := getRoutePattern(request)
-		h.Histogram.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
+		metric.Histogram.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
 	})
 }
 

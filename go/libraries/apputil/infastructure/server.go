@@ -13,8 +13,8 @@ import (
 
 type ServerConfig struct {
 	Port            int    `yaml:"port"`
-	CertificatePath string `yaml:"certificate_path"`
 	KeyPath         string `yaml:"key_path"`
+	CertificatePath string `yaml:"certificate_path"`
 }
 
 type Server struct {

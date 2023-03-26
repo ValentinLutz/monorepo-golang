@@ -126,8 +126,13 @@ components:
     order_request:
       type: object
       required:
+        - customer_id
         - items
       properties:
+        customer_id:
+          type: string
+          format: uuid
+          example: 6af7fd58-c92e-4b26-9eb7-1942f6ea9aee
         items:
           type: array
           items:
@@ -143,11 +148,16 @@ components:
     order_response:
       type: object
       required:
+        - customer_id
         - order_id
         - creation_date
         - status
         - items
       properties:
+        customer_id:
+          type: string
+          format: uuid
+          example: f8f3d5ce-3fc1-4d9d-9306-f5165b9279cc
         order_id:
           type: string
           example: I3xXiIqbP92-NONE-Ui*8i0kFHcA

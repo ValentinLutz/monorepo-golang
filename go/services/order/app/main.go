@@ -74,19 +74,13 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 	})
 	prometheus.MustRegister(databaseStats)
 
-	responseTimeHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "app",
-		Name:      "http_server_request_duration_seconds",
-		Help:      "Histogram of response time in seconds.",
-		Buckets:   prometheus.DefBuckets,
-	}, []string{"method", "route", "code"})
+	responseTimeHistogram := metrics.NewResponseTimeHistogram()
 	prometheus.MustRegister(responseTimeHistogram)
-
-	histogram := middleware.Histogram{Histogram: responseTimeHistogram}
+	responseTimeMetric := middleware.NewResponseTimeMetric(responseTimeHistogram)
 
 	router.Group(func(r chi.Router) {
 		r.Use(hlog.NewHandler(logger))
-		r.Use(histogram.Prometheus)
+		r.Use(responseTimeMetric.ResponseTimes)
 		r.Use(middleware.CorrelationId)
 		r.Use(middleware.RequestResponseLogging)
 		r.Use(authentication.BasicAuth)

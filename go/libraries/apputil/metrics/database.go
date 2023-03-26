@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"database/sql"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 

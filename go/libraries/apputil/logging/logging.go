@@ -2,16 +2,16 @@ package logging
 
 import (
 	"fmt"
-	"github.com/rs/zerolog"
 	"io"
 	"log"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
-type CorrelationIdKey struct {
-}
+type CorrelationIdKey struct{}
 
 type LogLevel string
 
