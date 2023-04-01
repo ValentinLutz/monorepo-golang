@@ -1,6 +1,8 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Environment string
 
@@ -11,7 +13,8 @@ const (
 	PROD      Environment = "PROD"
 )
 
-func (e *Environment) UnmarshalYAML(unmarshal func(interface{}) error) error {
+// Implements the yaml.Unmarshaler interface.
+func (e *Environment) UnmarshalYAML(unmarshal func(any) error) error {
 	var environmentString string
 	err := unmarshal(&environmentString)
 	if err != nil {

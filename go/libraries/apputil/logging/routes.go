@@ -1,10 +1,11 @@
 package logging
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/rs/zerolog"
 	"net/http"
 	"strings"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog"
 )
 
 func LogRoutes(logger zerolog.Logger, router *chi.Mux) {

@@ -1,12 +1,13 @@
 package service_test
 
 import (
-	"github.com/stretchr/testify/assert"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/service"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_NewOrderId(t *testing.T) {

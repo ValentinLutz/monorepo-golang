@@ -2,10 +2,11 @@ package config
 
 import (
 	"errors"
-	"gopkg.in/yaml.v3"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {

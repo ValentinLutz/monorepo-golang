@@ -1,6 +1,8 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Region string
 
@@ -10,7 +12,8 @@ const (
 	US   Region = "US"
 )
 
-func (r *Region) UnmarshalYAML(unmarshal func(interface{}) error) error {
+// Implements the yaml.Unmarshaler interface.
+func (r *Region) UnmarshalYAML(unmarshal func(any) error) error {
 	var regionString string
 	err := unmarshal(&regionString)
 	if err != nil {

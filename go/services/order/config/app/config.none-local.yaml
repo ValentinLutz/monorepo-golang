@@ -21,4 +21,4 @@ database:
   password: test
   database: test
   max_idle_connections: 10
-  max_open_connections: 80
+  max_open_connections: 100

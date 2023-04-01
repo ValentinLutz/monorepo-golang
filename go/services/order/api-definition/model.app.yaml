@@ -1,0 +1,4 @@
+package: orderapi
+generate:
+  models: true
+output: app/incoming/orderapi/model.gen.go

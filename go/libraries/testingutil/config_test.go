@@ -1,9 +1,10 @@
 package testingutil_test
 
 import (
-	"github.com/stretchr/testify/assert"
 	"monorepo/libraries/testingutil"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_ParseFile(t *testing.T) {

@@ -32,7 +32,11 @@ app/config/app.key: config/app.key ## Copy none-local private key to app directo
 app/config/app.crt: config/app.crt ## Copy none-local certificate to app directory
 	install -D config/app.crt app/config/app.crt
 
-app/incoming/orderapi/server.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/server.app.yaml ## Generate orders server from open api definition
+app/incoming/orderapi/model.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/model.app.yaml ## Generate order models from open api definition
+	oapi-codegen --config api-definition/model.app.yaml \
+		api-definition/order_api.yaml
+
+app/incoming/orderapi/server.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/server.app.yaml ## Generate order server from open api definition
 	oapi-codegen --config api-definition/server.app.yaml \
 		api-definition/order_api.yaml
 
@@ -45,15 +49,15 @@ deployment-kubernetes/base/config.yaml: config/app/config.${PROFILE}.yaml ## Cop
 
 
 
-app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/incoming/orderapi/server.gen.go ## Run the app
+app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Run the app
 	cd app && \
 		go run main.go
 
-app.build:: app/incoming/orderapi/server.gen.go ## Build the app into an executable
+app.build:: app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Build the app into an executable
 	cd app && \
 		go build
 
-app.lint:: dep.golangci-lint app/incoming/orderapi/server.gen.go ## Runs linters against go code
+app.lint:: dep.golangci-lint app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Runs linters against go code
 	cd app && \
 		golangci-lint run
 
