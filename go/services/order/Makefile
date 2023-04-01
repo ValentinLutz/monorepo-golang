@@ -66,7 +66,7 @@ app.lint:: dep.golangci-lint app/incoming/orderapi/model.gen.go app/incoming/ord
 test.spectral:: api-definition/order_api.yaml api-definition/ruleset.spectral.yaml
 	docker run --rm -it -v ./api-definition/:/tmp stoplight/spectral --ruleset "/tmp/ruleset.spectral.yaml" lint "/tmp/order_api.yaml"
 
-test.unit::  app/incoming/orderapi/server.gen.go ## Run the unit tests
+test.unit::  app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Run the unit tests
 	cd app && \
 		go test -race -cover ./...
 
