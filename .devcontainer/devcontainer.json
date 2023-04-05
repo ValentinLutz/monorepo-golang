@@ -28,19 +28,17 @@
 			]
 		}
 	},
-
 	"containerEnv": {
 		"DATABASE_URL": "postgres://test:test@localhost:5432/test"
 	},
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
-		8080, // app
-		5432 // postgres
+		8080, // app http
+		8443, // app https
+		5432 // postgres tcp
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "bash .devcontainer/install-dev-tools.sh"
-
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	//"remoteUser": "vscode"
 }

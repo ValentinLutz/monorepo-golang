@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  app:
+    image: ghcr.io/valentinlutz/order-service:latest
+    build:
+      context: ../../../
+      dockerfile: ./services/order/app/Dockerfile
+    container_name: app
+    network_mode: host
+    environment:
+      PROJECT_NAME: order-service
+      VERSION: docker-container
+    volumes:
+      - ../config/app.config.none-local.yaml:/app/config/config.yaml:ro
+      - ../config/app.crt:/app/config/app.crt:ro
+      - ../config/app.key:/app/config/app.key:ro
+

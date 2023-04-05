@@ -2,7 +2,7 @@
 
 help::
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) \
-		| awk -F':.*?## | \\| ' '{printf "\033[36m%-38s \033[37m %-68s \033[35m%s \n", $$1, $$2, $$3}'
+		| awk -F':.*?## | \\| ' '{printf "\033[36m%-40s \033[37m %-70s \033[35m%s \n", $$1, $$2, $$3}'
 
 ### VARIABLES ###
 export PROJECT_NAME ?= order-service
@@ -80,17 +80,20 @@ test.integration:: test-integration/orderapi/client.gen.go ## Run the integratio
 test.load:: ## Run load tests
 	docker run -it \
 		--rm \
-		--volume ${PWD}/test-load:/k6 \
 		--network host  \
+		--volume ${PWD}/test-load:/k6 \
         grafana/k6:0.39.0 \
 		run /k6/script.js \
 
 ### DATABASE ###
 database.migrate:: ## Migrate database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
-	cd migration-database && \
-		flyway clean \
+	docker run -it \
+		--rm \
+		--network host \
+		--volume ${PWD}/migration-database:/flyway/sql \
+		--volume ${PWD}/migration-database/${PROFILE}.conf:/flyway/conf/flyway.conf \
+		flyway/flyway:9.16.1-alpine \
 		migrate \
-		-configFiles=${PROFILE}.properties \
 		-user=${FLYWAY_USER} \
 		-password=${FLYWAY_PASSWORD}
 
@@ -120,17 +123,18 @@ docker.up:: ## Start containers | PROJECT_NAME
 		-f deployment-docker/docker-compose.yaml \
 		up -d --force-recreate
 
-docker.down:: ## Shutdown containers | PROJECT_NAME
+docker.app.up:: docker.up database.migrate ## Start app container | PROJECT_NAME
 	docker compose -p ${PROJECT_NAME} \
-		-f deployment-docker/docker-compose.yaml \
-		down
-
-docker.app.up:: docker.up docker.build database.migrate ## Start containers | PROJECT_NAME
-	docker compose -p ${PROJECT_NAME} \
-    		-f deployment-docker/docker-compose-app.yaml \
+    		-f deployment-docker/app.docker-compose.yaml \
     		up -d --force-recreate
 	docker logs app \
 		--follow
+
+docker.down:: ## Shutdown containers | PROJECT_NAME
+	docker compose -p ${PROJECT_NAME} \
+		-f deployment-docker/docker-compose.yaml \
+		-f deployment-docker/app.docker-compose.yaml \
+		down
 
 #### KUBERNETES ####
 kubernetes.image:: dep.kustomize ## Update app image version
