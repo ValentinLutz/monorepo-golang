@@ -25,7 +25,7 @@ func LoadConfig(basePath string) *Config {
 		panic("env PROFILE is not set")
 	}
 
-	parsedFile, err := ParseFile[Config](basePath + "/test-config." + profile + ".yaml")
+	parsedFile, err := ParseFile[Config](basePath + "/test.config." + profile + ".yaml")
 	if err != nil {
 		panic(err)
 	}

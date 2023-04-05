@@ -2,6 +2,7 @@ package infastructure
 
 import (
 	"fmt"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -9,13 +10,15 @@ import (
 )
 
 type DatabaseConfig struct {
-	Host               string `yaml:"host"`
-	Port               int    `yaml:"port"`
-	Username           string `yaml:"user"`
-	Password           string `yaml:"password"`
-	Database           string `yaml:"database"`
-	MaxIdleConnections int    `yaml:"max_idle_connections"`
-	MaxOpenConnections int    `yaml:"max_open_connections"`
+	Host               string        `yaml:"host"`
+	Port               int           `yaml:"port"`
+	Username           string        `yaml:"user"`
+	Password           string        `yaml:"password"`
+	Database           string        `yaml:"database"`
+	MaxIdleConnections int           `yaml:"max_idle_connections"`
+	MaxOpenConnections int           `yaml:"max_open_connections"`
+	MaxIdleTime        time.Duration `yaml:"max_idle_time"`
+	MaxLifetime        time.Duration `yaml:"max_lifetime"`
 }
 
 type Database struct {

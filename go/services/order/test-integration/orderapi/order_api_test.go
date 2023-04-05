@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var config = testingutil.LoadConfig("../../config/test")
+var config = testingutil.LoadConfig("../../config")
 
 func newClient(t *testing.T) *orderapi.Client {
 	tr := &http.Transport{

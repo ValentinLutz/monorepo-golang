@@ -2,14 +2,15 @@ package order_api_test
 
 import (
 	"crypto/tls"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"monorepo/libraries/testingutil"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-var config = testingutil.LoadConfig("../config/test")
+var config = testingutil.LoadConfig("../config")
 
 func initClient() http.Client {
 	tr := &http.Transport{

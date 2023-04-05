@@ -25,7 +25,7 @@ dep.kustomize:: # Install kustomize with go install
 
 ### FILES ###
 app/config/config.yaml: config/app.config.none-local.yaml ## Copy none-local config to app directory
-	install -D config/app/config.none-local.yaml app/config/config.yaml
+	install -D config/app.config.none-local.yaml app/config/config.yaml
 
 app/config/app.key: config/app.key ## Copy none-local private key to app directory
 	install -D config/app.key app/config/app.key
@@ -45,8 +45,8 @@ test-integration/orderapi/client.gen.go: dep.oapi-codegen api-definition/order_a
 	oapi-codegen --config api-definition/test.client.yaml \
 		api-definition/order_api.yaml
 
-deployment-kubernetes/base/config.yaml: config/app/config.${PROFILE}.yaml ## Copy config to kubernetes deployment directory
-	install -D config/app/config.${PROFILE}.yaml deployment-kubernetes/base/config.yaml
+deployment-kubernetes/base/config.yaml: config/app.config.${PROFILE}.yaml ## Copy config to kubernetes deployment directory
+	install -D config/app.config.${PROFILE}.yaml deployment-kubernetes/base/config.yaml
 
 ### APPLICATION ###
 app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Run the app
@@ -93,6 +93,7 @@ database.migrate:: ## Migrate database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 		--volume ${PWD}/migration-database:/flyway/sql \
 		--volume ${PWD}/migration-database/${PROFILE}.conf:/flyway/conf/flyway.conf \
 		flyway/flyway:9.16.1-alpine \
+		clean \
 		migrate \
 		-user=${FLYWAY_USER} \
 		-password=${FLYWAY_PASSWORD}
@@ -123,10 +124,10 @@ docker.up:: ## Start containers | PROJECT_NAME
 		-f deployment-docker/docker-compose.yaml \
 		up -d --force-recreate
 
-docker.app.up:: docker.up database.migrate ## Start app container | PROJECT_NAME
+docker.app.up:: ## Start app container | PROJECT_NAME
 	docker compose -p ${PROJECT_NAME} \
     		-f deployment-docker/app.docker-compose.yaml \
-    		up -d --force-recreate
+    		up -d --force-recreate --build
 	docker logs app \
 		--follow
 

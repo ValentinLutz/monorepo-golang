@@ -20,5 +20,7 @@ database:
   user: test
   password: test
   database: test
-  max_idle_connections: 10
+  max_idle_connections: 100
   max_open_connections: 100
+  max_idle_time: 5m
+  max_lifetime: 1h

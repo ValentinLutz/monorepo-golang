@@ -14,4 +14,8 @@ services:
       - ../config/app.config.none-local.yaml:/app/config/config.yaml:ro
       - ../config/app.crt:/app/config/app.crt:ro
       - ../config/app.key:/app/config/app.key:ro
-
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
