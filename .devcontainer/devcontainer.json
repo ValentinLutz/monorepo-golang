@@ -24,7 +24,8 @@
 			"extensions": [
 				"GitHub.copilot",
 				"usernamehw.errorlens",
-				"42crunch.vscode-openapi"
+				"42crunch.vscode-openapi",
+				"eamodio.gitlens"
 			]
 		}
 	},
