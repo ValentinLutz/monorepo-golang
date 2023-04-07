@@ -14,6 +14,12 @@ services:
           cpus: '2'
           memory: 1G
 
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.12.0
+    network_mode: host
+    environment:
+      DATA_SOURCE_NAME: postgresql://test:test@localhost:5432/test?sslmode=disable
+
   prometheus:
     image: prom/prometheus:v2.43.0
     container_name: prometheus
@@ -31,4 +37,5 @@ services:
     volumes:
       - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
       - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml:ro
-      - ./grafana/dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json:ro
+      - ./grafana/app.json:/etc/grafana/provisioning/dashboards/app.json:ro
+      - ./grafana/postgres.json:/etc/grafana/provisioning/dashboards/posgtres.json:ro
