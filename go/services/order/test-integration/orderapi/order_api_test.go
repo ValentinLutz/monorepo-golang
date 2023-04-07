@@ -14,8 +14,8 @@ import (
 	"testing"
 
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +33,7 @@ func newClient(t *testing.T) *orderapi.Client {
 	}
 
 	orderApiClient, err := orderapi.NewClient(
-		config.BaseURL+"/api",
+		config.BaseURL+"/",
 		orderapi.WithHTTPClient(client),
 		orderapi.WithRequestEditorFn(basicAuth.Intercept),
 	)
@@ -50,7 +50,7 @@ func newDatabase(t *testing.T) *sqlx.DB {
 		config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Password, config.Database.Database,
 	)
 
-	db, err := sqlx.Connect("pgx", psqlInfo)
+	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
 		t.Fatal(err)
 	}

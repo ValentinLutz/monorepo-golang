@@ -84,7 +84,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 		r.Use(middleware.CorrelationId)
 		r.Use(middleware.RequestResponseLogging)
 		r.Use(authentication.BasicAuth)
-		r.Mount("/api", orderapi.New(ordersService))
+		r.Mount("/", orderapi.New(ordersService))
 	})
 
 	router.Group(func(r chi.Router) {

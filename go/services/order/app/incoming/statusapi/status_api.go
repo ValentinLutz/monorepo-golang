@@ -30,8 +30,8 @@ func New(logger *zerolog.Logger, config *config.Config, db *sqlx.DB) *API {
 
 func (a *API) RegisterRoutes(router chi.Router) {
 	router.Group(func(r chi.Router) {
-		r.Get("/api/status/health", a.registerHealthChecks())
-		r.Method("GET", "/api/status/metrics", a.registerPrometheusMetrics())
+		r.Get("/status/health", a.registerHealthChecks())
+		r.Method("GET", "/status/metrics", a.registerPrometheusMetrics())
 	})
 }
 

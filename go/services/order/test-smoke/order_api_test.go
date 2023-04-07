@@ -24,7 +24,7 @@ func TestHealth(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get(config.BaseURL + "/api/status/health")
+	response, err := client.Get(config.BaseURL + "/status/health")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,7 +44,7 @@ func TestPrometheusMetrics(t *testing.T) {
 	client := initClient()
 
 	// WHEN
-	response, err := client.Get(config.BaseURL + "/api/status/metrics")
+	response, err := client.Get(config.BaseURL + "/status/metrics")
 	if err != nil {
 		t.Fatal(err)
 	}

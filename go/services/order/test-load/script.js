@@ -14,7 +14,7 @@ export const options = {
             executor: 'constant-vus',
             exec: 'fullScenario',
             vus: 100,
-            duration: '30s',
+            duration: '15s',
         },
     },
 };
@@ -29,7 +29,7 @@ export function fullScenario() {
 }
 
 export function getOrders() {
-    const response = http.get(BASE_URI + '/api/orders', {
+    const response = http.get(BASE_URI + '/orders', {
         headers: {
             Authorization: `Basic ${encodedCredentials}`,
         },
@@ -55,7 +55,7 @@ export function postOrder() {
         ]
     });
 
-    const response = http.post(BASE_URI + '/api/orders', payload, {
+    const response = http.post(BASE_URI + '/orders', payload, {
         headers: {
             Authorization: `Basic ${encodedCredentials}`,
         },
@@ -69,7 +69,7 @@ export function postOrder() {
 }
 
 export function getOrder(order_id) {
-    const response = http.get(BASE_URI + '/api/orders/' + order_id, {
+    const response = http.get(BASE_URI + '/orders/' + order_id, {
         headers: {
             Authorization: `Basic ${encodedCredentials}`,
         },

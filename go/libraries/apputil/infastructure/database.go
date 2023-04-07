@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 )
 
@@ -39,7 +39,7 @@ func (database *Database) Connect() *sqlx.DB {
 		database.config.Host, database.config.Port, database.config.Username, database.config.Password, database.config.Database,
 	)
 
-	db, err := sqlx.Open("pgx", psqlInfo)
+	db, err := sqlx.Open("postgres", psqlInfo)
 	if err != nil {
 		database.logger.Fatal().
 			Err(err).
