@@ -45,9 +45,6 @@ test-integration/orderapi/client.gen.go: dep.oapi-codegen api-definition/order_a
 	oapi-codegen --config api-definition/test.client.yaml \
 		api-definition/order_api.yaml
 
-deployment-kubernetes/base/config.yaml: config/app.config.${PROFILE}.yaml ## Copy config to kubernetes deployment directory
-	install -D config/app.config.${PROFILE}.yaml deployment-kubernetes/base/config.yaml
-
 ### APPLICATION ###
 app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Run the app
 	cd app && \
@@ -136,14 +133,3 @@ docker.down:: ## Shutdown containers | PROJECT_NAME
 		-f deployment-docker/docker-compose.yaml \
 		-f deployment-docker/app.docker-compose.yaml \
 		down
-
-#### KUBERNETES ####
-kubernetes.image:: dep.kustomize ## Update app image version
-	cd deployment-kubernetes/base && \
-		kustomize edit set image ghcr.io/valentinlutz/order-service=ghcr.io/valentinlutz/order-service:${VERSION}
-
-kubernetes.build:: dep.kustomize deployment-kubernetes/base/config.yaml ## Build kubernetes deployment
-	kustomize build deployment-kubernetes/base > deployment-kubernetes/${PROFILE}.yaml
-
-kubernetes.deploy:: kubernetes.build ## Deploy app to kubernetes
-	kubectl apply -f deployment-kubernetes/${PROFILE}.yaml

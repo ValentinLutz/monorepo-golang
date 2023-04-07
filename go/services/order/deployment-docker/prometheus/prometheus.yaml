@@ -12,6 +12,6 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: true
-    metrics_path: /api/status/metrics
+    metrics_path: /status/metrics
     static_configs:
       - targets: [ 'app:8443' ]
