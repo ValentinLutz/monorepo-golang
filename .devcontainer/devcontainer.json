@@ -36,7 +36,9 @@
 	"forwardPorts": [
 		8080, // app http
 		8443, // app https
-		5432 // postgres tcp
+		5432, // postgres tcp
+		9090, // prometheus tcp
+		3000 // grafana tcp
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "bash .devcontainer/install-dev-tools.sh"

@@ -14,4 +14,4 @@ scrape_configs:
       insecure_skip_verify: true
     metrics_path: /status/metrics
     static_configs:
-      - targets: [ 'app:8443' ]
+      - targets: [ 'localhost:8443' ]
