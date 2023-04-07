@@ -4,6 +4,9 @@ services:
     image: postgres:15.2-alpine3.17
     container_name: postgres
     network_mode: host
+    command:
+      - -c
+      - max_connections=102
     environment:
       POSTGRES_DB: test
       POSTGRES_USER: test
@@ -16,6 +19,7 @@ services:
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.12.0
+    container_name: postgres-exporter
     network_mode: host
     environment:
       DATA_SOURCE_NAME: postgresql://test:test@localhost:5432/test?sslmode=disable
