@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -97,11 +98,17 @@ func NewLoggerWrapper(logger *zerolog.Logger) *LoggerWrapper {
 	return &LoggerWrapper{logger: logger}
 }
 
-func (lw *LoggerWrapper) Write(p []byte) (n int, err error) {
-	lw.logger.Error().Msg(strings.TrimSpace(string(p)))
-	return len(p), nil
+func (lw *LoggerWrapper) Write(bytes []byte) (n int, err error) {
+	lw.logger.Error().Err(createErrorFromBytes(bytes)).Msg("server error")
+	return len(bytes), nil
 }
 
 func (lw *LoggerWrapper) ToLogger() *log.Logger {
 	return log.New(lw, "", 0)
+}
+
+func createErrorFromBytes(bytes []byte) error {
+	errorString := string(bytes)
+	errorString = strings.TrimSpace(errorString)
+	return errors.New(errorString)
 }

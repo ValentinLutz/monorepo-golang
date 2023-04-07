@@ -32,8 +32,8 @@ func NewServer(logger *zerolog.Logger, config *ServerConfig, handler http.Handle
 
 	return &Server{
 		logger: logger,
-		server: server,
 		config: config,
+		server: server,
 	}
 }
 
@@ -67,5 +67,5 @@ func (s *Server) Stop() {
 	s.logger.Info().
 		Msg("server stopped")
 
-	// stop other connections like database, message queue
+	// stop other connections like message queue
 }

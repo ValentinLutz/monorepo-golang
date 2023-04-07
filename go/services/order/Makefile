@@ -124,9 +124,7 @@ docker.up:: ## Start containers | PROJECT_NAME
 docker.app.up:: ## Start app container | PROJECT_NAME
 	docker compose -p ${PROJECT_NAME} \
     		-f deployment-docker/app.docker-compose.yaml \
-    		up -d --force-recreate --build
-	docker logs app \
-		--follow
+    		up --force-recreate --build
 
 docker.down:: ## Shutdown containers | PROJECT_NAME
 	docker compose -p ${PROJECT_NAME} \
