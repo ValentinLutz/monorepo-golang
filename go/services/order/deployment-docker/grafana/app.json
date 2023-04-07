@@ -112,9 +112,10 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "builder",
-          "expr": "sum by(method, route) (rate(app_http_server_request_duration_seconds_sum[$__rate_interval])) / sum by (method, route) (rate(app_http_server_request_duration_seconds_count[$__rate_interval]))",
+          "expr": "sum by(method, route) (rate(app_http_server_request_duration_seconds_sum[$__rate_interval])) / sum by(method, route) (rate(app_http_server_request_duration_seconds_count[$__rate_interval]))",
           "hide": false,
-          "legendFormat": "{{mehtod}}{{route}}",
+          "interval": "",
+          "legendFormat": "{{method}} {{route}}",
           "range": true,
           "refId": "A"
         }
@@ -506,7 +507,7 @@
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{mehtod}} {{route}}",
+          "legendFormat": "{{method}} {{route}}",
           "range": true,
           "refId": "A"
         }
@@ -940,7 +941,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1083,7 +1084,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1189,7 +1190,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1284,7 +1285,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1379,7 +1380,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1473,7 +1474,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.7",
       "pointradius": 1,
       "points": true,
       "renderer": "flot",
@@ -1527,7 +1528,8 @@
     }
   ],
   "refresh": "1m",
-  "schemaVersion": 37,
+  "revision": 1,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [
     "go",
