@@ -19,7 +19,7 @@ func NewResponseTimeMetric(histogram *prometheus.HistogramVec) *ResponseTimeMetr
 	}
 }
 
-func (metric ResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
+func (metric *ResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
 		startTime := time.Now()
 

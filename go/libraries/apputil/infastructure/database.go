@@ -48,6 +48,8 @@ func (database *Database) Connect() *sqlx.DB {
 
 	db.SetMaxIdleConns(database.config.MaxIdleConnections)
 	db.SetMaxOpenConns(database.config.MaxOpenConnections)
+	db.SetConnMaxIdleTime(database.config.MaxIdleTime)
+	db.SetConnMaxLifetime(database.config.MaxLifetime)
 
 	err = db.Ping()
 	if err != nil {
