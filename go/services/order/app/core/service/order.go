@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -27,7 +28,16 @@ func NewOrder(
 	}
 }
 
-func (service *Order) GetOrders(ctx context.Context, offset int, limit int) ([]model.Order, error) {
+func (service *Order) GetOrders(ctx context.Context, customerId *uuid.UUID, offset int, limit int) ([]model.Order, error) {
+	if customerId != nil {
+		orders, err := service.orderRepository.FindAllOrdersByCustomerId(ctx, *customerId, offset, limit)
+		if err != nil {
+			return nil, err
+		}
+
+		return orders, nil
+	}
+
 	orders, err := service.orderRepository.FindAllOrders(ctx, offset, limit)
 	if err != nil {
 		return nil, err
@@ -36,7 +46,7 @@ func (service *Order) GetOrders(ctx context.Context, offset int, limit int) ([]m
 	return orders, nil
 }
 
-func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (model.Order, error) {
+func (service *Order) PlaceOrder(ctx context.Context, customerId uuid.UUID, itemNames []string) (model.Order, error) {
 	creationDate := time.Now()
 	orderId := NewOrderId(
 		service.config.Region,
@@ -55,6 +65,7 @@ func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (model
 
 	orderEntity := model.Order{
 		OrderId:      orderId,
+		CustomerId:   customerId,
 		Workflow:     "default_workflow",
 		CreationDate: creationDate,
 		Status:       model.OrderPlaced,
@@ -69,7 +80,7 @@ func (service *Order) PlaceOrder(ctx context.Context, itemNames []string) (model
 }
 
 func (service *Order) GetOrder(ctx context.Context, orderId model.OrderId) (model.Order, error) {
-	order, err := service.orderRepository.FindOrderById(ctx, orderId)
+	order, err := service.orderRepository.FindOrderByOrderId(ctx, orderId)
 	if err != nil {
 		return model.Order{}, errors.Wrapf(err, "order id is '%v'", orderId)
 	}

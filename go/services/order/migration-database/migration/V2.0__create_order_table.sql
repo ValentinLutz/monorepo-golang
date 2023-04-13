@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS order_service.order
 (
     order_id       VARCHAR     NOT NULL UNIQUE,
+    customer_id    UUID        NOT NULL,
     creation_date  TIMESTAMPTZ NOT NULL,
     modified_date  TIMESTAMPTZ NOT NULL DEFAULT now(),
     order_workflow VARCHAR     NOT NULL,

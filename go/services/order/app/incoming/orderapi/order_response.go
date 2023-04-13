@@ -17,6 +17,7 @@ func FromOrder(order model.Order) (OrderResponse, error) {
 
 	return OrderResponse{
 		OrderId:      string(order.OrderId),
+		CustomerId:   order.CustomerId,
 		CreationDate: order.CreationDate,
 		Status:       orderStatus,
 		Items:        orderItems,

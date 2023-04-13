@@ -1,6 +1,7 @@
 [
   {
     "order_id": "IsQah2TkaqS-NONE-JewgL0Ye73g",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_placed",
     "items": [
@@ -14,6 +15,7 @@
   },
   {
     "order_id": "Fs2VoM7ZhrK-NONE-vzTf7kaHbRA",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_in_progress",
     "items": [
@@ -24,6 +26,7 @@
   },
   {
     "order_id": "sgy1K3*SXcv-NONE-eVbldUAYXnA",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_canceled",
     "items": [
@@ -34,6 +37,7 @@
   },
   {
     "order_id": "F2P!criGu2L-NONE-fJ7bBFx1vHg",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
     "creation_date": "1980-01-01T00:00:00Z",
     "status": "order_completed",
     "items": [

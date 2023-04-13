@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type OrderStatus string
 
@@ -15,6 +19,7 @@ type OrderId string
 
 type Order struct {
 	OrderId      OrderId
+	CustomerId   uuid.UUID
 	CreationDate time.Time
 	Status       OrderStatus
 	Workflow     string

@@ -3,10 +3,13 @@ package orderrepo
 import (
 	"monorepo/services/order/app/core/model"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type OrderEntity struct {
 	OrderId       string    `db:"order_id"`
+	CustomerId    uuid.UUID `db:"customer_id"`
 	CreationDate  time.Time `db:"creation_date"`
 	OrderStatus   string    `db:"order_status"`
 	OrderWorkflow string    `db:"order_workflow"`
@@ -15,6 +18,7 @@ type OrderEntity struct {
 func NewOrderEntity(order model.Order) OrderEntity {
 	return OrderEntity{
 		OrderId:       string(order.OrderId),
+		CustomerId:    order.CustomerId,
 		CreationDate:  order.CreationDate,
 		OrderStatus:   string(order.Status),
 		OrderWorkflow: order.Workflow,
@@ -33,6 +37,7 @@ func NewOrder(orderEntity OrderEntity, orderItemEntities []OrderItemEntity) mode
 
 	return model.Order{
 		OrderId:      model.OrderId(orderEntity.OrderId),
+		CustomerId:   orderEntity.CustomerId,
 		CreationDate: orderEntity.CreationDate,
 		Status:       model.OrderStatus(orderEntity.OrderStatus),
 		Workflow:     orderEntity.OrderWorkflow,
@@ -54,6 +59,7 @@ func NewOrders(orderEntities []OrderEntity, orderItemEntities []OrderItemEntity)
 	for _, orderEntity := range orderEntities {
 		orders = append(orders, model.Order{
 			OrderId:      model.OrderId(orderEntity.OrderId),
+			CustomerId:   orderEntity.CustomerId,
 			CreationDate: orderEntity.CreationDate,
 			Status:       model.OrderStatus(orderEntity.OrderStatus),
 			Workflow:     orderEntity.OrderWorkflow,

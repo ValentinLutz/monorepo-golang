@@ -1,0 +1,1 @@
+TRUNCATE TABLE order_service.order_item, order_service.order;
