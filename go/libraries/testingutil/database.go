@@ -3,13 +3,16 @@ package testingutil
 import (
 	"fmt"
 	"os"
-	"testing"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-func NewDatabase(t *testing.T, config *Config) *sqlx.DB {
+type Database struct {
+	*sqlx.DB
+}
+
+func NewDatabase(config *Config) *Database {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Password, config.Database.Database,
@@ -17,29 +20,29 @@ func NewDatabase(t *testing.T, config *Config) *sqlx.DB {
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 
-	return db
+	return &Database{db}
 }
 
-func LoadAndExec(t *testing.T, db *sqlx.DB, path string) {
-	query := LoadQuery(t, path)
-	Exec(t, db, query)
+func LoadAndExec(db *Database, path string) {
+	query := LoadQuery(path)
+	Exec(db, query)
 }
 
-func LoadQuery(t *testing.T, path string) string {
+func LoadQuery(path string) string {
 	query, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 
 	return string(query)
 }
 
-func Exec(t *testing.T, db *sqlx.DB, query string) {
+func Exec(db *Database, query string) {
 	_, err := db.Exec(query)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 }

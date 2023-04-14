@@ -33,7 +33,7 @@ func (api *API) GetOrders(w http.ResponseWriter, r *http.Request, params GetOrde
 		limit = *params.Limit
 	}
 
-	orderEntities, err := api.service.GetOrders(r.Context(), params.CustomerId, offset, limit)
+	orderEntities, err := api.service.GetOrders(r.Context(), offset, limit, params.CustomerId)
 	if err != nil {
 		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
 		return
