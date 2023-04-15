@@ -1,9 +1,19 @@
 version: '3.8'
 services:
-  postgres:
-    image: postgres:15.2-alpine3.17
-    container_name: postgres
+  mqtt-emqx:
+    image: emqx:5.0.21
+    container_name: mqtt-emqx
     network_mode: host
+    environment:
+      EMQX_DASHBOARD__DEFAULT_USERNAME: test
+      EMQX_DASHBOARD__DEFAULT_PASSWORD: test
+    # ports:
+    #   - 1883:1883
+    #   - 18083:18083 
+
+  database-postgres:
+    image: postgres:15.2-alpine3.17
+    container_name: database-postgres
     command:
       - -c
       - max_connections=102
@@ -11,30 +21,31 @@ services:
       POSTGRES_DB: test
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 1G
-
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.12.0
-    container_name: postgres-exporter
     network_mode: host
+    # ports:
+    #   - 5432:5432
+
+  monitoring-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.12.0
+    container_name: monitoring-postgres-exporter
     environment:
       DATA_SOURCE_NAME: postgresql://test:test@localhost:5432/test?sslmode=disable
-
-  prometheus:
-    image: prom/prometheus:v2.43.0
-    container_name: prometheus
     network_mode: host
+    # ports:
+    #   - 9187:9187
+
+  monitoring-prometheus:
+    image: prom/prometheus:v2.43.0
+    container_name: monitoring-prometheus
     volumes:
       - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
-
-  grafana:
-    image: grafana/grafana:9.4.7
-    container_name: grafana
     network_mode: host
+    # ports:
+    #   - 9090:9090
+
+  monitoring-grafana:
+    image: grafana/grafana:9.4.7
+    container_name: monitoring-grafana
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: true
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
@@ -43,3 +54,6 @@ services:
       - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml:ro
       - ./grafana/app.json:/etc/grafana/provisioning/dashboards/app.json:ro
       - ./grafana/postgres.json:/etc/grafana/provisioning/dashboards/posgtres.json:ro
+    network_mode: host
+    # ports:
+    #   - 3000:3000
