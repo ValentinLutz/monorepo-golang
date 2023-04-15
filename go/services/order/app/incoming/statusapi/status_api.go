@@ -2,6 +2,7 @@ package statusapi
 
 import (
 	"fmt"
+	"monorepo/libraries/apputil/infastructure"
 	"monorepo/services/order/app/config"
 	"net/http"
 	"time"
@@ -9,22 +10,21 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/hellofresh/health-go/v5"
 	psql "github.com/hellofresh/health-go/v5/checks/postgres"
-	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 )
 
 type API struct {
-	logger *zerolog.Logger
-	config *config.Config
-	db     *sqlx.DB
+	logger  *zerolog.Logger
+	config  *config.Config
+	databse *infastructure.Database
 }
 
-func New(logger *zerolog.Logger, config *config.Config, db *sqlx.DB) *API {
+func New(logger *zerolog.Logger, config *config.Config, databse *infastructure.Database) *API {
 	return &API{
-		logger: logger,
-		config: config,
-		db:     db,
+		logger:  logger,
+		config:  config,
+		databse: databse,
 	}
 }
 

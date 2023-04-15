@@ -22,42 +22,38 @@ type DatabaseConfig struct {
 }
 
 type Database struct {
+	*sqlx.DB
 	logger *zerolog.Logger
-	config *DatabaseConfig
 }
 
 func NewDatabase(logger *zerolog.Logger, config *DatabaseConfig) *Database {
-	return &Database{
-		config: config,
-		logger: logger,
-	}
-}
-
-func (database *Database) Connect() *sqlx.DB {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		database.config.Host, database.config.Port, database.config.Username, database.config.Password, database.config.Database,
+		config.Host, config.Port, config.Username, config.Password, config.Database,
 	)
 
 	db, err := sqlx.Open("postgres", psqlInfo)
 	if err != nil {
-		database.logger.Fatal().
+		logger.Fatal().
 			Err(err).
 			Msg("failed to connect to database")
 	}
 
-	db.SetMaxIdleConns(database.config.MaxIdleConnections)
-	db.SetMaxOpenConns(database.config.MaxOpenConnections)
-	db.SetConnMaxIdleTime(database.config.MaxIdleTime)
-	db.SetConnMaxLifetime(database.config.MaxLifetime)
+	db.SetMaxIdleConns(config.MaxIdleConnections)
+	db.SetMaxOpenConns(config.MaxOpenConnections)
+	db.SetConnMaxIdleTime(config.MaxIdleTime)
+	db.SetConnMaxLifetime(config.MaxLifetime)
 
 	err = db.Ping()
 	if err != nil {
 		db.Close()
-		database.logger.Fatal().
+		logger.Fatal().
 			Err(err).
 			Msg("failed to ping database")
 	}
 
-	return db
+	return &Database{
+		DB:     db,
+		logger: logger,
+	}
 }

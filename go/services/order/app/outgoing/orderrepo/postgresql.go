@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"monorepo/libraries/apputil/infastructure"
 	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/port"
 
@@ -13,16 +14,16 @@ import (
 )
 
 type PostgreSQL struct {
-	database *sqlx.DB
+	*infastructure.Database
 }
 
-func NewPostgreSQL(database *sqlx.DB) PostgreSQL {
-	return PostgreSQL{database: database}
+func NewPostgreSQL(database *infastructure.Database) PostgreSQL {
+	return PostgreSQL{Database: database}
 }
 
 func (orderRepository *PostgreSQL) FindAllOrdersByCustomerId(ctx context.Context, customerId uuid.UUID, offset int, limit int) ([]model.Order, error) {
 	var orderEntities []OrderEntity
-	err := orderRepository.database.SelectContext(
+	err := orderRepository.SelectContext(
 		ctx,
 		&orderEntities,
 		"SELECT order_id, customer_id, creation_date, order_status FROM order_service.order WHERE customer_id = $1 ORDER BY creation_date OFFSET $2 LIMIT $3",
@@ -38,7 +39,7 @@ func (orderRepository *PostgreSQL) FindAllOrdersByCustomerId(ctx context.Context
 	}
 
 	var orderItemEntities []OrderItemEntity
-	err = orderRepository.database.SelectContext(
+	err = orderRepository.SelectContext(
 		ctx,
 		&orderItemEntities,
 		"SELECT order_item_id, order_id, creation_date, order_item_name FROM order_service.order_item WHERE order_id = ANY($1)",
@@ -53,7 +54,7 @@ func (orderRepository *PostgreSQL) FindAllOrdersByCustomerId(ctx context.Context
 
 func (orderRepository *PostgreSQL) FindAllOrders(ctx context.Context, offset int, limit int) ([]model.Order, error) {
 	var orderEntities []OrderEntity
-	err := orderRepository.database.SelectContext(
+	err := orderRepository.SelectContext(
 		ctx,
 		&orderEntities,
 		"SELECT order_id, customer_id, creation_date, order_status FROM order_service.order ORDER BY creation_date OFFSET $1 LIMIT $2",
@@ -69,7 +70,7 @@ func (orderRepository *PostgreSQL) FindAllOrders(ctx context.Context, offset int
 	}
 
 	var orderItemEntities []OrderItemEntity
-	err = orderRepository.database.SelectContext(
+	err = orderRepository.SelectContext(
 		ctx,
 		&orderItemEntities,
 		"SELECT order_item_id, order_id, creation_date, order_item_name FROM order_service.order_item WHERE order_id = ANY($1)",
@@ -84,7 +85,7 @@ func (orderRepository *PostgreSQL) FindAllOrders(ctx context.Context, offset int
 
 func (orderRepository *PostgreSQL) FindOrderByOrderId(ctx context.Context, orderId model.OrderId) (model.Order, error) {
 	var orderEntity OrderEntity
-	err := orderRepository.database.GetContext(
+	err := orderRepository.GetContext(
 		ctx,
 		&orderEntity,
 		"SELECT order_id, customer_id, creation_date, order_status FROM order_service.order WHERE order_id = $1",
@@ -98,7 +99,7 @@ func (orderRepository *PostgreSQL) FindOrderByOrderId(ctx context.Context, order
 	}
 
 	var orderItemEntities []OrderItemEntity
-	err = orderRepository.database.SelectContext(
+	err = orderRepository.SelectContext(
 		ctx,
 		&orderItemEntities,
 		"SELECT order_item_id, order_id, creation_date, order_item_name FROM order_service.order_item WHERE order_id = $1",
@@ -112,7 +113,7 @@ func (orderRepository *PostgreSQL) FindOrderByOrderId(ctx context.Context, order
 }
 
 func (orderRepository *PostgreSQL) SaveOrder(ctx context.Context, order model.Order) error {
-	txx, err := orderRepository.database.BeginTxx(ctx, nil)
+	txx, err := orderRepository.BeginTxx(ctx, nil)
 	defer func(txx *sqlx.Tx) {
 		err := txx.Commit()
 		if err != nil {

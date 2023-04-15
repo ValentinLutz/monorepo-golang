@@ -18,7 +18,6 @@ import (
 	"syscall"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
@@ -42,10 +41,9 @@ func main() {
 
 	logger := logging.NewLogger(appConfig.Logger)
 
-	newDatabase := infastructure.NewDatabase(&logger, &appConfig.Database)
-	db := newDatabase.Connect()
+	database := infastructure.NewDatabase(&logger, &appConfig.Database)
 
-	handler := newHandler(logger, appConfig, db)
+	handler := newHandler(logger, appConfig, database)
 	server := infastructure.NewServer(&logger, &appConfig.Server, handler)
 
 	go server.Start()
@@ -57,10 +55,10 @@ func main() {
 	server.Stop()
 }
 
-func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.Handler {
+func newHandler(logger zerolog.Logger, config *config.Config, database *infastructure.Database) http.Handler {
 	router := chi.NewRouter()
 
-	orderRepository := orderrepo.NewPostgreSQL(db)
+	orderRepository := orderrepo.NewPostgreSQL(database)
 	ordersService := service.NewOrder(config, &orderRepository)
 
 	authentication := middleware.Authentication{
@@ -68,7 +66,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 		Password: "test",
 	}
 
-	databaseStats := metrics.NewDatabaseStats(db, metrics.DatabaseOpts{
+	databaseStats := metrics.NewDatabaseStats(database, metrics.DatabaseOpts{
 		Namespace: "app",
 		Subsystem: "order",
 	})
@@ -88,7 +86,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, db *sqlx.DB) http.
 	})
 
 	router.Group(func(r chi.Router) {
-		statusAPI := statusapi.New(&logger, config, db)
+		statusAPI := statusapi.New(&logger, config, database)
 		statusAPI.RegisterRoutes(r)
 
 		openAPI := openapi.New()
