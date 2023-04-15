@@ -98,64 +98,64 @@ func NewDatabaseStats(statsGetter StatsGetter, opts DatabaseOpts) *DatabaseStats
 }
 
 // Describe implements the prometheus.Collector interface.
-func (s DatabaseStats) Describe(ch chan<- *prometheus.Desc) {
-	ch <- s.maxOpenConnections
-	ch <- s.openConnections
-	ch <- s.inUse
-	ch <- s.idle
-	ch <- s.waitCount
-	ch <- s.waitDuration
-	ch <- s.maxIdleClosed
-	ch <- s.maxLifetimeClosed
-	ch <- s.maxIdleTimeClosed
+func (databaseStats DatabaseStats) Describe(ch chan<- *prometheus.Desc) {
+	ch <- databaseStats.maxOpenConnections
+	ch <- databaseStats.openConnections
+	ch <- databaseStats.inUse
+	ch <- databaseStats.idle
+	ch <- databaseStats.waitCount
+	ch <- databaseStats.waitDuration
+	ch <- databaseStats.maxIdleClosed
+	ch <- databaseStats.maxLifetimeClosed
+	ch <- databaseStats.maxIdleTimeClosed
 }
 
 // Collect implements the prometheus.Collector interface.
-func (s DatabaseStats) Collect(ch chan<- prometheus.Metric) {
-	stats := s.Stats()
+func (databaseStats DatabaseStats) Collect(ch chan<- prometheus.Metric) {
+	stats := databaseStats.Stats()
 
 	ch <- prometheus.MustNewConstMetric(
-		s.maxOpenConnections,
+		databaseStats.maxOpenConnections,
 		prometheus.GaugeValue,
 		float64(stats.MaxOpenConnections),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.openConnections,
+		databaseStats.openConnections,
 		prometheus.GaugeValue,
 		float64(stats.OpenConnections),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.inUse,
+		databaseStats.inUse,
 		prometheus.GaugeValue,
 		float64(stats.InUse),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.idle,
+		databaseStats.idle,
 		prometheus.GaugeValue,
 		float64(stats.Idle),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.waitCount,
+		databaseStats.waitCount,
 		prometheus.CounterValue,
 		float64(stats.WaitCount),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.waitDuration,
+		databaseStats.waitDuration,
 		prometheus.CounterValue,
 		stats.WaitDuration.Seconds(),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.maxIdleClosed,
+		databaseStats.maxIdleClosed,
 		prometheus.CounterValue,
 		float64(stats.MaxIdleClosed),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.maxLifetimeClosed,
+		databaseStats.maxLifetimeClosed,
 		prometheus.CounterValue,
 		float64(stats.MaxLifetimeClosed),
 	)
 	ch <- prometheus.MustNewConstMetric(
-		s.maxIdleTimeClosed,
+		databaseStats.maxIdleTimeClosed,
 		prometheus.CounterValue,
 		float64(stats.MaxIdleTimeClosed),
 	)

@@ -11,7 +11,7 @@ type Authentication struct {
 	Password string
 }
 
-func (a *Authentication) BasicAuth(next http.Handler) http.Handler {
+func (authentication *Authentication) BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		username, password, ok := r.BasicAuth()
 		if !ok {
@@ -19,7 +19,7 @@ func (a *Authentication) BasicAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		if subtle.ConstantTimeCompare([]byte(username+password), []byte(a.Username+a.Password)) != 1 {
+		if subtle.ConstantTimeCompare([]byte(username+password), []byte(authentication.Username+authentication.Password)) != 1 {
 			httpresponse.Status(w, http.StatusUnauthorized)
 			return
 		}

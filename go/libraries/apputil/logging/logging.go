@@ -98,13 +98,13 @@ func NewLoggerWrapper(logger *zerolog.Logger) *LoggerWrapper {
 	return &LoggerWrapper{logger: logger}
 }
 
-func (lw *LoggerWrapper) Write(bytes []byte) (n int, err error) {
-	lw.logger.Error().Err(createErrorFromBytes(bytes)).Msg("server error")
+func (loggerWrapper *LoggerWrapper) Write(bytes []byte) (n int, err error) {
+	loggerWrapper.logger.Error().Err(createErrorFromBytes(bytes)).Msg("server error")
 	return len(bytes), nil
 }
 
-func (lw *LoggerWrapper) ToLogger() *log.Logger {
-	return log.New(lw, "", 0)
+func (loggerWrapper *LoggerWrapper) ToLogger() *log.Logger {
+	return log.New(loggerWrapper, "", 0)
 }
 
 func createErrorFromBytes(bytes []byte) error {

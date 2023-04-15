@@ -19,7 +19,7 @@ func NewResponseTimeMetric(histogram *prometheus.HistogramVec) *ResponseTimeMetr
 	}
 }
 
-func (metric *ResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
+func (responseTimeMetric *ResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
 		startTime := time.Now()
 
@@ -30,7 +30,7 @@ func (metric *ResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler 
 		duration := time.Since(startTime)
 		statusCode := strconv.Itoa(responseWriterContainer.statusCode)
 		route := getRoutePattern(request)
-		metric.Histogram.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
+		responseTimeMetric.Histogram.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
 	})
 }
 

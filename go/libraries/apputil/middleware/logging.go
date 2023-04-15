@@ -77,17 +77,17 @@ func logRequest(context context.Context, request *http.Request, requestBody []by
 	logEvent.Msg("request")
 }
 
-func logResponse(context context.Context, responseWriterContainer *responseWriterContainer, duration time.Duration) {
+func logResponse(context context.Context, responseWriterWrapper *responseWriterWrapper, duration time.Duration) {
 	logger := zerolog.Ctx(context)
 
 	logEvent := logger.Info().
 		Str("duration", duration.String()).
-		Int("status", responseWriterContainer.statusCode)
+		Int("status", responseWriterWrapper.statusCode)
 
-	if json.Valid(responseWriterContainer.body) {
-		logEvent.RawJSON("body", responseWriterContainer.body)
+	if json.Valid(responseWriterWrapper.body) {
+		logEvent.RawJSON("body", responseWriterWrapper.body)
 	} else {
-		logEvent.Str("body", string(responseWriterContainer.body))
+		logEvent.Str("body", string(responseWriterWrapper.body))
 	}
 
 	logEvent.Msg("response")
