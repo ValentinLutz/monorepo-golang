@@ -29,6 +29,13 @@ func NewOrder(
 }
 
 func (service *Order) GetOrders(ctx context.Context, offset int, limit int, customerId *uuid.UUID) ([]model.Order, error) {
+	if offset < 0 {
+		return nil, port.InvalidOffsetError
+	}
+	if limit <= 0 {
+		return nil, port.InvalidLimitError
+	}
+
 	if customerId != nil {
 		orders, err := service.orderRepository.FindAllOrdersByCustomerId(ctx, *customerId, offset, limit)
 		if err != nil {

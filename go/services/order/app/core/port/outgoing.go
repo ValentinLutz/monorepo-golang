@@ -8,7 +8,9 @@ import (
 	"github.com/google/uuid"
 )
 
-var OrderNotFound = errors.New("no order was found")
+var (
+	OrderNotFound = errors.New("no order was found")
+)
 
 type OrderRepository interface {
 	FindAllOrdersByCustomerId(ctx context.Context, customerId uuid.UUID, offset int, limit int) ([]model.Order, error)

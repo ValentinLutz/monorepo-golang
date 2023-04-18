@@ -17,7 +17,7 @@ func New(service port.OrderService) http.Handler {
 		service: service,
 	}
 	errorHandlerFunc := func(w http.ResponseWriter, r *http.Request, err error) {
-		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		httpresponse.ErrorWithBody(w, http.StatusBadRequest, NewErrorResponse(r, 4000, err))
 	}
 
 	return HandlerWithOptions(api, ChiServerOptions{ErrorHandlerFunc: errorHandlerFunc})
@@ -35,7 +35,12 @@ func (api *API) GetOrders(w http.ResponseWriter, r *http.Request, params GetOrde
 
 	orderEntities, err := api.service.GetOrders(r.Context(), offset, limit, params.CustomerId)
 	if err != nil {
-		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		switch err {
+		case port.InvalidOffsetError, port.InvalidLimitError:
+			httpresponse.ErrorWithBody(w, http.StatusBadRequest, NewErrorResponse(r, 4000, err))
+		default:
+			httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		}
 		return
 	}
 

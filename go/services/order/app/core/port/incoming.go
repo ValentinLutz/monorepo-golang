@@ -2,9 +2,15 @@ package port
 
 import (
 	"context"
+	"errors"
 	"monorepo/services/order/app/core/model"
 
 	"github.com/google/uuid"
+)
+
+var (
+	InvalidOffsetError = errors.New("offset must be greater than or equal to 0")
+	InvalidLimitError  = errors.New("limit must be greater than 0")
 )
 
 type OrderService interface {
