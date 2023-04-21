@@ -36,7 +36,11 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 		10080, // app http
-		10443 // app https
+		10443, // app https
+		5432, // postgres
+		4566, // localstack
+		9090, // prometheus
+		3000 // grafana
 	],
 	"otherPortsAttributes": {
 		"onAutoForward": "ignore"

@@ -1,15 +1,26 @@
 version: '3.8'
 services:
-  mqtt-emqx:
-    image: emqx:5.0.21
-    container_name: mqtt-emqx
-    network_mode: host
+  # mqtt-emqx:
+  #   image: emqx:5.0.21
+  #   container_name: mqtt-emqx
+  #   environment:
+  #     EMQX_DASHBOARD__DEFAULT_USERNAME: test
+  #     EMQX_DASHBOARD__DEFAULT_PASSWORD: test
+  #   network_mode: host
+  #   # ports:
+  #   #   - 1883:1883
+  #   #   - 18083:18083 
+
+  aws-localstack:
+    image: localstack/localstack:2.0.1
+    container_name: aws-localstack
     environment:
-      EMQX_DASHBOARD__DEFAULT_USERNAME: test
-      EMQX_DASHBOARD__DEFAULT_PASSWORD: test
+      DEFAULT_REGION: eu-central-1
+    volumes:
+      - ./localstack:/etc/localstack/init:ro
+    network_mode: host
     # ports:
-    #   - 1883:1883
-    #   - 18083:18083 
+    #   - 4566:4566
 
   database-postgres:
     image: postgres:15.2-alpine3.17
