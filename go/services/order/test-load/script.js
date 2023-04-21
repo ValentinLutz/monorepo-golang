@@ -2,18 +2,18 @@ import http from 'k6/http';
 import encoding from 'k6/encoding';
 import { check } from "k6";
 
-export const BASE_URI = 'https://localhost:8443'
+export const BASE_URI = 'https://localhost:10443'
 
 export const options = {
     insecureSkipTLSVerify: true,
     thresholds: {
-        http_req_duration: ['p(90) < 400', 'p(95) < 800'],
+        http_req_duration: ['p(90) < 100', 'p(95) < 200'],
     },
     scenarios: {
         full_scenario: {
             executor: 'constant-vus',
             exec: 'fullScenario',
-            vus: 100,
+            vus: 2,
             duration: '15s',
         },
     },

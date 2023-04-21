@@ -2,11 +2,11 @@ package infastructure
 
 import (
 	"fmt"
+	"monorepo/libraries/apputil/logging"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/rs/zerolog"
 )
 
 type DatabaseConfig struct {
@@ -23,10 +23,10 @@ type DatabaseConfig struct {
 
 type Database struct {
 	*sqlx.DB
-	logger *zerolog.Logger
+	logger logging.Logger
 }
 
-func NewDatabase(logger *zerolog.Logger, config *DatabaseConfig) *Database {
+func NewDatabase(logger logging.Logger, config DatabaseConfig) *Database {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Host, config.Port, config.Username, config.Password, config.Database,

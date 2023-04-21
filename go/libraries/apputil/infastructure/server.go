@@ -7,8 +7,6 @@ import (
 	"monorepo/libraries/apputil/logging"
 	"net/http"
 	"time"
-
-	"github.com/rs/zerolog"
 )
 
 type ServerConfig struct {
@@ -19,11 +17,11 @@ type ServerConfig struct {
 
 type Server struct {
 	*http.Server
-	logger *zerolog.Logger
-	config *ServerConfig
+	logger logging.Logger
+	config ServerConfig
 }
 
-func NewServer(logger *zerolog.Logger, config *ServerConfig, handler http.Handler) *Server {
+func NewServer(logger logging.Logger, config ServerConfig, handler http.Handler) *Server {
 	server := &http.Server{
 		Addr:     fmt.Sprintf(":%d", config.Port),
 		Handler:  handler,

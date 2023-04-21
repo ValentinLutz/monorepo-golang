@@ -32,10 +32,10 @@ type LoggerConfig struct {
 }
 
 type Logger struct {
-	logger *zerolog.Logger
+	zerolog.Logger
 }
 
-func NewLogger(config LoggerConfig) zerolog.Logger {
+func NewLogger(config LoggerConfig) Logger {
 	var writer io.Writer
 	if config.Json {
 		writer = os.Stdout
@@ -47,10 +47,10 @@ func NewLogger(config LoggerConfig) zerolog.Logger {
 	}
 
 	zerolog.SetGlobalLevel(config.Level.toZeroLogLevel())
-	return zerolog.New(writer).
-		With().
-		Timestamp().
-		Logger()
+	zeroLogger := zerolog.New(writer).With().Timestamp().Logger()
+	return Logger{
+		Logger: zeroLogger,
+	}
 }
 
 func (logLevel *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -91,10 +91,10 @@ func (logLevel *LogLevel) toZeroLogLevel() zerolog.Level {
 }
 
 type LoggerWrapper struct {
-	logger *zerolog.Logger
+	logger Logger
 }
 
-func NewLoggerWrapper(logger *zerolog.Logger) *LoggerWrapper {
+func NewLoggerWrapper(logger Logger) *LoggerWrapper {
 	return &LoggerWrapper{logger: logger}
 }
 

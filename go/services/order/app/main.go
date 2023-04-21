@@ -19,7 +19,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 )
@@ -41,10 +40,10 @@ func main() {
 
 	logger := logging.NewLogger(appConfig.Logger)
 
-	database := infastructure.NewDatabase(&logger, &appConfig.Database)
+	database := infastructure.NewDatabase(logger, appConfig.Database)
 
 	handler := newHandler(logger, appConfig, database)
-	server := infastructure.NewServer(&logger, &appConfig.Server, handler)
+	server := infastructure.NewServer(logger, appConfig.Server, handler)
 
 	go server.Start()
 
@@ -55,7 +54,7 @@ func main() {
 	server.Stop()
 }
 
-func newHandler(logger zerolog.Logger, config *config.Config, database *infastructure.Database) http.Handler {
+func newHandler(logger logging.Logger, config config.Config, database *infastructure.Database) http.Handler {
 	router := chi.NewRouter()
 
 	orderRepository := orderrepo.NewPostgreSQL(database)
@@ -77,7 +76,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, database *infastru
 	responseTimeMetric := middleware.NewResponseTimeMetric(responseTimeHistogram)
 
 	router.Group(func(r chi.Router) {
-		r.Use(hlog.NewHandler(logger))
+		r.Use(hlog.NewHandler(logger.Logger))
 		r.Use(responseTimeMetric.ResponseTimes)
 		r.Use(middleware.CorrelationId)
 		r.Use(middleware.RequestResponseLogging)
@@ -86,7 +85,7 @@ func newHandler(logger zerolog.Logger, config *config.Config, database *infastru
 	})
 
 	router.Group(func(r chi.Router) {
-		statusAPI := statusapi.New(&logger, config, database)
+		statusAPI := statusapi.New(logger, config, database)
 		statusAPI.RegisterRoutes(r)
 
 		openAPI := openapi.New()

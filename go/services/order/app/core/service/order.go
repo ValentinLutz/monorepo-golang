@@ -14,12 +14,12 @@ import (
 )
 
 type Order struct {
-	config          *config.Config
+	config          config.Config
 	orderRepository port.OrderRepository
 }
 
 func NewOrder(
-	config *config.Config,
+	config config.Config,
 	orderRepository port.OrderRepository,
 ) *Order {
 	return &Order{

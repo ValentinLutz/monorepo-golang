@@ -19,10 +19,10 @@ type Config struct {
 	Logger      logging.LoggerConfig         `yaml:"logger"`
 }
 
-func New(path string) (*Config, error) {
+func New(path string) (Config, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return Config{}, err
 	}
 	defer func(file *os.File) {
 		closeErr := file.Close()
@@ -32,21 +32,21 @@ func New(path string) (*Config, error) {
 	}(file)
 
 	decoder := yaml.NewDecoder(file)
-	var decodedConfig *Config
+	var decodedConfig Config
 	err = decoder.Decode(&decodedConfig)
 	if err != nil {
-		return nil, err
+		return Config{}, err
 	}
 
 	version, ok := os.LookupEnv("VERSION")
 	if !ok {
-		return nil, errors.New("failed to load the environment variable 'VERSION'")
+		return Config{}, errors.New("failed to load the environment variable 'VERSION'")
 	}
 	decodedConfig.Version = version
 
 	projectName, ok := os.LookupEnv("PROJECT_NAME")
 	if !ok {
-		return nil, errors.New("failed to load the environment variable 'PROJECT_NAME'")
+		return Config{}, errors.New("failed to load the environment variable 'PROJECT_NAME'")
 	}
 	decodedConfig.ServiceName = projectName
 
