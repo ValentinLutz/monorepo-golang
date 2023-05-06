@@ -18,7 +18,7 @@ dep.oapi-codegen:: # Install oapi-codegen with go install
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4
 
 dep.golangci-lint:: # Install golangci-lint with go install
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
 
 dep.kustomize:: # Install kustomize with go install
 	go install sigs.k8s.io/kustomize/kustomize/v4@v4.5.6

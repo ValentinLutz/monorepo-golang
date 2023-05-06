@@ -49,7 +49,10 @@ func main() {
 
 	stopChannel := make(chan os.Signal, 1)
 	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGTERM)
-	logger.Info().Str("signal", (<-stopChannel).String()).Msg("received signal")
+	logger.
+		Info().
+		Str("signal", (<-stopChannel).String()).
+		Msg("received signal")
 
 	server.Stop()
 }
