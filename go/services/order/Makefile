@@ -33,11 +33,11 @@ app/config/app.key: config/app.key ## Copy none-local private key to app directo
 app/config/app.crt: config/app.crt ## Copy none-local certificate to app directory
 	install -D config/app.crt app/config/app.crt
 
-app/incoming/orderapi/model.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/app.model.yaml ## Generate order models from open api definition
+app/incoming/http/orderapi/model.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/app.model.yaml ## Generate order models from open api definition
 	oapi-codegen --config api-definition/app.model.yaml \
 		api-definition/order_api.yaml
 
-app/incoming/orderapi/server.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/app.server.yaml ## Generate order server from open api definition
+app/incoming/http/orderapi/server.gen.go: dep.oapi-codegen api-definition/order_api.yaml api-definition/app.server.yaml ## Generate order server from open api definition
 	oapi-codegen --config api-definition/app.server.yaml \
 		api-definition/order_api.yaml
 
@@ -45,16 +45,20 @@ test-integration/orderapi/client.gen.go: dep.oapi-codegen api-definition/order_a
 	oapi-codegen --config api-definition/test.client.yaml \
 		api-definition/order_api.yaml
 
+gen.app: app/incoming/http/orderapi/model.gen.go app/incoming/http/orderapi/server.gen.go ## Generate app models and server from open api definition
+
+gen.test: test-integration/orderapi/client.gen.go ## Generate test models from open api definition
+
 ### APPLICATION ###
-app.run:: app/config/config.yaml app/config/app.key app/config/app.crt app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Run the app
+app.run:: app/config/config.yaml app/config/app.key app/config/app.crt gen.app ## Run the app
 	cd app && \
 		go run main.go
 
-app.build:: app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Build the app into an executable
+app.build:: gen.app ## Build the app into an executable
 	cd app && \
 		go build
 
-app.lint:: dep.golangci-lint app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Runs linters against go code
+app.lint:: dep.golangci-lint gen.app ## Runs linters against go code
 	cd app && \
 		golangci-lint run
 
@@ -62,7 +66,7 @@ app.lint:: dep.golangci-lint app/incoming/orderapi/model.gen.go app/incoming/ord
 test.spectral:: api-definition/order_api.yaml api-definition/spectral.ruleset.yaml
 	docker run --rm -it -v ./api-definition/:/tmp stoplight/spectral --ruleset "/tmp/spectral.ruleset.yaml" lint "/tmp/order_api.yaml"
 
-test.unit::  app/incoming/orderapi/model.gen.go app/incoming/orderapi/server.gen.go ## Run the unit tests
+test.unit::  gen.app ## Run the unit tests
 	cd app && \
 		go test -race -cover ./...
 
@@ -70,7 +74,7 @@ test.smoke:: ## Run the smoke tests
 	cd test-smoke && \
 		go test -count=1 ./...
 
-test.integration:: test-integration/orderapi/client.gen.go ## Run the integration tests
+test.integration:: gen.test ## Run the integration tests
 	cd test-integration && \
 		go test -count=1 ./...
 
@@ -89,7 +93,7 @@ database.migrate:: ## Migrate database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 		--network host \
 		--volume ${PWD}/migration-database:/flyway/sql \
 		--volume ${PWD}/migration-database/${PROFILE}.conf:/flyway/conf/flyway.conf \
-		flyway/flyway:9.16.1-alpine \
+		flyway/flyway:9.17.0-alpine \
 		clean \
 		migrate \
 		-user=${FLYWAY_USER} \

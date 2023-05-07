@@ -14,7 +14,7 @@ export const options = {
             executor: 'constant-vus',
             exec: 'fullScenario',
             vus: 2,
-            duration: '15s',
+            duration: '300s',
         },
     },
 };

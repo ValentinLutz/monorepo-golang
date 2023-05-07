@@ -4,7 +4,7 @@ import (
 	"embed"
 	"io/fs"
 	"monorepo/libraries/apputil/httpresponse"
-	"monorepo/services/order/app/incoming/orderapi"
+	"monorepo/services/order/app/incoming/http/orderapi"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
