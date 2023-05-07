@@ -13,7 +13,7 @@ export const options = {
         full_scenario: {
             executor: 'constant-vus',
             exec: 'fullScenario',
-            vus: 2,
+            vus: 10,
             duration: '300s',
         },
     },
