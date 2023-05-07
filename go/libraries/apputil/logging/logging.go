@@ -99,7 +99,7 @@ func NewLoggerWrapper(logger Logger) *LoggerWrapper {
 }
 
 func (loggerWrapper *LoggerWrapper) Write(bytes []byte) (n int, err error) {
-	loggerWrapper.logger.Error().Err(createErrorFromBytes(bytes)).Msg("server error")
+	loggerWrapper.logger.Warn().Err(createErrorFromBytes(bytes)).Msg("server error")
 	return len(bytes), nil
 }
 
