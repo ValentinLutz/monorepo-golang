@@ -70,7 +70,7 @@ func NewDatabaseStats(statsGetter StatsGetter, opts DatabaseOpts) *DatabaseStats
 			opts.ConstLabels,
 		),
 		waitDuration: prometheus.NewDesc(
-			prometheus.BuildFQName(opts.Namespace, opts.Subsystem, "database_wait_duration"),
+			prometheus.BuildFQName(opts.Namespace, opts.Subsystem, "database_wait_duration_seconds"),
 			"The total time blocked waiting for a new connection.",
 			nil,
 			opts.ConstLabels,
@@ -142,7 +142,7 @@ func (databaseStats DatabaseStats) Collect(ch chan<- prometheus.Metric) {
 	ch <- prometheus.MustNewConstMetric(
 		databaseStats.waitDuration,
 		prometheus.CounterValue,
-		stats.WaitDuration.Seconds(),
+		float64(stats.WaitDuration.Seconds()),
 	)
 	ch <- prometheus.MustNewConstMetric(
 		databaseStats.maxIdleClosed,
