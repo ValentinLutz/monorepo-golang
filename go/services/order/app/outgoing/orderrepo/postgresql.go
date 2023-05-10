@@ -113,34 +113,37 @@ func (orderRepository *PostgreSQL) FindOrderByOrderId(ctx context.Context, order
 }
 
 func (orderRepository *PostgreSQL) SaveOrder(ctx context.Context, order model.Order) error {
-	txx, err := orderRepository.BeginTxx(ctx, nil)
-	defer func(txx *sqlx.Tx) {
-		err := txx.Commit()
+	return orderRepository.execTx(ctx, func(tx *sqlx.Tx) error {
+		_, err := tx.NamedExec(
+			"INSERT INTO order_service.order (order_id, customer_id, creation_date, order_status, order_workflow) VALUES (:order_id, :customer_id, :creation_date, :order_status, :order_workflow)",
+			NewOrderEntity(order),
+		)
 		if err != nil {
-			txx.Rollback()
+			return err
 		}
-	}(txx)
+
+		_, err = tx.NamedExec(
+			"INSERT INTO order_service.order_item (order_id, creation_date, order_item_name) VALUES (:order_id, :creation_date, :order_item_name)",
+			NewOrderItemEntities(order.OrderId, order.Items),
+		)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func (orderRepository *PostgreSQL) execTx(ctx context.Context, fn func(*sqlx.Tx) error) error {
+	tx, err := orderRepository.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	_, err = txx.NamedExec(
-		"INSERT INTO order_service.order (order_id, customer_id, creation_date, order_status, order_workflow) VALUES (:order_id, :customer_id, :creation_date, :order_status, :order_workflow)",
-		NewOrderEntity(order),
-	)
+	err = fn(tx)
 	if err != nil {
-		txx.Rollback()
-		return err
+		return errors.Join(err, tx.Rollback())
 	}
 
-	_, err = txx.NamedExec(
-		"INSERT INTO order_service.order_item (order_id, creation_date, order_item_name) VALUES (:order_id, :creation_date, :order_item_name)",
-		NewOrderItemEntities(order.OrderId, order.Items),
-	)
-	if err != nil {
-		txx.Rollback()
-		return err
-	}
-
-	return nil
+	return tx.Commit()
 }
