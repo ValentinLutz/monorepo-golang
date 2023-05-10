@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 type Order struct {
@@ -89,7 +88,7 @@ func (service *Order) PlaceOrder(ctx context.Context, customerId uuid.UUID, item
 func (service *Order) GetOrder(ctx context.Context, orderId model.OrderId) (model.Order, error) {
 	order, err := service.orderRepository.FindOrderByOrderId(ctx, orderId)
 	if err != nil {
-		return model.Order{}, errors.Wrapf(err, "order id is '%v'", orderId)
+		return model.Order{}, err
 	}
 
 	return order, nil

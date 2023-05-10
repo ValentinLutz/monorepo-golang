@@ -1,6 +1,6 @@
 {
   "code": 4004,
-  "message": "order id is 'NOPE': no order was found",
+  "message": "sql: no rows in result set\norder not found",
   "method": "GET",
   "path": "/orders/NOPE",
   "timestamp": "2022-09-04T19:43:56.0185708Z",

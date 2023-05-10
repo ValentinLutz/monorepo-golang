@@ -92,7 +92,7 @@ func (orderRepository *PostgreSQL) FindOrderByOrderId(ctx context.Context, order
 		orderId,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return model.Order{}, port.OrderNotFound
+		return model.Order{}, errors.Join(err, port.OrderNotFoundError)
 	}
 	if err != nil {
 		return model.Order{}, err

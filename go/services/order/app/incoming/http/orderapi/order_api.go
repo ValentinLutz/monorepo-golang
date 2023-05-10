@@ -81,7 +81,7 @@ func (api *API) PostOrders(w http.ResponseWriter, r *http.Request) {
 
 func (api *API) GetOrder(w http.ResponseWriter, r *http.Request, orderId string) {
 	order, err := api.service.GetOrder(r.Context(), model.OrderId(orderId))
-	if errors.Is(err, port.OrderNotFound) {
+	if errors.Is(err, port.OrderNotFoundError) {
 		httpresponse.ErrorWithBody(w, http.StatusNotFound, NewErrorResponse(r, 4004, err))
 		return
 	}

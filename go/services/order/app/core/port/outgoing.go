@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	OrderNotFound = errors.New("no order was found")
+	OrderNotFoundError = errors.New("order not found")
 )
 
 type OrderRepository interface {
