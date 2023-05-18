@@ -1,20 +1,14 @@
+# JetBrains IDEs
+.idea
+
 # Config for local development
 **/app/config/*.crt
 **/app/config/*.key
 **/app/config/*.yaml
-
 **/openapi/spec/*.yaml
-
-**/deployment-kubernetes/base/config.yaml
 
 # Generated GO clients
 *.gen.go
 
-# Rust
-target
-
-# JetBrains IDEs
-.idea
-
-# k6
+# K6
 node_modules
