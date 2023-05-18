@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine3.17 AS builder
+FROM golang:1.20-alpine3.18 AS builder
 WORKDIR /build
 COPY ./libraries ./libraries
 
@@ -8,7 +8,7 @@ WORKDIR /build/services/order/app
 COPY ./services/order/app ./
 RUN go build -o app
 
-FROM alpine:3.17
+FROM alpine:3.18
 WORKDIR /app
 COPY --from=builder /build/services/order/app/app ./
 CMD ["./app"]
