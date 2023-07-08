@@ -48,14 +48,14 @@ func RequestResponseLogging(next http.Handler) http.Handler {
 		reader := io.NopCloser(bytes.NewBuffer(requestBody))
 		request.Body = reader
 
-		responseWriterContainer := newResponseWriterContainer(responseWriter)
+		responseWriterWrapper := newResponseWriterWrapper(responseWriter)
 
-		next.ServeHTTP(responseWriterContainer, request)
+		next.ServeHTTP(responseWriterWrapper, request)
 
-		if responseWriterContainer.statusCode >= 400 {
+		if responseWriterWrapper.statusCode >= 400 {
 			requestContext := request.Context()
 			logRequest(requestContext, request, requestBody)
-			logResponse(requestContext, responseWriterContainer, time.Since(startTime))
+			logResponse(requestContext, responseWriterWrapper, time.Since(startTime))
 		}
 	})
 }

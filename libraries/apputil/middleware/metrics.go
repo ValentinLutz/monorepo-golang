@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"monorepo/libraries/apputil/metrics"
 	"net/http"
 	"strconv"
 	"time"
@@ -9,35 +10,41 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type ResponseTimeMetric struct {
-	Histogram *prometheus.HistogramVec
+type HttpResponseTimeMetric struct {
+	*prometheus.HistogramVec
 }
 
-func NewResponseTimeMetric(histogram *prometheus.HistogramVec) *ResponseTimeMetric {
-	return &ResponseTimeMetric{
-		Histogram: histogram,
+func NewHttpResponseTimeHistogramMetric() *HttpResponseTimeMetric {
+	responseTimeHistogram := metrics.NewHttpResponseTimeHistogram(metrics.HttpResponseTimeOps{
+		Namespace:  "app",
+		LabelNames: []string{"method", "route", "code"},
+	})
+
+	return &HttpResponseTimeMetric{
+		HistogramVec: responseTimeHistogram,
 	}
 }
 
-func (responseTimeMetric *ResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
+func (httpResponseTimeMetric *HttpResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
 		startTime := time.Now()
 
-		responseWriterContainer := newResponseWriterContainer(responseWriter)
+		responseWriterContainer := newResponseWriterWrapper(responseWriter)
 
 		next.ServeHTTP(responseWriterContainer, request)
 
-		duration := time.Since(startTime)
 		statusCode := strconv.Itoa(responseWriterContainer.statusCode)
 		route := getRoutePattern(request)
-		responseTimeMetric.Histogram.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
+		duration := time.Since(startTime)
+		httpResponseTimeMetric.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
 	})
 }
 
-func getRoutePattern(r *http.Request) string {
-	reqContext := chi.RouteContext(r.Context())
-	if pattern := reqContext.RoutePattern(); pattern != "" {
-		return pattern
+func getRoutePattern(request *http.Request) string {
+	routeContext := chi.RouteContext(request.Context())
+	routePattern := routeContext.RoutePattern()
+	if routePattern == "" {
+		return "undefined"
 	}
-	return "undefined"
+	return routePattern
 }

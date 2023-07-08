@@ -74,13 +74,12 @@ func newHandler(logger logging.Logger, config config.Config, database *infastruc
 	})
 	prometheus.MustRegister(databaseStats)
 
-	responseTimeHistogram := metrics.NewResponseTimeHistogram()
-	prometheus.MustRegister(responseTimeHistogram)
-	responseTimeMetric := middleware.NewResponseTimeMetric(responseTimeHistogram)
+	responseTimeHistogramMetric := middleware.NewHttpResponseTimeHistogramMetric()
+	prometheus.MustRegister(responseTimeHistogramMetric)
 
 	router.Group(func(r chi.Router) {
 		r.Use(hlog.NewHandler(logger.Logger))
-		r.Use(responseTimeMetric.ResponseTimes)
+		r.Use(responseTimeHistogramMetric.ResponseTimes)
 		r.Use(middleware.CorrelationId)
 		r.Use(middleware.RequestResponseLogging)
 		r.Use(authentication.BasicAuth)

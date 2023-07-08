@@ -10,6 +10,13 @@ type StatsGetter interface {
 	Stats() sql.DBStats
 }
 
+// DatabaseOpts is a reduced variation of the prometheus.Opts
+type DatabaseOpts struct {
+	Namespace   string
+	Subsystem   string
+	ConstLabels prometheus.Labels
+}
+
 // DatabaseStats contains database statistics from sql.DBStats.
 type DatabaseStats struct {
 	StatsGetter
@@ -27,13 +34,6 @@ type DatabaseStats struct {
 	maxIdleClosed     *prometheus.Desc // The total number of connections closed due to SetMaxIdleConns.
 	maxIdleTimeClosed *prometheus.Desc // The total number of connections closed due to SetConnMaxIdleTime.
 	maxLifetimeClosed *prometheus.Desc // The total number of connections closed due to SetConnMaxLifetime.
-}
-
-// DatabaseOpts is a reduced variation of the prometheus.Opts
-type DatabaseOpts struct {
-	Namespace   string
-	Subsystem   string
-	ConstLabels prometheus.Labels
 }
 
 func NewDatabaseStats(statsGetter StatsGetter, opts DatabaseOpts) *DatabaseStats {

@@ -8,11 +8,12 @@ import (
 // the written HTTP statusCode and the written HTTP body to be captured.
 type responseWriterWrapper struct {
 	http.ResponseWriter
+
 	statusCode int
 	body       []byte
 }
 
-func newResponseWriterContainer(responseWriter http.ResponseWriter) *responseWriterWrapper {
+func newResponseWriterWrapper(responseWriter http.ResponseWriter) *responseWriterWrapper {
 	return &responseWriterWrapper{ResponseWriter: responseWriter}
 }
 
