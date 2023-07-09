@@ -10,5 +10,8 @@
 # Generated GO clients
 *.gen.go
 
+# Taskfile
+.task
+
 # K6
 node_modules

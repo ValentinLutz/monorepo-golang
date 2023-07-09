@@ -4,18 +4,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"monorepo/libraries/testingutil"
 	"monorepo/services/order/test-integration/orderapi"
 	"net/http"
 	"os"
 	"testing"
-
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
-	testingutil.LoadAndExec(orderapi.GetTestDatabaseInstance(), "truncate_tables.sql")
+	testingutil.LoadAndExec(orderapi.GetTestDatabaseInstance(), "../truncate_tables.sql")
 
 	code := m.Run()
 	os.Exit(code)
