@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"monorepo/libraries/apputil/logging"
+	"golang.org/x/exp/slog"
+	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -17,34 +19,30 @@ type ServerConfig struct {
 
 type Server struct {
 	*http.Server
-	logger logging.Logger
 	config ServerConfig
 }
 
-func NewServer(logger logging.Logger, config ServerConfig, handler http.Handler) *Server {
+func NewServer(config ServerConfig, handler http.Handler, logger *log.Logger) *Server {
 	server := &http.Server{
 		Addr:     fmt.Sprintf(":%d", config.Port),
 		Handler:  handler,
-		ErrorLog: logging.NewLoggerWrapper(logger).ToLogger(),
+		ErrorLog: logger,
 	}
-
 	return &Server{
 		Server: server,
-		logger: logger,
 		config: config,
 	}
 }
 
 func (server *Server) Start() {
-	server.logger.Info().
-		Int("port", server.config.Port).
-		Msg("starting server")
+	slog.With("port", server.config.Port).
+		Info("starting server")
 
 	err := server.ListenAndServeTLS(server.config.CertificatePath, server.config.KeyPath)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		server.logger.Fatal().
-			Err(err).
-			Msg("failed to start server")
+		slog.With("err", err).
+			Error("failed to start server")
+		os.Exit(1)
 	}
 }
 
@@ -53,17 +51,16 @@ func (server *Server) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	server.logger.Info().
-		Float64("timeout", timeout.Seconds()).
-		Msg("stopping server")
+	slog.With("timeout", timeout.Seconds()).
+		Info("stopping server")
+
 	err := server.Shutdown(ctx)
 	if err != nil {
-		server.logger.Fatal().
-			Err(err).
-			Msg("failed to stop server gracefully")
+		slog.With("err", err).
+			Error("failed to stop server gracefully")
+		os.Exit(1)
 	}
-	server.logger.Info().
-		Msg("server stopped")
+	slog.Info("server stopped")
 
 	// stop other connections like message queue
 }

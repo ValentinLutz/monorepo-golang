@@ -2,24 +2,21 @@ package infastructure
 
 import (
 	"context"
-	"monorepo/libraries/apputil/logging"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+	"golang.org/x/exp/slog"
 )
 
 type SQSClient struct {
 	*sqs.Client
 	queueUrl string
-	logger   logging.Logger
 }
 
-func NewSQSClient(config aws.Config, queueUrl string, logger logging.Logger) *SQSClient {
+func NewSQSClient(config aws.Config, queueUrl string) *SQSClient {
 	return &SQSClient{
 		Client:   sqs.NewFromConfig(config),
 		queueUrl: queueUrl,
-		logger:   logger,
 	}
 }
 
@@ -31,9 +28,9 @@ func (sqsClient *SQSClient) PollMessage(ctx context.Context, channel chan<- *typ
 		MaxNumberOfMessages: 10,
 	})
 	if err != nil {
-		sqsClient.logger.Error().
-			Err(err).
-			Msgf("failed to receive message from '%v'", sqsClient.queueUrl)
+		slog.With("err", err).
+			With("queue_url", sqsClient.queueUrl).
+			Error("failed to receive message")
 	}
 
 	for _, message := range receiveMessageOutput.Messages {
@@ -47,8 +44,8 @@ func (sqsClient *SQSClient) DeleteMessage(ctx context.Context, message types.Mes
 		ReceiptHandle: message.ReceiptHandle,
 	})
 	if err != nil {
-		sqsClient.logger.Error().
-			Err(err).
-			Msgf("failed to delete message from '%v'", sqsClient.queueUrl)
+		slog.With("err", err).
+			With("queue_url", sqsClient.queueUrl).
+			Error("failed to delete message")
 	}
 }

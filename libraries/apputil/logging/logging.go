@@ -1,56 +1,23 @@
 package logging
 
 import (
-	"errors"
 	"fmt"
-	"io"
+	"golang.org/x/exp/slog"
 	"log"
 	"os"
-	"strings"
-	"time"
-
-	"github.com/rs/zerolog"
 )
-
-type CorrelationIdKey struct{}
 
 type LogLevel string
 
 const (
-	TRACE LogLevel = "TRACE"
 	DEBUG LogLevel = "DEBUG"
 	INFO  LogLevel = "INFO"
 	WARN  LogLevel = "WARN"
 	ERROR LogLevel = "ERROR"
-	FATAL LogLevel = "FATAL"
-	PANIC LogLevel = "PANIC"
 )
 
 type LoggerConfig struct {
-	Json  bool     `yaml:"json"`
 	Level LogLevel `yaml:"level"`
-}
-
-type Logger struct {
-	zerolog.Logger
-}
-
-func NewLogger(config LoggerConfig) Logger {
-	var writer io.Writer
-	if config.Json {
-		writer = os.Stdout
-	} else {
-		writer = zerolog.ConsoleWriter{
-			Out:        os.Stdout,
-			TimeFormat: time.RFC3339,
-		}
-	}
-
-	zerolog.SetGlobalLevel(config.Level.toZeroLogLevel())
-	zeroLogger := zerolog.New(writer).With().Timestamp().Logger()
-	return Logger{
-		Logger: zeroLogger,
-	}
 }
 
 func (logLevel *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -63,52 +30,53 @@ func (logLevel *LogLevel) UnmarshalYAML(unmarshal func(interface{}) error) error
 	parsedLogLevel := LogLevel(logLevelString)
 
 	switch parsedLogLevel {
-	case TRACE, DEBUG, INFO, WARN, ERROR, FATAL, PANIC:
+	case DEBUG, INFO, WARN, ERROR:
 		*logLevel = parsedLogLevel
 		return nil
 	}
-	return fmt.Errorf("log level '%v' is invalid", parsedLogLevel)
+	return fmt.Errorf("invalid log level '%v'", parsedLogLevel)
 }
 
-func (logLevel *LogLevel) toZeroLogLevel() zerolog.Level {
+func (logLevel *LogLevel) toSlogLevel() (slog.Level, error) {
 	switch *logLevel {
-	case TRACE:
-		return zerolog.TraceLevel
 	case DEBUG:
-		return zerolog.DebugLevel
+		return slog.LevelDebug, nil
 	case INFO:
-		return zerolog.InfoLevel
+		return slog.LevelInfo, nil
 	case WARN:
-		return zerolog.WarnLevel
+		return slog.LevelWarn, nil
 	case ERROR:
-		return zerolog.ErrorLevel
-	case FATAL:
-		return zerolog.FatalLevel
-	case PANIC:
-		return zerolog.PanicLevel
+		return slog.LevelError, nil
 	}
-	return zerolog.NoLevel
+	return 0, fmt.Errorf("unknown log level '%v'", *logLevel)
 }
 
-type LoggerWrapper struct {
-	logger Logger
+func NewSlogHandler(config LoggerConfig) slog.Handler {
+	slogLevel, err := config.Level.toSlogLevel()
+	if err != nil {
+		slog.With("err", err).Error("failed to parse log level")
+		os.Exit(1)
+	}
+
+	return slog.NewTextHandler(
+		os.Stdout,
+		&slog.HandlerOptions{
+			AddSource: true,
+			Level:     slogLevel,
+		},
+	)
 }
 
-func NewLoggerWrapper(logger Logger) *LoggerWrapper {
-	return &LoggerWrapper{logger: logger}
+func NewSlogLogger(handler slog.Handler) *slog.Logger {
+	return slog.New(handler)
 }
 
-func (loggerWrapper *LoggerWrapper) Write(bytes []byte) (n int, err error) {
-	loggerWrapper.logger.Warn().Err(createErrorFromBytes(bytes)).Msg("server error")
-	return len(bytes), nil
-}
+func NewLogger(handler slog.Handler, config LoggerConfig) *log.Logger {
+	slogLevel, err := config.Level.toSlogLevel()
+	if err != nil {
+		slog.With("err", err).Error("failed to parse log level")
+		os.Exit(1)
+	}
 
-func (loggerWrapper *LoggerWrapper) ToLogger() *log.Logger {
-	return log.New(loggerWrapper, "", 0)
-}
-
-func createErrorFromBytes(bytes []byte) error {
-	errorString := string(bytes)
-	errorString = strings.TrimSpace(errorString)
-	return errors.New(errorString)
+	return slog.NewLogLogger(handler, slogLevel)
 }

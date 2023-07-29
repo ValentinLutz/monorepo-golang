@@ -2,7 +2,8 @@ package infastructure
 
 import (
 	"fmt"
-	"monorepo/libraries/apputil/logging"
+	"golang.org/x/exp/slog"
+	"os"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -23,10 +24,9 @@ type DatabaseConfig struct {
 
 type Database struct {
 	*sqlx.DB
-	logger logging.Logger
 }
 
-func NewDatabase(logger logging.Logger, config DatabaseConfig) *Database {
+func NewDatabase(config DatabaseConfig) *Database {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Host, config.Port, config.Username, config.Password, config.Database,
@@ -34,9 +34,9 @@ func NewDatabase(logger logging.Logger, config DatabaseConfig) *Database {
 
 	db, err := sqlx.Open("postgres", psqlInfo)
 	if err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("failed to connect to database")
+		slog.With("err", err).
+			Error("failed to connect to database")
+		os.Exit(1)
 	}
 
 	db.SetMaxIdleConns(config.MaxIdleConnections)
@@ -46,14 +46,12 @@ func NewDatabase(logger logging.Logger, config DatabaseConfig) *Database {
 
 	err = db.Ping()
 	if err != nil {
-		db.Close()
-		logger.Fatal().
-			Err(err).
-			Msg("failed to ping database")
+		_ = db.Close()
+		slog.With("err", err).Error("failed to ping database")
+		os.Exit(1)
 	}
 
 	return &Database{
-		DB:     db,
-		logger: logger,
+		DB: db,
 	}
 }

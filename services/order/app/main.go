@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"golang.org/x/exp/slog"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/metrics"
@@ -19,8 +20,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog/hlog"
-	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -32,32 +31,37 @@ func main() {
 
 	appConfig, err := config.New(configFile)
 	if err != nil {
-		log.Fatal().
-			Err(err).
-			Str("path", configFile).
-			Msg("failed to load config file")
+		slog.With("err", err).
+			With("path", configFile).
+			Error("failed to load config file")
+		os.Exit(1)
 	}
 
-	logger := logging.NewLogger(appConfig.Logger)
+	slogHandler := logging.NewSlogHandler(appConfig.Logger)
+	contextHandler := logging.NewContextHandler(slogHandler, map[any]string{
+		logging.CorrelationIdKey{}: "correlation_id",
+	})
+	logger := logging.NewSlogLogger(contextHandler)
+	slog.SetDefault(logger)
 
-	database := infastructure.NewDatabase(logger, appConfig.Database)
+	logLogger := logging.NewLogger(contextHandler, appConfig.Logger)
 
-	handler := newHandler(logger, appConfig, database)
-	server := infastructure.NewServer(logger, appConfig.Server, handler)
+	database := infastructure.NewDatabase(appConfig.Database)
+
+	handler := newHandler(appConfig, database)
+	server := infastructure.NewServer(appConfig.Server, handler, logLogger)
 
 	go server.Start()
 
 	stopChannel := make(chan os.Signal, 1)
 	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGTERM)
-	logger.
-		Info().
-		Str("signal", (<-stopChannel).String()).
-		Msg("received signal")
+	slog.With("signal", (<-stopChannel).String()).
+		Info("received signal")
 
 	server.Stop()
 }
 
-func newHandler(logger logging.Logger, config config.Config, database *infastructure.Database) http.Handler {
+func newHandler(config config.Config, database *infastructure.Database) http.Handler {
 	router := chi.NewRouter()
 
 	orderRepository := orderrepo.NewPostgreSQL(database)
@@ -78,7 +82,6 @@ func newHandler(logger logging.Logger, config config.Config, database *infastruc
 	prometheus.MustRegister(responseTimeHistogramMetric)
 
 	router.Group(func(r chi.Router) {
-		r.Use(hlog.NewHandler(logger.Logger))
 		r.Use(responseTimeHistogramMetric.ResponseTimes)
 		r.Use(middleware.CorrelationId)
 		r.Use(middleware.RequestResponseLogging)
@@ -87,14 +90,14 @@ func newHandler(logger logging.Logger, config config.Config, database *infastruc
 	})
 
 	router.Group(func(r chi.Router) {
-		statusAPI := statusapi.New(logger, config, database)
+		statusAPI := statusapi.New(config, database)
 		statusAPI.RegisterRoutes(r)
 
 		openAPI := openapi.New()
 		openAPI.RegisterRoutes(r)
 	})
 
-	logging.LogRoutes(logger, router)
+	logging.LogRoutes(router)
 
 	return router
 }

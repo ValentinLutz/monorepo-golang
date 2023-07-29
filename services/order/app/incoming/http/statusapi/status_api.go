@@ -2,10 +2,11 @@ package statusapi
 
 import (
 	"fmt"
+	"golang.org/x/exp/slog"
 	"monorepo/libraries/apputil/infastructure"
-	"monorepo/libraries/apputil/logging"
 	"monorepo/services/order/app/config"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -15,16 +16,14 @@ import (
 )
 
 type API struct {
-	logger  logging.Logger
-	config  config.Config
-	databse *infastructure.Database
+	config   config.Config
+	database *infastructure.Database
 }
 
-func New(logger logging.Logger, config config.Config, databse *infastructure.Database) *API {
+func New(config config.Config, database *infastructure.Database) *API {
 	return &API{
-		logger:  logger,
-		config:  config,
-		databse: databse,
+		config:   config,
+		database: database,
 	}
 }
 
@@ -41,9 +40,9 @@ func (api *API) registerHealthChecks() http.HandlerFunc {
 		Version: api.config.Version,
 	}))
 	if err != nil {
-		api.logger.Fatal().
-			Err(err).
-			Msg("failed to create health container")
+		slog.With("err", err).
+			Error("failed to create health container")
+		os.Exit(1)
 	}
 
 	databaseConfig := api.config.Database
@@ -60,9 +59,9 @@ func (api *API) registerHealthChecks() http.HandlerFunc {
 		}),
 	})
 	if err != nil {
-		api.logger.Fatal().
-			Err(err).
-			Msg("failed to create postgres health check")
+		slog.With("err", err).
+			Error("failed to register postgres health check")
+		os.Exit(1)
 	}
 
 	return healthStatus.HandlerFunc
