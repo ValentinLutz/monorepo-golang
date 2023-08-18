@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"golang.org/x/exp/slog"
+	"log/slog"
 	"net/http"
 	"strings"
 

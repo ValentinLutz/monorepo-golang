@@ -2,8 +2,8 @@ package logging
 
 import (
 	"fmt"
-	"golang.org/x/exp/slog"
 	"log"
+	"log/slog"
 	"os"
 )
 

@@ -2,7 +2,7 @@ package infastructure
 
 import (
 	"fmt"
-	"golang.org/x/exp/slog"
+	"log/slog"
 	"os"
 	"time"
 

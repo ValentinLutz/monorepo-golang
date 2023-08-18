@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"golang.org/x/exp/slog"
+	"log/slog"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/metrics"
@@ -38,9 +38,7 @@ func main() {
 	}
 
 	slogHandler := logging.NewSlogHandler(appConfig.Logger)
-	contextHandler := logging.NewContextHandler(slogHandler, map[any]string{
-		logging.CorrelationIdKey{}: "correlation_id",
-	})
+	contextHandler := logging.NewContextHandler(slogHandler)
 	logger := logging.NewSlogLogger(contextHandler)
 	slog.SetDefault(logger)
 

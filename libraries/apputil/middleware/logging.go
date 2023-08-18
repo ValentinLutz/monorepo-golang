@@ -3,8 +3,8 @@ package middleware
 import (
 	"bytes"
 	"context"
-	"golang.org/x/exp/slog"
 	"io"
+	"log/slog"
 	"monorepo/libraries/apputil/logging"
 	"net/http"
 	"time"
@@ -19,7 +19,11 @@ func CorrelationId(next http.Handler) http.Handler {
 			correlationId = uuid.NewString()
 		}
 
-		requestContext := context.WithValue(request.Context(), logging.CorrelationIdKey{}, correlationId)
+		requestContext := logging.WithValue(
+			request.Context(),
+			logging.SlogContextKey{Name: "correlation_id"},
+			correlationId,
+		)
 		request = request.WithContext(requestContext)
 
 		responseWriter.Header().Set("Correlation-Id", correlationId)

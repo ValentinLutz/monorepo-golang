@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func NewErrorResponse(r *http.Request, errorCode int, error error) ErrorResponse {
-	correlationId := r.Context().Value(logging.CorrelationIdKey{})
-	if correlationId == nil {
+func NewErrorResponse(request *http.Request, errorCode int, error error) ErrorResponse {
+	correlationId, ok := request.Context().Value(logging.CorrelationIdKey).(string)
+	if !ok {
 		correlationId = uuid.NewString()
 	}
 
@@ -22,10 +22,10 @@ func NewErrorResponse(r *http.Request, errorCode int, error error) ErrorResponse
 	errorResponse := ErrorResponse{
 		Code:          errorCode,
 		Message:       &err,
-		Method:        r.Method,
-		Path:          r.RequestURI,
+		Method:        request.Method,
+		Path:          request.RequestURI,
 		Timestamp:     time.Now().UTC(),
-		CorrelationId: correlationId.(string),
+		CorrelationId: correlationId,
 	}
 
 	return errorResponse

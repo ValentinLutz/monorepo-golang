@@ -2,7 +2,7 @@ package statusapi
 
 import (
 	"fmt"
-	"golang.org/x/exp/slog"
+	"log/slog"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/services/order/app/config"
 	"net/http"
