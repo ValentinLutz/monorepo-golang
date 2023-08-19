@@ -21,10 +21,12 @@ func New() *API {
 }
 
 func (a *API) RegisterRoutes(router chi.Router) {
-	router.Group(func(r chi.Router) {
-		r.Get("/openapi/order_api.json", a.GetOrderAPISpec)
-		r.Get("/swagger/*", a.GetSwaggerUI)
-	})
+	router.Group(
+		func(r chi.Router) {
+			r.Get("/openapi/order_api.json", a.GetOrderAPISpec)
+			r.Get("/swagger/*", a.GetSwaggerUI)
+		},
+	)
 }
 
 func (a *API) GetSwaggerUI(w http.ResponseWriter, r *http.Request) {

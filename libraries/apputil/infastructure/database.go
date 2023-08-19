@@ -34,8 +34,10 @@ func NewDatabase(config DatabaseConfig) *Database {
 
 	db, err := sqlx.Open("postgres", psqlInfo)
 	if err != nil {
-		slog.With("err", err).
-			Error("failed to connect to database")
+		slog.Error(
+			"failed to connect to database",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 
@@ -47,7 +49,10 @@ func NewDatabase(config DatabaseConfig) *Database {
 	err = db.Ping()
 	if err != nil {
 		_ = db.Close()
-		slog.With("err", err).Error("failed to ping database")
+		slog.Error(
+			"failed to ping database",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 

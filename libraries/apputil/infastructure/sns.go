@@ -21,18 +21,26 @@ func NewSNSClient(config aws.Config, topicArn string) *SNSClient {
 }
 
 func (snsClient *SNSClient) PublishMessage(ctx context.Context, message string) (*sns.PublishOutput, error) {
-	result, err := snsClient.Publish(ctx, &sns.PublishInput{
-		TopicArn: &snsClient.topicArn,
-		Message:  &message,
-	})
+	result, err := snsClient.Publish(
+		ctx, &sns.PublishInput{
+			TopicArn: &snsClient.topicArn,
+			Message:  &message,
+		},
+	)
 	return result, err
 }
 
-func (snsClient *SNSClient) PublishMessageWithAttributes(ctx context.Context, message string, messageAttributes map[string]types.MessageAttributeValue) (*sns.PublishOutput, error) {
-	result, err := snsClient.Publish(ctx, &sns.PublishInput{
-		TopicArn:          &snsClient.topicArn,
-		Message:           &message,
-		MessageAttributes: messageAttributes,
-	})
+func (snsClient *SNSClient) PublishMessageWithAttributes(
+	ctx context.Context,
+	message string,
+	messageAttributes map[string]types.MessageAttributeValue,
+) (*sns.PublishOutput, error) {
+	result, err := snsClient.Publish(
+		ctx, &sns.PublishInput{
+			TopicArn:          &snsClient.topicArn,
+			Message:           &message,
+			MessageAttributes: messageAttributes,
+		},
+	)
 	return result, err
 }

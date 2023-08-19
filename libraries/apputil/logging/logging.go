@@ -54,11 +54,14 @@ func (logLevel *LogLevel) toSlogLevel() (slog.Level, error) {
 func NewSlogHandler(config LoggerConfig) slog.Handler {
 	slogLevel, err := config.Level.toSlogLevel()
 	if err != nil {
-		slog.With("err", err).Error("failed to parse log level")
+		slog.Error(
+			"failed to parse log level",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 
-	return slog.NewTextHandler(
+	return slog.NewJSONHandler(
 		os.Stdout,
 		&slog.HandlerOptions{
 			AddSource: true,
@@ -74,7 +77,10 @@ func NewSlogLogger(handler slog.Handler) *slog.Logger {
 func NewLogger(handler slog.Handler, config LoggerConfig) *log.Logger {
 	slogLevel, err := config.Level.toSlogLevel()
 	if err != nil {
-		slog.With("err", err).Error("failed to parse log level")
+		slog.Error(
+			"failed to parse log level",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 

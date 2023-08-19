@@ -21,16 +21,20 @@ func NewSQSClient(config aws.Config, queueUrl string) *SQSClient {
 }
 
 func (sqsClient *SQSClient) PollMessage(ctx context.Context, channel chan<- *types.Message) {
-	receiveMessageOutput, err := sqsClient.ReceiveMessage(ctx, &sqs.ReceiveMessageInput{
-		QueueUrl:            &sqsClient.queueUrl,
-		AttributeNames:      []types.QueueAttributeName{types.QueueAttributeNameAll},
-		WaitTimeSeconds:     20,
-		MaxNumberOfMessages: 10,
-	})
+	receiveMessageOutput, err := sqsClient.ReceiveMessage(
+		ctx, &sqs.ReceiveMessageInput{
+			QueueUrl:            &sqsClient.queueUrl,
+			AttributeNames:      []types.QueueAttributeName{types.QueueAttributeNameAll},
+			WaitTimeSeconds:     20,
+			MaxNumberOfMessages: 10,
+		},
+	)
 	if err != nil {
-		slog.With("err", err).
-			With("queue_url", sqsClient.queueUrl).
-			Error("failed to receive message")
+		slog.Error(
+			"failed to receive message",
+			slog.Any("err", err),
+			slog.String("queue_url", sqsClient.queueUrl),
+		)
 	}
 
 	for _, message := range receiveMessageOutput.Messages {
@@ -39,13 +43,17 @@ func (sqsClient *SQSClient) PollMessage(ctx context.Context, channel chan<- *typ
 }
 
 func (sqsClient *SQSClient) DeleteMessage(ctx context.Context, message types.Message) {
-	_, err := sqsClient.Client.DeleteMessage(ctx, &sqs.DeleteMessageInput{
-		QueueUrl:      &sqsClient.queueUrl,
-		ReceiptHandle: message.ReceiptHandle,
-	})
+	_, err := sqsClient.Client.DeleteMessage(
+		ctx, &sqs.DeleteMessageInput{
+			QueueUrl:      &sqsClient.queueUrl,
+			ReceiptHandle: message.ReceiptHandle,
+		},
+	)
 	if err != nil {
-		slog.With("err", err).
-			With("queue_url", sqsClient.queueUrl).
-			Error("failed to delete message")
+		slog.Error(
+			"failed to delete message",
+			slog.Any("err", err),
+			slog.String("queue_url", sqsClient.queueUrl),
+		)
 	}
 }

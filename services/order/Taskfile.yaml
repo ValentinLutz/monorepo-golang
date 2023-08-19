@@ -154,7 +154,9 @@ tasks:
     cmds:
       - docker compose -p ${PROJECT_NAME}
         -f ./docker-compose.yaml
-        up -d --force-recreate
+        up -d
+        --force-recreate
+        --wait
 
   docker:app:up:
     desc: Start app docker container
@@ -167,7 +169,9 @@ tasks:
     cmds:
       - docker compose -p ${PROJECT_NAME}
         -f ./app.docker-compose.yaml
-        up --force-recreate --build
+        up
+        --force-recreate
+        --build
 
   docker:down:
     desc: Stop docker containers

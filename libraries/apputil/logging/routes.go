@@ -9,16 +9,26 @@ import (
 )
 
 func LogRoutes(router *chi.Mux) {
-	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+	walkFunc := func(
+		method string,
+		route string,
+		handler http.Handler,
+		middlewares ...func(http.Handler) http.Handler,
+	) error {
 		route = strings.Replace(route, "/*/", "/", -1)
-		slog.With("method", method).
-			With("route", route).
-			Info("register")
+		slog.Info(
+			"register",
+			slog.String("method", method),
+			slog.String("route", route),
+		)
 		return nil
 	}
 
-	if err := chi.Walk(router, walkFunc); err != nil {
-		slog.With("err", err).
-			Error("failed to walk the routing tree")
+	err := chi.Walk(router, walkFunc)
+	if err != nil {
+		slog.Error(
+			"failed to walk the routing tree",
+			slog.Any("err", err),
+		)
 	}
 }

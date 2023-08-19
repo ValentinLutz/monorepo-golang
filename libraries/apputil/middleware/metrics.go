@@ -15,10 +15,12 @@ type HttpResponseTimeMetric struct {
 }
 
 func NewHttpResponseTimeHistogramMetric() *HttpResponseTimeMetric {
-	responseTimeHistogram := metrics.NewHttpResponseTimeHistogram(metrics.HttpResponseTimeOps{
-		Namespace:  "app",
-		LabelNames: []string{"method", "route", "code"},
-	})
+	responseTimeHistogram := metrics.NewHttpResponseTimeHistogram(
+		metrics.HttpResponseTimeOps{
+			Namespace:  "app",
+			LabelNames: []string{"method", "route", "code"},
+		},
+	)
 
 	return &HttpResponseTimeMetric{
 		HistogramVec: responseTimeHistogram,
@@ -26,18 +28,20 @@ func NewHttpResponseTimeHistogramMetric() *HttpResponseTimeMetric {
 }
 
 func (httpResponseTimeMetric *HttpResponseTimeMetric) ResponseTimes(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
-		startTime := time.Now()
+	return http.HandlerFunc(
+		func(responseWriter http.ResponseWriter, request *http.Request) {
+			startTime := time.Now()
 
-		responseWriterContainer := newResponseWriterWrapper(responseWriter)
+			responseWriterContainer := newResponseWriterWrapper(responseWriter)
 
-		next.ServeHTTP(responseWriterContainer, request)
+			next.ServeHTTP(responseWriterContainer, request)
 
-		statusCode := strconv.Itoa(responseWriterContainer.statusCode)
-		route := getRoutePattern(request)
-		duration := time.Since(startTime)
-		httpResponseTimeMetric.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
-	})
+			statusCode := strconv.Itoa(responseWriterContainer.statusCode)
+			route := getRoutePattern(request)
+			duration := time.Since(startTime)
+			httpResponseTimeMetric.WithLabelValues(request.Method, route, statusCode).Observe(duration.Seconds())
+		},
+	)
 }
 
 func getRoutePattern(request *http.Request) string {

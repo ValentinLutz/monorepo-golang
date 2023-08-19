@@ -13,7 +13,7 @@ const (
 	PROD      Environment = "PROD"
 )
 
-// Implements the yaml.Unmarshaler interface.
+// UnmarshalYAML implements the yaml.Unmarshaler interface.
 func (environment *Environment) UnmarshalYAML(unmarshal func(any) error) error {
 	var environmentString string
 	err := unmarshal(&environmentString)
@@ -21,12 +21,12 @@ func (environment *Environment) UnmarshalYAML(unmarshal func(any) error) error {
 		return err
 	}
 
-	unmarshaledEnvironment := Environment(environmentString)
+	unmarshalledEnvironment := Environment(environmentString)
 
-	switch unmarshaledEnvironment {
+	switch unmarshalledEnvironment {
 	case LOCAL, CONTAINER, TEST, PROD:
-		*environment = unmarshaledEnvironment
+		*environment = unmarshalledEnvironment
 		return nil
 	}
-	return fmt.Errorf("environment '%v' is invalid", unmarshaledEnvironment)
+	return fmt.Errorf("environment '%v' is invalid", unmarshalledEnvironment)
 }

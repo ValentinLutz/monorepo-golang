@@ -21,13 +21,20 @@ func NewPostgreSQL(database *infastructure.Database) PostgreSQL {
 	return PostgreSQL{Database: database}
 }
 
-func (orderRepository *PostgreSQL) FindAllOrdersByCustomerId(ctx context.Context, customerId uuid.UUID, offset int, limit int) ([]model.Order, error) {
+func (orderRepository *PostgreSQL) FindAllOrdersByCustomerId(
+	ctx context.Context,
+	customerId uuid.UUID,
+	offset int,
+	limit int,
+) ([]model.Order, error) {
 	var orderEntities []OrderEntity
 	err := orderRepository.SelectContext(
 		ctx,
 		&orderEntities,
 		"SELECT order_id, customer_id, creation_date, order_status FROM order_service.order WHERE customer_id = $1 ORDER BY creation_date OFFSET $2 LIMIT $3",
-		customerId, offset, limit,
+		customerId,
+		offset,
+		limit,
 	)
 	if err != nil {
 		return nil, err
@@ -113,25 +120,27 @@ func (orderRepository *PostgreSQL) FindOrderByOrderId(ctx context.Context, order
 }
 
 func (orderRepository *PostgreSQL) SaveOrder(ctx context.Context, order model.Order) error {
-	return orderRepository.execTx(ctx, func(tx *sqlx.Tx) error {
-		_, err := tx.NamedExec(
-			"INSERT INTO order_service.order (order_id, customer_id, creation_date, order_status, order_workflow) VALUES (:order_id, :customer_id, :creation_date, :order_status, :order_workflow)",
-			NewOrderEntity(order),
-		)
-		if err != nil {
-			return err
-		}
+	return orderRepository.execTx(
+		ctx, func(tx *sqlx.Tx) error {
+			_, err := tx.NamedExec(
+				"INSERT INTO order_service.order (order_id, customer_id, creation_date, order_status, order_workflow) VALUES (:order_id, :customer_id, :creation_date, :order_status, :order_workflow)",
+				NewOrderEntity(order),
+			)
+			if err != nil {
+				return err
+			}
 
-		_, err = tx.NamedExec(
-			"INSERT INTO order_service.order_item (order_id, creation_date, order_item_name) VALUES (:order_id, :creation_date, :order_item_name)",
-			NewOrderItemEntities(order.OrderId, order.Items),
-		)
-		if err != nil {
-			return err
-		}
+			_, err = tx.NamedExec(
+				"INSERT INTO order_service.order_item (order_id, creation_date, order_item_name) VALUES (:order_id, :creation_date, :order_item_name)",
+				NewOrderItemEntities(order.OrderId, order.Items),
+			)
+			if err != nil {
+				return err
+			}
 
-		return nil
-	})
+			return nil
+		},
+	)
 }
 
 func (orderRepository *PostgreSQL) execTx(ctx context.Context, fn func(*sqlx.Tx) error) error {

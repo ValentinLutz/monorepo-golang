@@ -7,6 +7,7 @@ import (
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/metrics"
 	"monorepo/libraries/apputil/middleware"
+	"monorepo/libraries/apputil/workflow"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/service"
 	"monorepo/services/order/app/incoming/http/openapi"
@@ -31,10 +32,7 @@ func main() {
 
 	appConfig, err := config.New(configFile)
 	if err != nil {
-		slog.With("err", err).
-			With("path", configFile).
-			Error("failed to load config file")
-		os.Exit(1)
+		panic(err)
 	}
 
 	slogHandler := logging.NewSlogHandler(appConfig.Logger)
@@ -53,8 +51,10 @@ func main() {
 
 	stopChannel := make(chan os.Signal, 1)
 	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGTERM)
-	slog.With("signal", (<-stopChannel).String()).
-		Info("received signal")
+	slog.Info(
+		"received signal",
+		slog.String("signal", (<-stopChannel).String()),
+	)
 
 	server.Stop()
 }
@@ -70,30 +70,37 @@ func newHandler(config config.Config, database *infastructure.Database) http.Han
 		Password: "test",
 	}
 
-	databaseStats := metrics.NewDatabaseStats(database, metrics.DatabaseOpts{
-		Namespace: "app",
-		Subsystem: "order",
-	})
+	databaseStats := metrics.NewDatabaseStats(
+		database, metrics.DatabaseOpts{
+			Namespace: "app",
+			Subsystem: "order",
+		},
+	)
 	prometheus.MustRegister(databaseStats)
 
 	responseTimeHistogramMetric := middleware.NewHttpResponseTimeHistogramMetric()
 	prometheus.MustRegister(responseTimeHistogramMetric)
 
-	router.Group(func(r chi.Router) {
-		r.Use(responseTimeHistogramMetric.ResponseTimes)
-		r.Use(middleware.CorrelationId)
-		r.Use(middleware.RequestResponseLogging)
-		r.Use(authentication.BasicAuth)
-		r.Mount("/", orderapi.New(ordersService))
-	})
+	router.Group(
+		func(r chi.Router) {
+			r.Use(responseTimeHistogramMetric.ResponseTimes) // before logging
+			r.Use(middleware.CorrelationId)                  // before logging
+			r.Use(middleware.RequestResponseLogging)
+			r.Use(authentication.BasicAuth)
+			r.Use(middleware.Recover) // always last
+			r.Mount("/", orderapi.New(ordersService))
+		},
+	)
 
-	router.Group(func(r chi.Router) {
-		statusAPI := statusapi.New(config, database)
-		statusAPI.RegisterRoutes(r)
+	router.Group(
+		func(r chi.Router) {
+			statusAPI := statusapi.New(config, database)
+			statusAPI.RegisterRoutes(r)
 
-		openAPI := openapi.New()
-		openAPI.RegisterRoutes(r)
-	})
+			openAPI := openapi.New()
+			openAPI.RegisterRoutes(r)
+		},
+	)
 
 	logging.LogRoutes(router)
 

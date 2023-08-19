@@ -12,7 +12,7 @@ const (
 	US   Region = "US"
 )
 
-// Implements the yaml.Unmarshaler interface.
+// UnmarshalYAML implements the yaml.Unmarshaler interface.
 func (region *Region) UnmarshalYAML(unmarshal func(any) error) error {
 	var regionString string
 	err := unmarshal(&regionString)
@@ -20,12 +20,12 @@ func (region *Region) UnmarshalYAML(unmarshal func(any) error) error {
 		return err
 	}
 
-	unmarshaledRegion := Region(regionString)
+	unmarshalledRegion := Region(regionString)
 
-	switch unmarshaledRegion {
+	switch unmarshalledRegion {
 	case NONE, EU, US:
-		*region = unmarshaledRegion
+		*region = unmarshalledRegion
 		return nil
 	}
-	return fmt.Errorf("region '%v' is invalid", unmarshaledRegion)
+	return fmt.Errorf("region '%v' is invalid", unmarshalledRegion)
 }

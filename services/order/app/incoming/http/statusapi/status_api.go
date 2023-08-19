@@ -28,20 +28,28 @@ func New(config config.Config, database *infastructure.Database) *API {
 }
 
 func (api *API) RegisterRoutes(router chi.Router) {
-	router.Group(func(r chi.Router) {
-		r.Get("/status/health", api.registerHealthChecks())
-		r.Method("GET", "/status/metrics", api.registerPrometheusMetrics())
-	})
+	router.Group(
+		func(r chi.Router) {
+			r.Get("/status/health", api.registerHealthChecks())
+			r.Method("GET", "/status/metrics", api.registerPrometheusMetrics())
+		},
+	)
 }
 
 func (api *API) registerHealthChecks() http.HandlerFunc {
-	healthStatus, err := health.New(health.WithComponent(health.Component{
-		Name:    api.config.ServiceName,
-		Version: api.config.Version,
-	}))
+	healthStatus, err := health.New(
+		health.WithComponent(
+			health.Component{
+				Name:    api.config.ServiceName,
+				Version: api.config.Version,
+			},
+		),
+	)
 	if err != nil {
-		slog.With("err", err).
-			Error("failed to create health container")
+		slog.Error(
+			"failed to create health container",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 
@@ -50,17 +58,23 @@ func (api *API) registerHealthChecks() http.HandlerFunc {
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		databaseConfig.Host, databaseConfig.Port, databaseConfig.Username, databaseConfig.Password, databaseConfig.Database,
 	)
-	err = healthStatus.Register(health.Config{
-		Name:      "postgresql",
-		Timeout:   time.Second * 30,
-		SkipOnErr: false,
-		Check: psql.New(psql.Config{
-			DSN: psqlInfo,
-		}),
-	})
+	err = healthStatus.Register(
+		health.Config{
+			Name:      "postgresql",
+			Timeout:   time.Second * 30,
+			SkipOnErr: false,
+			Check: psql.New(
+				psql.Config{
+					DSN: psqlInfo,
+				},
+			),
+		},
+	)
 	if err != nil {
-		slog.With("err", err).
-			Error("failed to register postgres health check")
+		slog.Error(
+			"failed to register postgres health check",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 

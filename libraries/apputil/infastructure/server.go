@@ -35,13 +35,17 @@ func NewServer(config ServerConfig, handler http.Handler, logger *log.Logger) *S
 }
 
 func (server *Server) Start() {
-	slog.With("port", server.config.Port).
-		Info("starting server")
+	slog.Info(
+		"starting server",
+		slog.Int("port", server.config.Port),
+	)
 
 	err := server.ListenAndServeTLS(server.config.CertificatePath, server.config.KeyPath)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		slog.With("err", err).
-			Error("failed to start server")
+		slog.Error(
+			"failed to start server",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 }
@@ -51,13 +55,17 @@ func (server *Server) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	slog.With("timeout", timeout.Seconds()).
-		Info("stopping server")
+	slog.Info(
+		"stopping server",
+		slog.String("timeout", timeout.String()),
+	)
 
 	err := server.Shutdown(ctx)
 	if err != nil {
-		slog.With("err", err).
-			Error("failed to stop server gracefully")
+		slog.Error(
+			"failed to stop server gracefully",
+			slog.Any("err", err),
+		)
 		os.Exit(1)
 	}
 	slog.Info("server stopped")

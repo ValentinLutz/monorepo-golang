@@ -33,10 +33,12 @@ func (contextHandler *ContextHandler) Handle(ctx context.Context, record slog.Re
 		if !ok {
 			continue
 		}
-		record.AddAttrs(slog.Attr{
-			Key:   key,
-			Value: slog.AnyValue(value),
-		})
+		record.AddAttrs(
+			slog.Attr{
+				Key:   key,
+				Value: slog.AnyValue(value),
+			},
+		)
 	}
 	return contextHandler.handler.Handle(ctx, record)
 }

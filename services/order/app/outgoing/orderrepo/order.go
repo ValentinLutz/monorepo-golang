@@ -28,11 +28,13 @@ func NewOrderEntity(order model.Order) OrderEntity {
 func NewOrder(orderEntity OrderEntity, orderItemEntities []OrderItemEntity) model.Order {
 	var orderItems = make([]model.OrderItem, 0)
 	for _, orderItemEntity := range orderItemEntities {
-		orderItems = append(orderItems, model.OrderItem{
-			OrderItemId:  orderItemEntity.OrderItemId,
-			Name:         orderItemEntity.ItemName,
-			CreationDate: orderItemEntity.CreationDate,
-		})
+		orderItems = append(
+			orderItems, model.OrderItem{
+				OrderItemId:  orderItemEntity.OrderItemId,
+				Name:         orderItemEntity.ItemName,
+				CreationDate: orderItemEntity.CreationDate,
+			},
+		)
 	}
 
 	return model.Order{
@@ -48,23 +50,27 @@ func NewOrder(orderEntity OrderEntity, orderItemEntities []OrderItemEntity) mode
 func NewOrders(orderEntities []OrderEntity, orderItemEntities []OrderItemEntity) []model.Order {
 	orderIdToOrderItems := make(map[string][]model.OrderItem)
 	for _, orderItemEntity := range orderItemEntities {
-		orderIdToOrderItems[orderItemEntity.OrderId] = append(orderIdToOrderItems[orderItemEntity.OrderId], model.OrderItem{
-			OrderItemId:  orderItemEntity.OrderItemId,
-			Name:         orderItemEntity.ItemName,
-			CreationDate: orderItemEntity.CreationDate,
-		})
+		orderIdToOrderItems[orderItemEntity.OrderId] = append(
+			orderIdToOrderItems[orderItemEntity.OrderId], model.OrderItem{
+				OrderItemId:  orderItemEntity.OrderItemId,
+				Name:         orderItemEntity.ItemName,
+				CreationDate: orderItemEntity.CreationDate,
+			},
+		)
 	}
 
 	orders := make([]model.Order, 0)
 	for _, orderEntity := range orderEntities {
-		orders = append(orders, model.Order{
-			OrderId:      model.OrderId(orderEntity.OrderId),
-			CustomerId:   orderEntity.CustomerId,
-			CreationDate: orderEntity.CreationDate,
-			Status:       model.OrderStatus(orderEntity.OrderStatus),
-			Workflow:     orderEntity.OrderWorkflow,
-			Items:        orderIdToOrderItems[orderEntity.OrderId],
-		})
+		orders = append(
+			orders, model.Order{
+				OrderId:      model.OrderId(orderEntity.OrderId),
+				CustomerId:   orderEntity.CustomerId,
+				CreationDate: orderEntity.CreationDate,
+				Status:       model.OrderStatus(orderEntity.OrderStatus),
+				Workflow:     orderEntity.OrderWorkflow,
+				Items:        orderIdToOrderItems[orderEntity.OrderId],
+			},
+		)
 	}
 
 	return orders

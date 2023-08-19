@@ -9,10 +9,12 @@ type HttpResponseTimeOps struct {
 }
 
 func NewHttpResponseTimeHistogram(ops HttpResponseTimeOps) *prometheus.HistogramVec {
-	return prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: ops.Namespace,
-		Name:      "http_server_request_duration_seconds",
-		Help:      "Histogram of http response times in seconds.",
-		Buckets:   prometheus.DefBuckets,
-	}, ops.LabelNames)
+	return prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: ops.Namespace,
+			Name:      "http_server_request_duration_seconds",
+			Help:      "Histogram of http response times in seconds.",
+			Buckets:   prometheus.DefBuckets,
+		}, ops.LabelNames,
+	)
 }

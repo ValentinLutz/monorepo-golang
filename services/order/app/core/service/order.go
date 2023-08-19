@@ -62,11 +62,13 @@ func (service *Order) PlaceOrder(ctx context.Context, customerId uuid.UUID, item
 
 	var orderItems []model.OrderItem
 	for _, itemName := range itemNames {
-		orderItems = append(orderItems, model.OrderItem{
-			OrderItemId:  0,
-			Name:         itemName,
-			CreationDate: creationDate,
-		})
+		orderItems = append(
+			orderItems, model.OrderItem{
+				OrderItemId:  0,
+				Name:         itemName,
+				CreationDate: creationDate,
+			},
+		)
 	}
 
 	orderEntity := model.Order{

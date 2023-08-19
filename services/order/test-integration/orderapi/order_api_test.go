@@ -32,9 +32,11 @@ func Test_GetOrders(t *testing.T) {
 	}
 
 	// WHEN
-	apiOrder, err := client.GetOrders(context.Background(), &orderapi.GetOrdersParams{
-		CustomerId: &customerId,
-	})
+	apiOrder, err := client.GetOrders(
+		context.Background(), &orderapi.GetOrdersParams{
+			CustomerId: &customerId,
+		},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,9 +61,11 @@ func Test_GetOrders_EmptyArray(t *testing.T) {
 	}
 
 	// WHEN
-	apiOrder, err := client.GetOrders(context.Background(), &orderapi.GetOrdersParams{
-		CustomerId: &customerId,
-	})
+	apiOrder, err := client.GetOrders(
+		context.Background(), &orderapi.GetOrdersParams{
+			CustomerId: &customerId,
+		},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,10 +108,12 @@ func Test_PostOrder(t *testing.T) {
 	var actualResponse orderapi.OrderResponse
 	testingutil.ReadToObject(t, apiOrder.Body, &actualResponse)
 	assert.Equal(t, orderapi.OrderPlaced, actualResponse.Status)
-	assert.Equal(t, []orderapi.OrderItemResponse{
-		{Name: "caramel"},
-		{Name: "clementine"},
-	}, actualResponse.Items)
+	assert.Equal(
+		t, []orderapi.OrderItemResponse{
+			{Name: "caramel"},
+			{Name: "clementine"},
+		}, actualResponse.Items,
+	)
 	assert.NotEmpty(t, actualResponse.OrderId)
 	assert.NotEmpty(t, actualResponse.CreationDate)
 }
