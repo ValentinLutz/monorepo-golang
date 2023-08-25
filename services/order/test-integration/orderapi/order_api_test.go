@@ -147,7 +147,7 @@ func Test_GetOrder_NotFound(t *testing.T) {
 
 	// WHEN
 	addCorrelationIdHeader := func(ctx context.Context, req *http.Request) error {
-		req.Header.Add("Correlation-ID", "2685342d-4888-4d74-9a57-aa5393fc8e35")
+		req.Header.Add("Correlation-Id", "2685342d-4888-4d74-9a57-aa5393fc8e35")
 		return nil
 	}
 	apiOrder, err := client.GetOrder(context.Background(), "NOPE", addCorrelationIdHeader)

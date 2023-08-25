@@ -40,39 +40,39 @@ func NewErrorResponse(request *http.Request, errorCode int, error error) ErrorRe
 	return errorResponse
 }
 
-func Status(w http.ResponseWriter, statusCode int) {
-	w.WriteHeader(statusCode)
+func Status(responseWriter http.ResponseWriter, statusCode int) {
+	responseWriter.WriteHeader(statusCode)
 }
 
-func StatusWithBody(w http.ResponseWriter, statusCode int, body any) {
+func StatusWithBody(responseWriter http.ResponseWriter, statusCode int, body any) {
 	bytes, err := json.Marshal(body)
 	if err != nil {
-		Status(w, http.StatusInternalServerError)
+		Status(responseWriter, http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	_, err = w.Write(bytes)
+	responseWriter.Header().Set("Content-Type", "application/json")
+	responseWriter.WriteHeader(statusCode)
+	_, err = responseWriter.Write(bytes)
 	if err != nil {
-		Status(w, http.StatusInternalServerError)
+		Status(responseWriter, http.StatusInternalServerError)
 		return
 	}
 }
 
-func ErrorWithBody(w http.ResponseWriter, statusCode int, body any) {
+func ErrorWithBody(responseWriter http.ResponseWriter, statusCode int, body any) {
 	bytes, err := json.Marshal(body)
 	if err != nil {
-		Status(w, http.StatusInternalServerError)
+		Status(responseWriter, http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.WriteHeader(statusCode)
-	_, err = w.Write(bytes)
+	responseWriter.Header().Set("Content-Type", "application/json")
+	responseWriter.Header().Set("X-Content-Type-Options", "nosniff")
+	responseWriter.WriteHeader(statusCode)
+	_, err = responseWriter.Write(bytes)
 	if err != nil {
-		Status(w, http.StatusInternalServerError)
+		Status(responseWriter, http.StatusInternalServerError)
 		return
 	}
 }

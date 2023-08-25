@@ -23,7 +23,7 @@ func New(service port.OrderService) http.Handler {
 	return HandlerWithOptions(api, ChiServerOptions{ErrorHandlerFunc: errorHandlerFunc})
 }
 
-func (api *API) GetOrders(w http.ResponseWriter, r *http.Request, params GetOrdersParams) {
+func (api *API) GetOrders(responseWriter http.ResponseWriter, request *http.Request, params GetOrdersParams) {
 	offset := 0
 	if params.Offset != nil {
 		offset = *params.Offset
@@ -33,13 +33,13 @@ func (api *API) GetOrders(w http.ResponseWriter, r *http.Request, params GetOrde
 		limit = *params.Limit
 	}
 
-	orderEntities, err := api.service.GetOrders(r.Context(), offset, limit, params.CustomerId)
+	orderEntities, err := api.service.GetOrders(request.Context(), offset, limit, params.CustomerId)
 	if err != nil {
 		switch err {
 		case port.InvalidOffsetError, port.InvalidLimitError:
-			httpresponse.ErrorWithBody(w, http.StatusBadRequest, NewErrorResponse(r, 4000, err))
+			httpresponse.ErrorWithBody(responseWriter, http.StatusBadRequest, NewErrorResponse(request, 4000, err))
 		default:
-			httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+			httpresponse.ErrorWithBody(responseWriter, http.StatusInternalServerError, NewErrorResponse(request, 9009, err))
 		}
 		return
 	}
@@ -48,53 +48,53 @@ func (api *API) GetOrders(w http.ResponseWriter, r *http.Request, params GetOrde
 	for _, orderEntity := range orderEntities {
 		orderEntity, err := FromOrder(orderEntity)
 		if err != nil {
-			httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+			httpresponse.ErrorWithBody(responseWriter, http.StatusInternalServerError, NewErrorResponse(request, 9009, err))
 		}
 		ordersResponse = append(ordersResponse, orderEntity)
 
 	}
 
-	httpresponse.StatusWithBody(w, http.StatusOK, ordersResponse)
+	httpresponse.StatusWithBody(responseWriter, http.StatusOK, ordersResponse)
 }
 
-func (api *API) PostOrders(w http.ResponseWriter, r *http.Request) {
-	orderRequest, err := FromJSON(r.Body)
+func (api *API) PostOrders(responseWriter http.ResponseWriter, request *http.Request) {
+	orderRequest, err := FromJSON(request.Body)
 	if err != nil {
-		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		httpresponse.ErrorWithBody(responseWriter, http.StatusInternalServerError, NewErrorResponse(request, 9009, err))
 		return
 	}
 
-	orderEntity, err := api.service.PlaceOrder(r.Context(), orderRequest.CustomerId, orderRequest.ToOrderItemNames())
+	orderEntity, err := api.service.PlaceOrder(request.Context(), orderRequest.CustomerId, orderRequest.ToOrderItemNames())
 	if err != nil {
-		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		httpresponse.ErrorWithBody(responseWriter, http.StatusInternalServerError, NewErrorResponse(request, 9009, err))
 		return
 	}
 
 	orderResponse, err := FromOrder(orderEntity)
 	if err != nil {
-		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		httpresponse.ErrorWithBody(responseWriter, http.StatusInternalServerError, NewErrorResponse(request, 9009, err))
 		return
 	}
 
-	httpresponse.StatusWithBody(w, http.StatusCreated, orderResponse)
+	httpresponse.StatusWithBody(responseWriter, http.StatusCreated, orderResponse)
 }
 
-func (api *API) GetOrder(w http.ResponseWriter, r *http.Request, orderId string) {
-	order, err := api.service.GetOrder(r.Context(), model.OrderId(orderId))
+func (api *API) GetOrder(responseWriter http.ResponseWriter, request *http.Request, orderId string) {
+	order, err := api.service.GetOrder(request.Context(), model.OrderId(orderId))
 	if errors.Is(err, port.OrderNotFoundError) {
-		httpresponse.ErrorWithBody(w, http.StatusNotFound, NewErrorResponse(r, 4004, err))
+		httpresponse.ErrorWithBody(responseWriter, http.StatusNotFound, NewErrorResponse(request, 4004, err))
 		return
 	}
 	if err != nil {
-		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		httpresponse.ErrorWithBody(responseWriter, http.StatusInternalServerError, NewErrorResponse(request, 9009, err))
 		return
 	}
 
 	orderResponse, err := FromOrder(order)
 	if err != nil {
-		httpresponse.ErrorWithBody(w, http.StatusInternalServerError, NewErrorResponse(r, 9009, err))
+		httpresponse.ErrorWithBody(responseWriter, http.StatusInternalServerError, NewErrorResponse(request, 9009, err))
 		return
 	}
 
-	httpresponse.StatusWithBody(w, http.StatusOK, orderResponse)
+	httpresponse.StatusWithBody(responseWriter, http.StatusOK, orderResponse)
 }

@@ -10,6 +10,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Benchmark_NewOrderId(b *testing.B) {
+	timestamp, err := time.Parse(time.RFC3339, "1980-01-01T00:00:00+00:00")
+	if err != nil {
+		b.Fatal(err)
+	}
+	for i := 0; i < b.N; i++ {
+		service.NewOrderId(config.NONE, timestamp, "1")
+	}
+}
+
 func Test_NewOrderId(t *testing.T) {
 	// GIVEN
 	timestamp, err := time.Parse(time.RFC3339, "1980-01-01T00:00:00+00:00")

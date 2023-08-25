@@ -7,7 +7,6 @@ services:
       dockerfile: ./services/order/app/Dockerfile
     container_name: app
     environment:
-      PROJECT_NAME: order-service
       VERSION: docker-container
     volumes:
       - ../config/app.config.none-local.yaml:/app/config/config.yaml:ro

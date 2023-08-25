@@ -16,7 +16,7 @@ type HttpResponseTimeMetric struct {
 
 func NewHttpResponseTimeHistogramMetric() *HttpResponseTimeMetric {
 	responseTimeHistogram := metrics.NewHttpResponseTimeHistogram(
-		metrics.HttpResponseTimeOps{
+		metrics.HttpResponseTimeOpts{
 			Namespace:  "app",
 			LabelNames: []string{"method", "route", "code"},
 		},

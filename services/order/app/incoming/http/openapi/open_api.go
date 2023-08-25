@@ -29,28 +29,28 @@ func (a *API) RegisterRoutes(router chi.Router) {
 	)
 }
 
-func (a *API) GetSwaggerUI(w http.ResponseWriter, r *http.Request) {
+func (a *API) GetSwaggerUI(responseWriter http.ResponseWriter, request *http.Request) {
 	subtree, _ := fs.Sub(swaggerUIFiles, "swagger-ui")
 
 	server := http.StripPrefix("/swagger", http.FileServer(http.FS(subtree)))
-	server.ServeHTTP(w, r)
+	server.ServeHTTP(responseWriter, request)
 }
 
-func (a *API) GetOrderAPISpec(w http.ResponseWriter, r *http.Request) {
+func (a *API) GetOrderAPISpec(responseWriter http.ResponseWriter, _ *http.Request) {
 	swagger, err := orderapi.GetSwagger()
 	if err != nil {
-		httpresponse.Status(w, http.StatusInternalServerError)
+		httpresponse.Status(responseWriter, http.StatusInternalServerError)
 		return
 	}
 
 	json, err := swagger.MarshalJSON()
 	if err != nil {
-		httpresponse.Status(w, http.StatusInternalServerError)
+		httpresponse.Status(responseWriter, http.StatusInternalServerError)
 		return
 	}
-	_, err = w.Write(json)
+	_, err = responseWriter.Write(json)
 	if err != nil {
-		httpresponse.Status(w, http.StatusInternalServerError)
+		httpresponse.Status(responseWriter, http.StatusInternalServerError)
 		return
 	}
 }

@@ -40,7 +40,6 @@ func (api *API) registerHealthChecks() http.HandlerFunc {
 	healthStatus, err := health.New(
 		health.WithComponent(
 			health.Component{
-				Name:    api.config.ServiceName,
 				Version: api.config.Version,
 			},
 		),

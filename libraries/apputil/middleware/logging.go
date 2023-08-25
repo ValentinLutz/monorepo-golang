@@ -12,22 +12,26 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	CorrelationIdKey = "Correlation-Id"
+)
+
 func CorrelationId(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, request *http.Request) {
-			correlationId := request.Header.Get("Correlation-Id")
+			correlationId := request.Header.Get(CorrelationIdKey)
 			if correlationId == "" {
 				correlationId = uuid.NewString()
 			}
 
 			requestContext := logging.WithValue(
 				request.Context(),
-				logging.SlogContextKey{Name: "correlation_id"},
+				logging.CorrelationIdKey,
 				correlationId,
 			)
 			request = request.WithContext(requestContext)
 
-			responseWriter.Header().Set("Correlation-Id", correlationId)
+			responseWriter.Header().Set(CorrelationIdKey, correlationId)
 			next.ServeHTTP(responseWriter, request)
 		},
 	)
@@ -45,40 +49,39 @@ func RequestResponseLogging(next http.Handler) http.Handler {
 					slog.Any("err", err),
 				)
 			}
-
 			reader := io.NopCloser(bytes.NewBuffer(requestBody))
 			request.Body = reader
 
-			responseWriterWrapper := newResponseWriterWrapper(responseWriter)
+			writerWrapper := newResponseWriterWrapper(responseWriter)
 
-			next.ServeHTTP(responseWriterWrapper, request)
+			next.ServeHTTP(writerWrapper, request)
 
-			if responseWriterWrapper.statusCode >= 400 {
+			if writerWrapper.statusCode >= 400 {
 				logRequest(request, requestBody)
-				logResponse(request.Context(), responseWriterWrapper, time.Since(startTime))
+				logResponse(request.Context(), writerWrapper, time.Since(startTime))
 			}
 		},
 	)
 }
 
-func logRequest(request *http.Request, requestBody []byte) {
+func logRequest(r *http.Request, requestBody []byte) {
 	slog.InfoContext(
-		request.Context(),
+		r.Context(),
 		"request",
-		slog.String("method", request.Method),
-		slog.String("path", request.URL.Path),
-		slog.String("query_params", request.URL.Query().Encode()),
+		slog.String("method", r.Method),
+		slog.String("path", r.URL.Path),
+		slog.String("query_params", r.URL.Query().Encode()),
 		slog.String("body", string(requestBody)),
-		slog.Any("headers", request.Header),
+		slog.Any("headers", r.Header),
 	)
 }
 
-func logResponse(ctx context.Context, responseWriterWrapper *responseWriterWrapper, duration time.Duration) {
+func logResponse(ctx context.Context, w *responseWriterWrapper, duration time.Duration) {
 	slog.InfoContext(
 		ctx,
 		"response",
 		slog.String("duration", duration.String()),
-		slog.String("body", string(responseWriterWrapper.body)),
-		slog.Any("headers", responseWriterWrapper.Header()),
+		slog.String("body", string(w.body)),
+		slog.Any("headers", w.Header()),
 	)
 }

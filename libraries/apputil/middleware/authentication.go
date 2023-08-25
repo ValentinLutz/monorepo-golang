@@ -13,10 +13,10 @@ type Authentication struct {
 
 func (authentication *Authentication) BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			username, password, ok := r.BasicAuth()
+		func(responseWriter http.ResponseWriter, request *http.Request) {
+			username, password, ok := request.BasicAuth()
 			if !ok {
-				httpresponse.Status(w, http.StatusUnauthorized)
+				httpresponse.Status(responseWriter, http.StatusUnauthorized)
 				return
 			}
 
@@ -24,11 +24,11 @@ func (authentication *Authentication) BasicAuth(next http.Handler) http.Handler 
 				[]byte(username+password),
 				[]byte(authentication.Username+authentication.Password),
 			) != 1 {
-				httpresponse.Status(w, http.StatusUnauthorized)
+				httpresponse.Status(responseWriter, http.StatusUnauthorized)
 				return
 			}
 
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(responseWriter, request)
 		},
 	)
 }

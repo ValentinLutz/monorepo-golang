@@ -11,7 +11,6 @@ import (
 
 type Config struct {
 	Version     string
-	ServiceName string
 	Region      Region                       `yaml:"region"`
 	Environment Environment                  `yaml:"environment"`
 	Server      infastructure.ServerConfig   `yaml:"server"`
@@ -40,15 +39,9 @@ func New(path string) (Config, error) {
 
 	version, ok := os.LookupEnv("VERSION")
 	if !ok {
-		return Config{}, errors.New("failed to load the environment variable 'VERSION'")
+		return Config{}, errors.New("failed to load env 'VERSION'")
 	}
 	decodedConfig.Version = version
-
-	projectName, ok := os.LookupEnv("PROJECT_NAME")
-	if !ok {
-		return Config{}, errors.New("failed to load the environment variable 'PROJECT_NAME'")
-	}
-	decodedConfig.ServiceName = projectName
 
 	return decodedConfig, nil
 }
