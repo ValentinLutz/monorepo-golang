@@ -12,6 +12,8 @@ import (
 type App mg.Namespace
 
 func (App) Run() error {
+	getVersionOrSetDefault()
+
 	mg.Deps(Dep.Copy, Dep.Generate)
 
 	os.Chdir("./app")

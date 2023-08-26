@@ -13,10 +13,10 @@ type Docker mg.Namespace
 
 // Builds the container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
 func (Docker) Build() error {
-	dockerRegistry := getDockerRegistryOrDefault()
-	dockerRepository := getDockerRepositoryOrDefault()
-	projectName := getProjectNameOrDefault()
-	version := getVersionOrDefault()
+	dockerRegistry := getDockerRegistryOrSetDefault()
+	dockerRepository := getDockerRepositoryOrSetDefault()
+	projectName := getProjectNameOrSetDefault()
+	version := getVersionOrSetDefault()
 
 	mg.Deps(Dep.Generate)
 
@@ -31,10 +31,10 @@ func (Docker) Build() error {
 
 // Publish the container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
 func (Docker) Push() error {
-	dockerRegistry := getDockerRegistryOrDefault()
-	dockerRepository := getDockerRepositoryOrDefault()
-	projectName := getProjectNameOrDefault()
-	version := getVersionOrDefault()
+	dockerRegistry := getDockerRegistryOrSetDefault()
+	dockerRepository := getDockerRepositoryOrSetDefault()
+	projectName := getProjectNameOrSetDefault()
+	version := getVersionOrSetDefault()
 
 	return sh.RunV(
 		"docker",

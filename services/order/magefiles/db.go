@@ -15,9 +15,9 @@ type Db mg.Namespace
 
 // Cleans flyway schema from the database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 func (Db) Clean() {
-	flywayUser := getFlywayUserOrDefault()
-	flywayPassword := getFlywayPasswordOrDefault()
-	profile := getProfileOrDefault()
+	flywayUser := getFlywayUserOrSetDefault()
+	flywayPassword := getFlywayPasswordOrSetDefault()
+	profile := getProfileOrSetDefault()
 
 	os.Chdir("./migration-database")
 	defer os.Chdir("..")
@@ -39,9 +39,9 @@ func (Db) Clean() {
 
 // Migrates flyway schema to the database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 func (Db) Migrate() {
-	flywayUser := getFlywayUserOrDefault()
-	flywayPassword := getFlywayPasswordOrDefault()
-	profile := getProfileOrDefault()
+	flywayUser := getFlywayUserOrSetDefault()
+	flywayPassword := getFlywayPasswordOrSetDefault()
+	profile := getProfileOrSetDefault()
 
 	os.Chdir("./migration-database")
 	defer os.Chdir("..")

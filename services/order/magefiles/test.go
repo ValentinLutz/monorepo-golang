@@ -47,7 +47,7 @@ func (Test) Spectral() {
 }
 
 func (Test) Smoke() {
-	getProfileOrDefault()
+	getProfileOrSetDefault()
 
 	mg.Deps(Dep.Generate)
 
@@ -58,7 +58,7 @@ func (Test) Smoke() {
 }
 
 func (Test) Integration() {
-	getProfileOrDefault()
+	getProfileOrSetDefault()
 
 	mg.Deps(Dep.Generate)
 

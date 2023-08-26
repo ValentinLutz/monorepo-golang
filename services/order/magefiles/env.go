@@ -5,35 +5,35 @@ import (
 	"os"
 )
 
-func getProfileOrDefault() string {
-	return getValueOrDefault("PROFILE", "none-local")
+func getProfileOrSetDefault() string {
+	return getValueOrSetDefault("PROFILE", "none-local")
 }
 
-func getDockerRegistryOrDefault() string {
-	return getValueOrDefault("DOCKER_REGISTRY", "ghcr.io")
+func getDockerRegistryOrSetDefault() string {
+	return getValueOrSetDefault("DOCKER_REGISTRY", "ghcr.io")
 }
 
-func getDockerRepositoryOrDefault() string {
-	return getValueOrDefault("DOCKER_REPOSITORY", "valentinlutz")
+func getDockerRepositoryOrSetDefault() string {
+	return getValueOrSetDefault("DOCKER_REPOSITORY", "valentinlutz")
 }
 
-func getProjectNameOrDefault() string {
-	return getValueOrDefault("PROJECT_NAME", "order-service")
+func getProjectNameOrSetDefault() string {
+	return getValueOrSetDefault("PROJECT_NAME", "order-service")
 }
 
-func getVersionOrDefault() string {
-	return getValueOrDefault("VERSION", "latest")
+func getVersionOrSetDefault() string {
+	return getValueOrSetDefault("VERSION", "latest")
 }
 
-func getFlywayUserOrDefault() string {
-	return getValueOrDefault("FLYWAY_USER", "test")
+func getFlywayUserOrSetDefault() string {
+	return getValueOrSetDefault("FLYWAY_USER", "test")
 }
 
-func getFlywayPasswordOrDefault() string {
-	return getValueOrDefault("FLYWAY_PASSWORD", "test")
+func getFlywayPasswordOrSetDefault() string {
+	return getValueOrSetDefault("FLYWAY_PASSWORD", "test")
 }
 
-func getValueOrDefault(key string, defaultValue string) string {
+func getValueOrSetDefault(key string, defaultValue string) string {
 	value, ok := os.LookupEnv(key)
 	if !ok {
 		fmt.Printf("env '%s' not set, defaulting to '%s'\n", key, defaultValue)
