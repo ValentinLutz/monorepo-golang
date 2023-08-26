@@ -65,7 +65,7 @@ func newHandler(config config.Config, database *infastructure.Database) http.Han
 	orderRepository := orderrepo.NewPostgreSQL(database)
 	ordersService := service.NewOrder(config, &orderRepository)
 
-	authentication := middleware.Authentication{
+	authentication := middleware.BasicAuth{
 		Username: "test",
 		Password: "test",
 	}
@@ -82,23 +82,23 @@ func newHandler(config config.Config, database *infastructure.Database) http.Han
 	prometheus.MustRegister(responseTimeHistogramMetric)
 
 	router.Group(
-		func(r chi.Router) {
-			r.Use(responseTimeHistogramMetric.ResponseTimes) // before logging
-			r.Use(middleware.CorrelationId)                  // before logging
-			r.Use(middleware.RequestResponseLogging)
-			r.Use(authentication.BasicAuth)
-			r.Use(middleware.Recover) // always last
-			r.Mount("/", orderapi.New(ordersService))
+		func(router chi.Router) {
+			router.Use(responseTimeHistogramMetric.ResponseTimes) // before logging
+			router.Use(middleware.CorrelationId)                  // before logging
+			router.Use(middleware.RequestResponseLogging)
+			router.Use(authentication.BasicAuth)
+			router.Use(middleware.Recover) // always last
+			router.Mount("/", orderapi.New(ordersService))
 		},
 	)
 
 	router.Group(
-		func(r chi.Router) {
+		func(router chi.Router) {
 			statusAPI := statusapi.New(config, database)
-			statusAPI.RegisterRoutes(r)
+			statusAPI.RegisterRoutes(router)
 
 			openAPI := openapi.New()
-			openAPI.RegisterRoutes(r)
+			openAPI.RegisterRoutes(router)
 		},
 	)
 

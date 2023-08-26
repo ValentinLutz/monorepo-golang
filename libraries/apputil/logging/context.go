@@ -4,6 +4,8 @@ import (
 	"context"
 )
 
+var CorrelationIdKey = SlogContextKey{Name: "correlation_id"}
+
 type SlogContextKey struct {
 	Name string
 }
@@ -19,5 +21,3 @@ func WithValue(ctx context.Context, key SlogContextKey, value SlogContextValue) 
 	}
 	return context.WithValue(ctx, key, value)
 }
-
-var CorrelationIdKey = SlogContextKey{Name: "correlation_id"}

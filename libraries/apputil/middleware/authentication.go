@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-type Authentication struct {
+type BasicAuth struct {
 	Username string
 	Password string
 }
 
-func (authentication *Authentication) BasicAuth(next http.Handler) http.Handler {
+func (basicAuth *BasicAuth) BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, request *http.Request) {
 			username, password, ok := request.BasicAuth()
@@ -22,7 +22,7 @@ func (authentication *Authentication) BasicAuth(next http.Handler) http.Handler 
 
 			if subtle.ConstantTimeCompare(
 				[]byte(username+password),
-				[]byte(authentication.Username+authentication.Password),
+				[]byte(basicAuth.Username+basicAuth.Password),
 			) != 1 {
 				httpresponse.Status(responseWriter, http.StatusUnauthorized)
 				return

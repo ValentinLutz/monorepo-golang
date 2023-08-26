@@ -29,9 +29,9 @@ func New(config config.Config, database *infastructure.Database) *API {
 
 func (api *API) RegisterRoutes(router chi.Router) {
 	router.Group(
-		func(r chi.Router) {
-			r.Get("/status/health", api.registerHealthChecks())
-			r.Method("GET", "/status/metrics", api.registerPrometheusMetrics())
+		func(router chi.Router) {
+			router.Get("/status/health", api.registerHealthChecks())
+			router.Method("GET", "/status/metrics", api.registerPrometheusMetrics())
 		},
 	)
 }

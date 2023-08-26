@@ -64,24 +64,24 @@ func RequestResponseLogging(next http.Handler) http.Handler {
 	)
 }
 
-func logRequest(r *http.Request, requestBody []byte) {
+func logRequest(request *http.Request, requestBody []byte) {
 	slog.InfoContext(
-		r.Context(),
+		request.Context(),
 		"request",
-		slog.String("method", r.Method),
-		slog.String("path", r.URL.Path),
-		slog.String("query_params", r.URL.Query().Encode()),
+		slog.String("method", request.Method),
+		slog.String("path", request.URL.Path),
+		slog.String("query_params", request.URL.Query().Encode()),
 		slog.String("body", string(requestBody)),
-		slog.Any("headers", r.Header),
+		slog.Any("headers", request.Header),
 	)
 }
 
-func logResponse(ctx context.Context, w *responseWriterWrapper, duration time.Duration) {
+func logResponse(ctx context.Context, responseWriter *responseWriterWrapper, duration time.Duration) {
 	slog.InfoContext(
 		ctx,
 		"response",
 		slog.String("duration", duration.String()),
-		slog.String("body", string(w.body)),
-		slog.Any("headers", w.Header()),
+		slog.String("body", string(responseWriter.body)),
+		slog.Any("headers", responseWriter.Header()),
 	)
 }
