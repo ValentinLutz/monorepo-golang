@@ -11,6 +11,38 @@ import (
 
 type Docker mg.Namespace
 
+// Builds the container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
+func (Docker) Build() error {
+	dockerRegistry := getDockerRegistryOrDefault()
+	dockerRepository := getDockerRepositoryOrDefault()
+	projectName := getProjectNameOrDefault()
+	version := getVersionOrDefault()
+
+	mg.Deps(Dep.Generate)
+
+	return sh.RunV(
+		"docker",
+		"build",
+		"--file", "./app/Dockerfile",
+		"--tag", dockerRegistry+"/"+dockerRepository+"/"+projectName+":"+version,
+		"../../",
+	)
+}
+
+// Publish the container image | DOCKER_REGISTRY, DOCKER_REPOSITORY, PROJECT_NAME, VERSION
+func (Docker) Push() error {
+	dockerRegistry := getDockerRegistryOrDefault()
+	dockerRepository := getDockerRepositoryOrDefault()
+	projectName := getProjectNameOrDefault()
+	version := getVersionOrDefault()
+
+	return sh.RunV(
+		"docker",
+		"push",
+		dockerRegistry+"/"+dockerRepository+"/"+projectName+":"+version,
+	)
+}
+
 func (Docker) Up() error {
 	os.Chdir("./deployment-docker")
 	defer os.Chdir("..")

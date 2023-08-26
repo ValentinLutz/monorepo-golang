@@ -6,10 +6,35 @@ import (
 )
 
 func getProfileOrDefault() string {
-	key := "PROFILE"
-	defaultValue := "none-local"
+	return getValueOrDefault("PROFILE", "none-local")
+}
 
-	profile, ok := os.LookupEnv(key)
+func getDockerRegistryOrDefault() string {
+	return getValueOrDefault("DOCKER_REGISTRY", "ghcr.io")
+}
+
+func getDockerRepositoryOrDefault() string {
+	return getValueOrDefault("DOCKER_REPOSITORY", "valentinlutz")
+}
+
+func getProjectNameOrDefault() string {
+	return getValueOrDefault("PROJECT_NAME", "order-service")
+}
+
+func getVersionOrDefault() string {
+	return getValueOrDefault("VERSION", "latest")
+}
+
+func getFlywayUserOrDefault() string {
+	return getValueOrDefault("FLYWAY_USER", "test")
+}
+
+func getFlywayPasswordOrDefault() string {
+	return getValueOrDefault("FLYWAY_PASSWORD", "test")
+}
+
+func getValueOrDefault(key string, defaultValue string) string {
+	value, ok := os.LookupEnv(key)
 	if !ok {
 		fmt.Printf("env '%s' not set, defaulting to '%s'\n", key, defaultValue)
 		err := os.Setenv(key, defaultValue)
@@ -18,17 +43,5 @@ func getProfileOrDefault() string {
 		}
 		return defaultValue
 	}
-	return profile
-}
-
-type FlywayCredentials struct {
-	Username string
-	Password string
-}
-
-func getFlywayCredentials() FlywayCredentials {
-	return FlywayCredentials{
-		Username: "test",
-		Password: "test",
-	}
+	return value
 }

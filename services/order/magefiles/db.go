@@ -11,8 +11,10 @@ import (
 
 type Db mg.Namespace
 
+// Migrate flyway schema to the database | PROFILE, FLYWAY_USER, FLYWAY_PASSWORD
 func (Db) Migrate() {
-	flywayCredentials := getFlywayCredentials()
+	flywayUser := getFlywayUserOrDefault()
+	flywayPassword := getFlywayPasswordOrDefault()
 	profile := getProfileOrDefault()
 
 	os.Chdir("./migration-database")
@@ -29,7 +31,7 @@ func (Db) Migrate() {
 		"flyway/flyway:9.17.0-alpine",
 		"clean",
 		"migrate",
-		"-user="+flywayCredentials.Username,
-		"-password="+flywayCredentials.Password,
+		"-user="+flywayUser,
+		"-password="+flywayPassword,
 	)
 }
