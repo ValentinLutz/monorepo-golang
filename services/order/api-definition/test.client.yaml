@@ -2,4 +2,4 @@ package: orderapi
 generate:
   client: true
   models: true
-output: test-integration/orderapi/client.gen.go
+output: test-functional/orderapi/client.gen.go

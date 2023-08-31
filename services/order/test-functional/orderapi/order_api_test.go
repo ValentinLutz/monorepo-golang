@@ -7,21 +7,24 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"monorepo/libraries/testingutil"
-	"monorepo/services/order/test-integration/orderapi"
+	"monorepo/services/order/test-functional/orderapi"
 	"net/http"
 	"os"
 	"testing"
 )
 
 func TestMain(m *testing.M) {
+	// before
 	testingutil.LoadAndExec(orderapi.GetTestDatabaseInstance(), "../truncate_tables.sql")
 
 	code := m.Run()
+
+	// after
 	os.Exit(code)
 }
 
 func Test_GetOrders(t *testing.T) {
-	// GIVEN
+	// given
 	client := orderapi.GetOrderApiClientInstance()
 	database := orderapi.GetTestDatabaseInstance()
 
@@ -31,7 +34,7 @@ func Test_GetOrders(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// WHEN
+	// when
 	apiOrder, err := client.GetOrders(
 		context.Background(), &orderapi.GetOrdersParams{
 			CustomerId: &customerId,
@@ -42,7 +45,7 @@ func Test_GetOrders(t *testing.T) {
 	}
 	defer apiOrder.Body.Close()
 
-	// THEN
+	// then
 	assert.Equal(t, 200, apiOrder.StatusCode)
 
 	var actualResponse orderapi.OrdersResponse
@@ -53,14 +56,14 @@ func Test_GetOrders(t *testing.T) {
 }
 
 func Test_GetOrders_EmptyArray(t *testing.T) {
-	// GIVEN
+	// given
 	client := orderapi.GetOrderApiClientInstance()
 	customerId, err := uuid.Parse("00000000-0000-0000-0000-000000000000")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// WHEN
+	// when
 	apiOrder, err := client.GetOrders(
 		context.Background(), &orderapi.GetOrdersParams{
 			CustomerId: &customerId,
@@ -71,7 +74,7 @@ func Test_GetOrders_EmptyArray(t *testing.T) {
 	}
 	defer apiOrder.Body.Close()
 
-	// THEN
+	// then
 	assert.Equal(t, 200, apiOrder.StatusCode)
 
 	var actualResponse orderapi.OrdersResponse
@@ -82,7 +85,7 @@ func Test_GetOrders_EmptyArray(t *testing.T) {
 }
 
 func Test_PostOrder(t *testing.T) {
-	// GIVEN
+	// given
 	client := orderapi.GetOrderApiClientInstance()
 	orderItems := []orderapi.OrderItemRequest{
 		{Name: "caramel"},
@@ -95,14 +98,14 @@ func Test_PostOrder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// WHEN
+	// when
 	apiOrder, err := client.PostOrdersWithBody(context.Background(), "application/json", &body)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer apiOrder.Body.Close()
 
-	// THEN
+	// then
 	assert.Equal(t, 201, apiOrder.StatusCode)
 
 	var actualResponse orderapi.OrderResponse
@@ -119,19 +122,19 @@ func Test_PostOrder(t *testing.T) {
 }
 
 func Test_GetOrder(t *testing.T) {
-	// GIVEN
+	// given
 	client := orderapi.GetOrderApiClientInstance()
 	database := orderapi.GetTestDatabaseInstance()
 	testingutil.LoadAndExec(database, "init_getOrder.sql")
 
-	// WHEN
+	// when
 	apiOrder, err := client.GetOrder(context.Background(), "fdCDxjV9o!O-NONE-ZCTH5i6fWcA")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer apiOrder.Body.Close()
 
-	// THEN
+	// then
 	assert.Equal(t, 200, apiOrder.StatusCode)
 
 	var actualResponse orderapi.OrderResponse
@@ -142,10 +145,10 @@ func Test_GetOrder(t *testing.T) {
 }
 
 func Test_GetOrder_NotFound(t *testing.T) {
-	// GIVEN
+	// given
 	client := orderapi.GetOrderApiClientInstance()
 
-	// WHEN
+	// when
 	addCorrelationIdHeader := func(ctx context.Context, req *http.Request) error {
 		req.Header.Add("Correlation-Id", "2685342d-4888-4d74-9a57-aa5393fc8e35")
 		return nil
@@ -156,7 +159,7 @@ func Test_GetOrder_NotFound(t *testing.T) {
 	}
 	defer apiOrder.Body.Close()
 
-	// THEN
+	// then
 	assert.Equal(t, 404, apiOrder.StatusCode)
 
 	var actualResponse orderapi.ErrorResponse

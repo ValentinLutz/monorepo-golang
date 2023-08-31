@@ -20,10 +20,10 @@ func initClient() http.Client {
 }
 
 func TestHealth(t *testing.T) {
-	// GIVEN
+	// given
 	client := initClient()
 
-	// WHEN
+	// when
 	response, err := client.Get(config.BaseURL + "/status/health")
 	if err != nil {
 		t.Fatal(err)
@@ -35,15 +35,15 @@ func TestHealth(t *testing.T) {
 		}
 	}(response.Body)
 
-	// THEN
+	// then
 	assert.Equal(t, 200, response.StatusCode)
 }
 
 func TestPrometheusMetrics(t *testing.T) {
-	// GIVEN
+	// given
 	client := initClient()
 
-	// WHEN
+	// when
 	response, err := client.Get(config.BaseURL + "/status/metrics")
 	if err != nil {
 		t.Fatal(err)
@@ -55,15 +55,15 @@ func TestPrometheusMetrics(t *testing.T) {
 		}
 	}(response.Body)
 
-	// THEN
+	// then
 	assert.Equal(t, 200, response.StatusCode)
 }
 
 func TestSwaggerUI(t *testing.T) {
-	// GIVEN
+	// given
 	client := initClient()
 
-	// WHEN
+	// when
 	response, err := client.Get(config.BaseURL + "/swagger/")
 	if err != nil {
 		t.Fatal(err)
@@ -75,6 +75,6 @@ func TestSwaggerUI(t *testing.T) {
 		}
 	}(response.Body)
 
-	// THEN
+	// then
 	assert.Equal(t, 200, response.StatusCode)
 }

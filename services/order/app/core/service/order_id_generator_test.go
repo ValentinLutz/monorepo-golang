@@ -21,7 +21,7 @@ func Benchmark_NewOrderId(b *testing.B) {
 }
 
 func Test_NewOrderId(t *testing.T) {
-	// GIVEN
+	// given
 	timestamp, err := time.Parse(time.RFC3339, "1980-01-01T00:00:00+00:00")
 	if err != nil {
 		t.Fatal(err)
@@ -45,9 +45,9 @@ func testNewOrderId(region config.Region, timestamp time.Time, salt string, expe
 		t.Logf("Region: %v", region)
 		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
 		t.Logf("Salt: %v", salt)
-		// WHEN
+		// when
 		actual := service.NewOrderId(region, timestamp, salt)
-		// THEN
+		// then
 		assert.Equal(t, expected, actual)
 	}
 }

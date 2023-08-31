@@ -8,13 +8,13 @@ import (
 )
 
 func Test_ParseFile(t *testing.T) {
-	// GIVEN
+	// given
 	path := "resources/test_config.yaml"
 
-	// WHEN
+	// when
 	config, err := testingutil.ParseFile[testingutil.Config](path)
 
-	// THEN
+	// then
 	assert.NoError(t, err)
 
 	expectedConfig := &testingutil.Config{
@@ -31,23 +31,23 @@ func Test_ParseFile(t *testing.T) {
 }
 
 func Test_ParseFile_FileNotFound(t *testing.T) {
-	// GIVEN
+	// given
 	path := "file_not_found.yaml"
 
-	// WHEN
+	// when
 	_, err := testingutil.ParseFile[testingutil.Config](path)
 
-	// THEN
+	// then
 	assert.Error(t, err)
 }
 
 func Test_ParseFile_UnmarshalFailed(t *testing.T) {
-	// GIVEN
+	// given
 	path := "resources/unknown_format.text"
 
-	// WHEN
+	// when
 	_, err := testingutil.ParseFile[testingutil.Config](path)
 
-	// THEN
+	// then
 	assert.Error(t, err)
 }

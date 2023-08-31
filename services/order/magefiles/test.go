@@ -57,12 +57,12 @@ func (Test) Smoke() {
 	sh.RunV("go", "test", "-count=1", "./...")
 }
 
-func (Test) Integration() {
+func (Test) Functional() {
 	getProfileOrSetDefault()
 
 	mg.Deps(Dep.Generate)
 
-	os.Chdir("./test-integration")
+	os.Chdir("./test-functional")
 	defer os.Chdir("..")
 
 	sh.RunV("go", "test", "-count=1", "./...")
