@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  app:
+    image: ghcr.io/valentinlutz/order-service:latest
+    build:
+      context: ../../../
+      dockerfile: ./services/frontend/app/Dockerfile
+    container_name: app
+    environment:
+      VERSION: docker-container
+    volumes:
+      - ../config/app.config.none-local.yaml:/app/config/config.yaml:ro
+      - ../config/app.crt:/app/config/app.crt:ro
+      - ../config/app.key:/app/config/app.key:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+    network_mode: host
+    # ports:
+    #   - 10443:10443
