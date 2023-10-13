@@ -12,24 +12,24 @@ import (
 //go:embed templates
 var templatesFS embed.FS
 
-type API struct {
+type TemplateAPI struct {
 	config   config.Config
 	template *template.Template
 }
 
-func New(config config.Config) *API {
+func NewTemplateAPI(config config.Config) *TemplateAPI {
 	parsedTemplate, err := template.ParseFS(templatesFS, "templates/*")
 	if err != nil {
 		panic(err)
 	}
 
-	return &API{
+	return &TemplateAPI{
 		config:   config,
 		template: parsedTemplate,
 	}
 }
 
-func (api *API) RegisterRoutes(router chi.Router) {
+func (api *TemplateAPI) RegisterRoutes(router chi.Router) {
 	router.Group(
 		func(router chi.Router) {
 			router.Use(chimiddleware.AllowContentType("text/html"))
@@ -39,7 +39,17 @@ func (api *API) RegisterRoutes(router chi.Router) {
 	)
 }
 
-func (api *API) index(responseWriter http.ResponseWriter, _ *http.Request) {
+func (api *TemplateAPI) NotFound(responseWriter http.ResponseWriter, _ *http.Request) {
+	err := api.template.ExecuteTemplate(
+		responseWriter, "not_found", nil,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (api *TemplateAPI) index(responseWriter http.ResponseWriter, _ *http.Request) {
 	err := api.template.ExecuteTemplate(
 		responseWriter, "index.gohtml",
 		map[string]interface{}{

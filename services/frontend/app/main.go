@@ -51,8 +51,11 @@ func main() {
 func newHandler(config config.Config) http.Handler {
 	router := chi.NewRouter()
 
-	api := incoming.New(config)
-	api.RegisterRoutes(router)
+	incoming.NewImageAPI(config).RegisterRoutes(router)
+	templateAPI := incoming.NewTemplateAPI(config)
+	templateAPI.RegisterRoutes(router)
+
+	router.NotFound(templateAPI.NotFound)
 
 	logging.LogRoutes(router)
 
