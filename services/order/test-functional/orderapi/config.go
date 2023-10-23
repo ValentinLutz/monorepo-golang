@@ -2,26 +2,26 @@ package orderapi
 
 import (
 	"crypto/tls"
-	"monorepo/libraries/testingutil"
+	"monorepo/libraries/testutil"
 	"net/http"
 
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 )
 
-var testConfig *testingutil.Config
+var testConfig *testutil.Config
 
-func GetTestConfigInstance() *testingutil.Config {
+func GetTestConfigInstance() *testutil.Config {
 	if testConfig == nil {
-		testConfig = testingutil.LoadConfig("../../config")
+		testConfig = testutil.LoadConfig("../../config")
 	}
 	return testConfig
 }
 
-var testDatabase *testingutil.Database
+var testDatabase *testutil.Database
 
-func GetTestDatabaseInstance() *testingutil.Database {
+func GetTestDatabaseInstance() *testutil.Database {
 	if testDatabase == nil {
-		testDatabase = testingutil.NewDatabase(GetTestConfigInstance())
+		testDatabase = testutil.NewDatabase(GetTestConfigInstance())
 	}
 	return testDatabase
 }
@@ -35,7 +35,7 @@ func GetOrderApiClientInstance() *Client {
 	return orderApiClient
 }
 
-func newOrderApiClient(config *testingutil.Config) *Client {
+func newOrderApiClient(config *testutil.Config) *Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}

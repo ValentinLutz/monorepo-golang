@@ -1,53 +1,43 @@
 package service_test
 
 import (
-	"monorepo/services/order/app/config"
-	"monorepo/services/order/app/core/model"
+	"monorepo/libraries/apputil/config"
 	"monorepo/services/order/app/core/service"
+	"regexp"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Benchmark_NewOrderId(b *testing.B) {
-	timestamp, err := time.Parse(time.RFC3339, "1980-01-01T00:00:00+00:00")
-	if err != nil {
-		b.Fatal(err)
-	}
 	for i := 0; i < b.N; i++ {
-		service.NewOrderId(config.NONE, timestamp, "1")
+		service.NewOrderId(config.NONE)
 	}
 }
 
 func Test_NewOrderId(t *testing.T) {
 	// given
-	timestamp, err := time.Parse(time.RFC3339, "1980-01-01T00:00:00+00:00")
-	if err != nil {
-		t.Fatal(err)
+	regions := []string{
+		"NONE",
+		"EU",
+		"US",
 	}
-	t.Run("NONE", testNewOrderId(config.NONE, timestamp, "1", "zanhVXdOCEg-NONE-asPc!MEMcMw"))
-	t.Run("NONE", testNewOrderId(config.NONE, timestamp, "101", "hjm847MUbWn-NONE-CsuoZDDc6LQ"))
-	t.Run("NONE", testNewOrderId(config.NONE, timestamp, "10101", "TlhDaTmRWBr-NONE-UqIiPE7q!Qw"))
-	t.Run("NONE", testNewOrderId(config.NONE, timestamp, "1010101", "uryHjO0*I1o-NONE-ngfDhQLBkFw"))
-	t.Run("EU", testNewOrderId(config.EU, timestamp, "1", "7QGZGgo5999-EU-moedOlxN4BQ"))
-	t.Run("EU", testNewOrderId(config.EU, timestamp, "101", "QN1iLILbclC-EU-wqVzId1oMHw"))
-	t.Run("EU", testNewOrderId(config.EU, timestamp, "10101", "*vFRicU14gk-EU-cA*kDJf*Jig"))
-	t.Run("EU", testNewOrderId(config.EU, timestamp, "1010101", "p5tCoqCnVfS-EU-J8C5J!L!mMA"))
-	t.Run("US", testNewOrderId(config.US, timestamp, "1", "Ad6P0F0DuUq-US-jcj2Jqrklew"))
-	t.Run("US", testNewOrderId(config.US, timestamp, "101", "kv0Hbli7PTn-US-TvwK!socVFg"))
-	t.Run("US", testNewOrderId(config.US, timestamp, "10101", "MnWZUuMf7df-US-f9GUPjtFBdA"))
-	t.Run("US", testNewOrderId(config.US, timestamp, "1010101", "gATm85KNU5H-US-UF!dI1xtcog"))
+	regex := regexp.MustCompile("[A-Za-z0-9!*]*-[A-Z]{2,4}-[A-Za-z0-9!*]*")
+
+	for _, region := range regions {
+		for i := 0; i < 100; i++ {
+			t.Run(region, testNewOrderId(config.Region(region), regex))
+		}
+	}
 }
 
-func testNewOrderId(region config.Region, timestamp time.Time, salt string, expected model.OrderId) func(t *testing.T) {
+func testNewOrderId(region config.Region, regex *regexp.Regexp) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Logf("Region: %v", region)
-		t.Logf("Timestamp: %v", timestamp.Format(time.RFC3339))
-		t.Logf("Salt: %v", salt)
+
 		// when
-		actual := service.NewOrderId(region, timestamp, salt)
+		orderId := service.NewOrderId(region)
 		// then
-		assert.Equal(t, expected, actual)
+		assert.Regexp(t, regex, orderId)
 	}
 }

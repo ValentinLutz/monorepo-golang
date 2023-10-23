@@ -2,11 +2,9 @@ package service
 
 import (
 	"context"
-	"math/rand"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/model"
 	"monorepo/services/order/app/core/port"
-	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -56,8 +54,6 @@ func (service *Order) PlaceOrder(ctx context.Context, customerId uuid.UUID, item
 	creationDate := time.Now()
 	orderId := NewOrderId(
 		service.config.Region,
-		creationDate,
-		strconv.Itoa(rand.Int()),
 	)
 
 	var orderItems []model.OrderItem

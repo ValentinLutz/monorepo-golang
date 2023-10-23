@@ -1,20 +1,20 @@
 package service
 
 import (
-	"crypto/md5"
 	"encoding/base64"
 	"fmt"
-	"monorepo/services/order/app/config"
+	"monorepo/libraries/apputil/config"
 	"monorepo/services/order/app/core/model"
 	"strings"
-	"time"
+
+	"github.com/google/uuid"
 )
 
-func NewOrderId(region config.Region, timestamp time.Time, salt string) model.OrderId {
-	valueToHash := string(region) + timestamp.Format(time.RFC3339) + salt
-	md5Sum := md5.Sum([]byte(valueToHash))
+func NewOrderId(region config.Region) model.OrderId {
+	uuidValue := uuid.New()
+	uuidBytes := uuidValue[:]
 
-	base64String := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(md5Sum[:])
+	base64String := base64.RawURLEncoding.EncodeToString(uuidBytes)
 	base64WithoutUnderscore := replaceHyphenAndUnderscore(base64String)
 
 	regionIdentifier := fmt.Sprintf("-%s-", region)

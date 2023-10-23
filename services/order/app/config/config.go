@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"monorepo/libraries/apputil/config"
 	"monorepo/libraries/apputil/infastructure"
 	"monorepo/libraries/apputil/logging"
 	"os"
@@ -11,8 +12,8 @@ import (
 
 type Config struct {
 	Version     string
-	Region      Region                       `yaml:"region"`
-	Environment Environment                  `yaml:"environment"`
+	Region      config.Region                `yaml:"region"`
+	Environment config.Environment           `yaml:"environment"`
 	Server      infastructure.ServerConfig   `yaml:"server"`
 	Database    infastructure.DatabaseConfig `yaml:"database"`
 	Logger      logging.LoggerConfig         `yaml:"logger"`

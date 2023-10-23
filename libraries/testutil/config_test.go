@@ -1,7 +1,7 @@
-package testingutil_test
+package testutil_test
 
 import (
-	"monorepo/libraries/testingutil"
+	"monorepo/libraries/testutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,14 +12,14 @@ func Test_ParseFile(t *testing.T) {
 	path := "resources/test_config.yaml"
 
 	// when
-	config, err := testingutil.ParseFile[testingutil.Config](path)
+	config, err := testutil.ParseFile[testutil.Config](path)
 
 	// then
 	assert.NoError(t, err)
 
-	expectedConfig := &testingutil.Config{
+	expectedConfig := &testutil.Config{
 		BaseURL: "http://localhost:8080",
-		Database: testingutil.DatabaseConfig{
+		Database: testutil.DatabaseConfig{
 			Host:     "localhost",
 			Port:     9432,
 			Database: "dev_db",
@@ -35,7 +35,7 @@ func Test_ParseFile_FileNotFound(t *testing.T) {
 	path := "file_not_found.yaml"
 
 	// when
-	_, err := testingutil.ParseFile[testingutil.Config](path)
+	_, err := testutil.ParseFile[testutil.Config](path)
 
 	// then
 	assert.Error(t, err)
@@ -46,7 +46,7 @@ func Test_ParseFile_UnmarshalFailed(t *testing.T) {
 	path := "resources/unknown_format.text"
 
 	// when
-	_, err := testingutil.ParseFile[testingutil.Config](path)
+	_, err := testutil.ParseFile[testutil.Config](path)
 
 	// then
 	assert.Error(t, err)

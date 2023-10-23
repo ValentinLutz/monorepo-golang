@@ -8,14 +8,14 @@ import (
 )
 
 func Test_WithValue(t *testing.T) {
-	// GIVEN
+	// given
 	ctx := context.Background()
 	correlationId := "9752e638-5d49-409a-b90b-b8fd363c44eb"
 
-	// WHEN
+	// when
 	updatedCtx := logging.WithValue(ctx, logging.CorrelationIdKey, correlationId)
 
-	// THEN
+	// then
 	value := updatedCtx.Value(logging.CorrelationIdKey)
 
 	assert.Equal(t, correlationId, value)

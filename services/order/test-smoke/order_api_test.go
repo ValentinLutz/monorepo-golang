@@ -3,14 +3,14 @@ package orderapi_test
 import (
 	"crypto/tls"
 	"io"
-	"monorepo/libraries/testingutil"
+	"monorepo/libraries/testutil"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var config = testingutil.LoadConfig("../config")
+var config = testutil.LoadConfig("../config")
 
 func initClient() http.Client {
 	tr := &http.Transport{

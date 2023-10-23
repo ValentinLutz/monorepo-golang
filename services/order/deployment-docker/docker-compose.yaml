@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   # mqtt-emqx:
-  #   image: emqx:5.0.21
+  #   image: emqx:5.3.0
   #   container_name: mqtt-emqx
   #   environment:
   #     EMQX_DASHBOARD__DEFAULT_USERNAME: test
@@ -12,7 +12,7 @@ services:
   #   #   - 18083:18083 
 
   aws-localstack:
-    image: localstack/localstack:2.0.1
+    image: localstack/localstack:2.3.2
     container_name: aws-localstack
     environment:
       DEFAULT_REGION: eu-central-1
@@ -23,21 +23,20 @@ services:
     #   - 4566:4566
 
   database-postgres:
-    image: postgres:15.2-alpine3.17
+    image: postgres:15.4-alpine3.18
     container_name: database-postgres
-    command:
-      - -c
-      - max_connections=102
     environment:
       POSTGRES_DB: test
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
     network_mode: host
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
     # ports:
     #   - 5432:5432
 
   monitoring-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.12.0
+    image: prometheuscommunity/postgres-exporter:v0.14.0
     container_name: monitoring-postgres-exporter
     environment:
       DATA_SOURCE_NAME: postgresql://test:test@localhost:5432/test?sslmode=disable
@@ -46,7 +45,7 @@ services:
     #   - 9187:9187
 
   monitoring-prometheus:
-    image: prom/prometheus:v2.43.0
+    image: prom/prometheus:v2.47.2
     container_name: monitoring-prometheus
     volumes:
       - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
@@ -55,7 +54,7 @@ services:
     #   - 9090:9090
 
   monitoring-grafana:
-    image: grafana/grafana:9.4.7
+    image: grafana/grafana:10.1.5
     container_name: monitoring-grafana
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: true
