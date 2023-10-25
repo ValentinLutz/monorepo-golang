@@ -20,6 +20,7 @@ import (
 	"syscall"
 
 	"github.com/go-chi/chi/v5"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -86,6 +87,7 @@ func newHandler(config config.Config, database *infastructure.Database) http.Han
 			router.Use(responseTimeHistogramMetric.ResponseTimes) // before logging
 			router.Use(middleware.CorrelationId)                  // before logging
 			router.Use(middleware.RequestResponseLogging)
+			router.Use(chimiddleware.AllowContentType("application/json"))
 			router.Use(authentication.BasicAuth)
 			router.Use(middleware.Recover) // always last
 			router.Mount("/", orderapi.New(ordersService))

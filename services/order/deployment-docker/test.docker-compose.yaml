@@ -4,14 +4,16 @@ services:
     image: ghcr.io/valentinlutz/order-service:latest
     build:
       context: ../../../
-      dockerfile: ./services/order/app/app.dockerfile
+      dockerfile: ./services/order/app/test.dockerfile
     container_name: app
     environment:
       VERSION: docker-container
+      GOCOVERDIR: /app/coverage
     volumes:
       - ../config/app.config.none-local.yaml:/app/config/config.yaml:ro
       - ../config/app.crt:/app/config/app.crt:ro
       - ../config/app.key:/app/config/app.key:ro
+      - ../test-functional/coverage:/app/coverage:rw
     network_mode: host
     # ports:
     #   - 10443:10443

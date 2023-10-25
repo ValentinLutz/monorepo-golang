@@ -4,9 +4,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"os"
 )
 
 type Docker mg.Namespace
@@ -23,7 +24,7 @@ func (Docker) Build() error {
 	return sh.RunV(
 		"docker",
 		"build",
-		"--file", "./app/Dockerfile",
+		"--file", "./app/app.dockerfile",
 		"--tag", dockerRegistry+"/"+dockerRepository+"/"+projectName+":"+version,
 		"../../",
 	)
@@ -71,6 +72,35 @@ func (Docker) Appup() error {
 		"up",
 		"--force-recreate",
 		"--build",
+	)
+}
+
+func (Docker) Testup() error {
+	mg.Deps(Dep.Generate)
+
+	os.Chdir("./deployment-docker")
+	defer os.Chdir("..")
+
+	return sh.RunV(
+		"docker",
+		"compose",
+		"--file", "./test.docker-compose.yaml",
+		"up",
+		"--force-recreate",
+		"--build",
+		"-d",
+	)
+}
+
+func (Docker) Testdown() error {
+	os.Chdir("./deployment-docker")
+	defer os.Chdir("..")
+
+	return sh.RunV(
+		"docker",
+		"compose",
+		"--file", "./test.docker-compose.yaml",
+		"down",
 	)
 }
 

@@ -4,9 +4,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"os"
 )
 
 type Test mg.Namespace
@@ -66,6 +67,20 @@ func (Test) Functional() {
 	defer os.Chdir("..")
 
 	sh.RunV("go", "test", "-count=1", "./...")
+}
+
+func (Test) Coverage() {
+	getProfileOrSetDefault()
+	os.RemoveAll("./test-functional/coverage")
+
+	mg.Deps(Docker.Testup)
+	mg.Deps(Test.Functional)
+	mg.Deps(Docker.Testdown)
+
+	os.Chdir("./test-functional")
+	defer os.Chdir("..")
+
+	sh.RunV("go", "tool", "covdata", "percent", "-i", "./coverage")
 }
 
 func (Test) Load() {
