@@ -83,6 +83,14 @@ func (Test) Coverage() {
 	sh.RunV("go", "tool", "covdata", "percent", "-i", "./coverage")
 }
 
+func (Test) Coveragehtml() {
+	os.Chdir("./test-functional")
+	defer os.Chdir("..")
+
+	sh.RunV("go", "tool", "covdata", "textfmt", "-i", "./coverage", "-o", "./coverage/coverage.txt")
+	sh.RunV("go", "tool", "cover", "-html=./coverage/coverage.txt", "-o", "./coverage/coverage.html")
+}
+
 func (Test) Load() {
 	os.Chdir("./test-load")
 	defer os.Chdir("..")
