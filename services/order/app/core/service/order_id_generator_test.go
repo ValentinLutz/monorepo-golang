@@ -22,7 +22,7 @@ func Test_NewOrderId(t *testing.T) {
 		"EU",
 		"US",
 	}
-	regex := regexp.MustCompile("[A-Za-z0-9!*]*-[A-Z]{2,4}-[A-Za-z0-9!*]*")
+	regex := regexp.MustCompile("^[A-Za-z0-9]{13}-[A-Z]{2,4}-[A-Za-z0-9]{13}$")
 
 	for _, region := range regions {
 		for i := 0; i < 100; i++ {
