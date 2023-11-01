@@ -1,0 +1,23 @@
+{{define "shop"}}
+    <section class="py-5 text-center container">
+        <div class="row">
+            <div class="col-lg-7 mx-auto">
+                <h1 class="fw-light">Ultimate Fruit Emporium</h1>
+                <p class="lead text-body-secondary">No matter where you are in the galaxy, we'll get your fruits to you
+                    faster than a warp-speed spaceship. Your dose of vitamins is just a wormhole away.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-2 container">
+        <div class="col-lg-3 mx-auto">
+            <input class="form-control text-center text-body-secondary" type="search" name="search" placeholder="search"
+                   aria-label="search"
+                   hx-get="/shop-search" hx-trigger="keyup changed delay:500ms, search" hx-target="#search-results">
+        </div>
+    </section>
+
+    <div class="album py-5 bg-body-tertiary">
+        <div class="container" id="search-results" hx-get="/shop-search" hx-trigger="load"></div>
+    </div>
+{{end}}

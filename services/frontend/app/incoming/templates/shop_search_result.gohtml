@@ -1,0 +1,9 @@
+{{define "shop_search"}}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {{ range . }}
+            <div class="col">
+                {{ template "shop_item_card" .}}
+            </div>
+        {{end}}
+    </div>
+{{end}}
