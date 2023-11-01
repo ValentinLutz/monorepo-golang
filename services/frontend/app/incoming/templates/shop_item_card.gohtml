@@ -1,8 +1,8 @@
 {{define "shop_item_card"}}
-    <div class="card shadow-sm">
+    <div class="card shadow-sm" hx-get="/item" hx-target="#base-container" hx-push-url="true" hx-vals='{"name": "{{.Name}}"}'>
         <h5 class="card-header text-center">{{.Name}}</h5>
         <div class="text-center" style="max-height: 220px;height: 220px">
-            <img class="bd-placeholder-img mh-100 mw-100" src="images/{{ .ImageName }}" alt="{{ .ImageAlt }}">
+            <img class="bd-placeholder-img mh-100 mw-100" src="/images/{{ .ImageName }}" alt="{{ .ImageAlt }}">
         </div>
         <div class="card-footer text-md-end">
             {{.Price}}€

@@ -39,7 +39,7 @@ func (api *TemplateAPI) RegisterRoutes(router chi.Router) {
 			router.Get("/", api.index)
 			router.Get("/item", api.item)
 			router.Get("/shop", api.shop)
-			router.Get("/shop-search", api.shopSearch)
+			router.Get("/shop/search", api.shopSearch)
 		},
 	)
 }
@@ -57,9 +57,7 @@ func (api *TemplateAPI) NotFound(responseWriter http.ResponseWriter, _ *http.Req
 func (api *TemplateAPI) index(responseWriter http.ResponseWriter, _ *http.Request) {
 	err := api.template.ExecuteTemplate(
 		responseWriter, "index",
-		map[string]interface{}{
-			"Number": 12245,
-		},
+		nil,
 	)
 
 	if err != nil {
@@ -67,12 +65,18 @@ func (api *TemplateAPI) index(responseWriter http.ResponseWriter, _ *http.Reques
 	}
 }
 
-func (api *TemplateAPI) item(responseWriter http.ResponseWriter, _ *http.Request) {
+func (api *TemplateAPI) item(responseWriter http.ResponseWriter, request *http.Request) {
+	var shopItemResponse core.ShopItem
+	for _, shopItem := range core.ShopItems {
+		if shopItem.Name == request.URL.Query().Get("name") {
+			shopItemResponse = shopItem
+			break
+		}
+	}
+
 	err := api.template.ExecuteTemplate(
 		responseWriter, "item",
-		map[string]interface{}{
-			"Number": 4211,
-		},
+		shopItemResponse,
 	)
 
 	if err != nil {
