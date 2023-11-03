@@ -22,7 +22,7 @@ func (Test) Unit() {
 }
 
 func (Test) Lint() {
-	mg.Deps(Dep.Install, Dep.Copy, Dep.Generate)
+	mg.Deps(Dep.Copy, Dep.Generate)
 
 	os.Chdir("./app")
 	defer os.Chdir("..")

@@ -25,14 +25,6 @@ func getVersionOrSetDefault() string {
 	return getValueOrSetDefault("VERSION", "latest")
 }
 
-func getFlywayUserOrSetDefault() string {
-	return getValueOrSetDefault("FLYWAY_USER", "test")
-}
-
-func getFlywayPasswordOrSetDefault() string {
-	return getValueOrSetDefault("FLYWAY_PASSWORD", "test")
-}
-
 func getValueOrSetDefault(key string, defaultValue string) string {
 	value, ok := os.LookupEnv(key)
 	if !ok {

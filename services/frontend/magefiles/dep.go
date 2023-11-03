@@ -10,10 +10,6 @@ import (
 
 type Dep mg.Namespace
 
-func (Dep) Install() error {
-	return sh.RunV("go", "install", "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.2")
-}
-
 func (Dep) Copy() error {
 	err := sh.RunV("install", "-D", "./config/app.config.none-local.yaml", "./app/config/config.yaml")
 	if err != nil {
