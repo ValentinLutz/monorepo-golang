@@ -69,6 +69,4 @@ func (server *Server) Stop() {
 		os.Exit(1)
 	}
 	slog.Info("server stopped")
-
-	// stop other connections like message queue
 }
