@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  lambda:
+    image: ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${PROJECT_NAME}:${VERSION}
+    volumes:
+      - ~/.aws-lambda-rie:/aws-lambda:ro
+    entrypoint:
+      - /aws-lambda/aws-lambda-rie
+    ports:
+      - "9000:8080"
+    command:
+      - /app/main
