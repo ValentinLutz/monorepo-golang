@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Minimal SAM Template
+
+Globals:
+  Function:
+    Timeout: 5
+    MemorySize: 128
+    Tracing: Active
+    Architectures: [ x86_64 ]
+
+Resources:
+  FactsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+    Metadata:
+      DockerTag: alpine.3.18-v1
+      DockerContext: ./app
+      Dockerfile: Dockerfile
+
+Outputs:
+  FactsFunction:
+    Description: First Lambda Function ARN
+    Value: !GetAtt FactsFunction.Arn
