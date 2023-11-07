@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  database-postgres:
+    image: postgres:15.4-alpine3.18
+    container_name: database-postgres
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:rw
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", $DB_NAME, "-U", $DB_USER ]
+      interval: 5s
+    networks:
+      - facts-lambda-network
+    ports:
+      - '5432:5432'
+
+networks:
+  facts-lambda-network:
+    name: facts-lambda-network
+    driver: bridge
