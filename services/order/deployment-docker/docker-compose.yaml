@@ -34,7 +34,7 @@ services:
       - '5432:5432'
 
   database-flyway-migration:
-    image: flyway/flyway:10.0-alpine
+    image: flyway/flyway:10.0
     container_name: database-flyway-migration
     command: [ 'clean', 'migrate', '-user=test', '-password=test']
     volumes:

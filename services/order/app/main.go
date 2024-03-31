@@ -7,7 +7,6 @@ import (
 	"monorepo/libraries/apputil/logging"
 	"monorepo/libraries/apputil/metrics"
 	"monorepo/libraries/apputil/middleware"
-	"monorepo/libraries/apputil/workflow"
 	"monorepo/services/order/app/config"
 	"monorepo/services/order/app/core/service"
 	"monorepo/services/order/app/incoming/http/openapi"
