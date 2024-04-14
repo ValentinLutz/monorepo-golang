@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   app:
     image: ghcr.io/valentinlutz/order-service:latest
@@ -12,6 +11,5 @@ services:
       - ../config/app.config.none-local.yaml:/app/config/config.yaml:ro
       - ../config/app.crt:/app/config/app.crt:ro
       - ../config/app.key:/app/config/app.key:ro
-    network_mode: host
-    # ports:
-    #   - 10443:10443
+    ports:
+      - "10443:10443"

@@ -14,7 +14,7 @@ logger:
 
 # Database config
 database:
-  host: localhost
+  host: database-postgres
   port: 5432
   user: test
   password: test
