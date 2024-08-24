@@ -10,9 +10,6 @@
 # Generated GO clients
 *.gen.go
 
-# Generated aws sam
-.aws-sam
-
 # Generate code coverage reports
 **/coverage/*
 

@@ -1,28 +1,14 @@
-version: '3.8'
 services:
-  # mqtt-emqx:
-  #   image: emqx:5.3.0
-  #   container_name: mqtt-emqx
-  #   environment:
-  #     EMQX_DASHBOARD__DEFAULT_USERNAME: test
-  #     EMQX_DASHBOARD__DEFAULT_PASSWORD: test
-  #   network_mode: host
-  #   # ports:
-  #   #   - 1883:1883
-  #   #   - 18083:18083 
-
   aws-localstack:
-    image: localstack/localstack:2.3.2
+    image: localstack/localstack:3.6
     container_name: aws-localstack
-    environment:
-      DEFAULT_REGION: eu-central-1
     volumes:
       - ./localstack:/etc/localstack/init:ro
     ports:
       - '4566:4566'
 
   database-postgres:
-    image: postgres:15.4-alpine3.18
+    image: postgres:16.4-alpine3.20
     container_name: database-postgres
     environment:
       POSTGRES_DB: test
@@ -30,45 +16,42 @@ services:
       POSTGRES_PASSWORD: test
     healthcheck:
       test: [ 'CMD-SHELL', 'pg_isready' ]
+      start_period: 1s
     ports:
       - '5432:5432'
 
   database-flyway-migration:
-    image: flyway/flyway:10.0
+    image: flyway/flyway:10.17
     container_name: database-flyway-migration
-    command: [ 'clean', 'migrate', '-user=test', '-password=test']
+    command: [ 'clean', 'migrate', '-user=test', '-password=test' ]
     volumes:
       - ../migration-database/migration:/flyway/sql/migration:ro
-      - ../migration-database/none-local.conf:/flyway/conf/flyway.conf:ro
+      - ../migration-database/none-dev.conf:/flyway/conf/flyway.conf:ro
     depends_on:
       - database-postgres
 
-  monitoring-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.14.0
-    container_name: monitoring-postgres-exporter
+  app:
+    image: ghcr.io/valentinlutz/order-service:latest
+    build:
+      context: ../../../
+      dockerfile: ./services/order/app/Dockerfile
+      args:
+        GO_BUILD_ARGS: -cover
+    container_name: app
     environment:
-      DATA_SOURCE_NAME: postgresql://test:test@localhost:5432/test?sslmode=disable
-    ports:
-      - '9187:9187'
-
-  monitoring-prometheus:
-    image: prom/prometheus:v2.47.2
-    container_name: monitoring-prometheus
+      VERSION: docker-container
+      GOCOVERDIR: /app/coverage
     volumes:
-      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - ../config/app.config.none-dev.yaml:/app/config/config.yaml:ro
+      - ../config/app.public.none-dev.crt:/app/config/app.public.none-dev.crt:ro
+      - ../config/app.private.none-dev.key:/app/config/app.private.none-dev.key:ro
+      - ../test-functional/coverage:/app/coverage:rw
+    healthcheck:
+      test: [ 'CMD-SHELL', 'wget --no-verbose --tries=1 --output-document=- --no-check-certificate https://127.0.0.1:10443/status/health || exit 1' ]
+      start_period: 1s
+    restart: on-failure:3
     ports:
-      - '9090:9090'
-
-  monitoring-grafana:
-    image: grafana/grafana:10.1.5
-    container_name: monitoring-grafana
-    environment:
-      GF_AUTH_ANONYMOUS_ENABLED: true
-      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
-    volumes:
-      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
-      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml:ro
-      - ./grafana/app.json:/etc/grafana/provisioning/dashboards/app.json:ro
-      - ./grafana/postgres.json:/etc/grafana/provisioning/dashboards/posgtres.json:ro
-    ports:
-      - '3000:3000'
+      - "10443:10443"
+    depends_on:
+      - database-postgres
+      - database-flyway-migration

@@ -73,9 +73,9 @@ func (Test) Coverage() {
 	getProfileOrSetDefault()
 	os.RemoveAll("./test-functional/coverage")
 
-	mg.Deps(Docker.Testup)
+	mg.Deps(Docker.Up)
 	mg.Deps(Test.Functional)
-	mg.Deps(Docker.Testdown)
+	mg.Deps(Docker.Down)
 
 	os.Chdir("./test-functional")
 	defer os.Chdir("..")

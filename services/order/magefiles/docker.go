@@ -24,7 +24,7 @@ func (Docker) Build() error {
 	return sh.RunV(
 		"docker",
 		"build",
-		"--file", "./app/app.dockerfile",
+		"--file", "./app/Dockerfile",
 		"--tag", dockerRegistry+"/"+dockerRepository+"/"+projectName+":"+version,
 		"../../",
 	)
@@ -54,7 +54,8 @@ func (Docker) Up() error {
 		"--file", "./docker-compose.yaml",
 		"up",
 		"--force-recreate",
-		//"--wait",
+		"--build",
+		"--wait",
 		//"--detach",
 	)
 }
@@ -67,36 +68,6 @@ func (Docker) Down() error {
 		"docker",
 		"compose",
 		"--file", "./docker-compose.yaml",
-		"--file", "./test.docker-compose.yaml",
-		"down",
-	)
-}
-
-func (Docker) Testup() error {
-	mg.Deps(Dep.Generate)
-
-	os.Chdir("./deployment-docker")
-	defer os.Chdir("..")
-
-	return sh.RunV(
-		"docker",
-		"compose",
-		"--file", "./test.docker-compose.yaml",
-		"up",
-		"--force-recreate",
-		"--build",
-		"-d",
-	)
-}
-
-func (Docker) Testdown() error {
-	os.Chdir("./deployment-docker")
-	defer os.Chdir("..")
-
-	return sh.RunV(
-		"docker",
-		"compose",
-		"--file", "./test.docker-compose.yaml",
 		"down",
 	)
 }

@@ -7,10 +7,9 @@ import (
 type Environment string
 
 const (
-	LOCAL     Environment = "LOCAL"
-	CONTAINER Environment = "CONTAINER"
-	TEST      Environment = "TEST"
-	PROD      Environment = "PROD"
+	DEV  Environment = "DEV"
+	TEST Environment = "TEST"
+	PROD Environment = "PROD"
 )
 
 // UnmarshalYAML implements the yaml.Unmarshaler interface.
@@ -24,7 +23,7 @@ func (environment *Environment) UnmarshalYAML(unmarshal func(any) error) error {
 	unmarshalledEnvironment := Environment(environmentString)
 
 	switch unmarshalledEnvironment {
-	case LOCAL, CONTAINER, TEST, PROD:
+	case DEV, TEST, PROD:
 		*environment = unmarshalledEnvironment
 		return nil
 	}

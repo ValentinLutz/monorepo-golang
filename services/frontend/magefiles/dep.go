@@ -11,7 +11,7 @@ import (
 type Dep mg.Namespace
 
 func (Dep) Copy() error {
-	err := sh.RunV("install", "-D", "./config/app.config.none-local.yaml", "./app/config/config.yaml")
+	err := sh.RunV("install", "-D", "./config/app.config.none-dev.yaml", "./app/config/config.yaml")
 	if err != nil {
 		return err
 	}

@@ -1,12 +1,12 @@
 # Global config
 region: NONE
-environment: LOCAL
+environment: DEV
 
 # Server config
 server:
   port: 10443
-  certificate_path: config/app.crt
-  key_path: config/app.key
+  certificate_path: config/app.public.none-dev.crt
+  key_path: config/app.private.none-dev.key
 
 # Logger config
 logger:

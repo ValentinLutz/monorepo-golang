@@ -1,6 +1,6 @@
 # Global config
 region: NONE
-environment: LOCAL
+environment: DEV
 
 # Server config
 server:

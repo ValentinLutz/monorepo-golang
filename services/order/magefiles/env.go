@@ -6,7 +6,7 @@ import (
 )
 
 func getProfileOrSetDefault() string {
-	return getValueOrSetDefault("PROFILE", "none-local")
+	return getValueOrSetDefault("PROFILE", "none-dev")
 }
 
 func getDockerRegistryOrSetDefault() string {

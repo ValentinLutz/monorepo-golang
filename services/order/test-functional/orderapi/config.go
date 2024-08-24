@@ -5,8 +5,10 @@ import (
 	"monorepo/libraries/testutil"
 	"net/http"
 
-	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
+	"github.com/oapi-codegen/oapi-codegen/v2/pkg/securityprovider"
 )
+
+//go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=../../api-definition/test.client.yaml ../../api-definition/order_api.yaml
 
 var testConfig *testutil.Config
 
