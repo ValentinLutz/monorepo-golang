@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func ReadToObject(t *testing.T, reader io.Reader, object interface{}) {
+func ReadToObject(t *testing.T, reader io.Reader, object any) {
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(object)
 	if err != nil {

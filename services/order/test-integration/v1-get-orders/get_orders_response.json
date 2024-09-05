@@ -1,0 +1,49 @@
+[
+  {
+    "creation_date": "1970-01-01T00:00:00Z",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
+    "items": [
+      {
+        "name": "orange"
+      },
+      {
+        "name": "banana"
+      }
+    ],
+    "order_id": "01J71WWQ9K1A2-NONE-1JB0VJ47X1W0Q",
+    "status": "order_placed"
+  },
+  {
+    "creation_date": "1970-01-01T00:00:00Z",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
+    "items": [
+      {
+        "name": "chocolate"
+      }
+    ],
+    "order_id": "01J71WXMDHMWH-NONE-PVHE8560H324S",
+    "status": "order_in_progress"
+  },
+  {
+    "creation_date": "1970-01-01T00:00:00Z",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
+    "items": [
+      {
+        "name": "marshmallow"
+      }
+    ],
+    "order_id": "01J71X1VZRWF2-NONE-4Q25SM23WRP1G",
+    "status": "order_canceled"
+  },
+  {
+    "creation_date": "1970-01-01T00:00:00Z",
+    "customer_id": "44bd6239-7e3d-4d4a-90a0-7d4676a00f5c",
+    "items": [
+      {
+        "name": "apple"
+      }
+    ],
+    "order_id": "01J71WYVYCDDA-NONE-44EJWDYHQHCHZ",
+    "status": "order_completed"
+  }
+]

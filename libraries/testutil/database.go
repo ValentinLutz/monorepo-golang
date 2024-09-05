@@ -1,52 +1,55 @@
 package testutil
 
 import (
+	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"os"
-
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"time"
 )
 
 type Database struct {
-	*sqlx.DB
+	*pgxpool.Pool
 }
 
-func NewDatabase(config *Config) *Database {
+func NewDatabase(config DatabaseConfig) *Database {
 	psqlInfo := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.Database.Host,
-		config.Database.Port,
-		config.Database.Username,
-		config.Database.Password,
-		config.Database.Database,
+		"host=%s port=%d dbname=%s user=%s password=%s sslmode=disable",
+		config.Host, config.Port, config.Name, config.User, config.Password,
 	)
 
-	db, err := sqlx.Connect("postgres", psqlInfo)
+	ctx := context.Background()
+
+	db, err := pgxpool.New(ctx, psqlInfo)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to connect to database: %w", err))
 	}
 
-	return &Database{db}
+	return &Database{
+		Pool: db,
+	}
 }
 
-func LoadAndExec(db *Database, path string) {
-	query := LoadQuery(path)
-	Exec(db, query)
+func (db *Database) MustLoadAndExec(path string) {
+	query := MustLoadQuery(path)
+	db.MustExec(query)
 }
 
-func LoadQuery(path string) string {
+func (db *Database) MustExec(query string) {
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancelFunc()
+
+	_, err := db.Exec(ctx, query)
+	if err != nil {
+		panic(fmt.Errorf("failed to execute query: %w", err))
+	}
+}
+
+func MustLoadQuery(path string) string {
 	query, err := os.ReadFile(path)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to read file: %w", err))
 	}
 
 	return string(query)
-}
-
-func Exec(db *Database, query string) {
-	_, err := db.Exec(query)
-	if err != nil {
-		panic(err)
-	}
 }

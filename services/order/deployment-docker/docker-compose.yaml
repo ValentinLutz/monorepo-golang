@@ -45,7 +45,7 @@ services:
       - ../config/app.config.none-dev.yaml:/app/config/config.yaml:ro
       - ../config/app.public.none-dev.crt:/app/config/app.public.none-dev.crt:ro
       - ../config/app.private.none-dev.key:/app/config/app.private.none-dev.key:ro
-      - ../test-functional/coverage:/app/coverage:rw
+      - ../test-integration/coverage:/app/coverage:rw
     healthcheck:
       test: [ 'CMD-SHELL', 'wget --no-verbose --tries=1 --output-document=- --no-check-certificate https://127.0.0.1:10443/status/health || exit 1' ]
       start_period: 1s

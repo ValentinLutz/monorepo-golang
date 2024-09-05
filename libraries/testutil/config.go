@@ -13,8 +13,8 @@ type Config struct {
 type DatabaseConfig struct {
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
-	Database string `yaml:"database"`
-	Username string `yaml:"user"`
+	Name     string `yaml:"name"`
+	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 }
 

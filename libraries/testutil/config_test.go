@@ -22,8 +22,8 @@ func Test_ParseFile(t *testing.T) {
 		Database: testutil.DatabaseConfig{
 			Host:     "localhost",
 			Port:     9432,
-			Database: "dev_db",
-			Username: "test",
+			Name:     "dev_db",
+			User:     "test",
 			Password: "test",
 		},
 	}

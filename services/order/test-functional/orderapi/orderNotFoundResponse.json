@@ -1,8 +1,0 @@
-{
-  "code": 4004,
-  "message": "sql: no rows in result set\norder not found",
-  "method": "GET",
-  "path": "/orders/NOPE",
-  "timestamp": "2022-09-04T19:43:56.0185708Z",
-  "correlation_id": "2685342d-4888-4d74-9a57-aa5393fc8e35"
-}

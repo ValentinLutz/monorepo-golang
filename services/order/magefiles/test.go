@@ -63,7 +63,7 @@ func (Test) Functional() {
 
 	mg.Deps(Dep.Generate)
 
-	os.Chdir("./test-functional")
+	os.Chdir("./test-integration")
 	defer os.Chdir("..")
 
 	sh.RunV("go", "test", "-count=1", "./...")
@@ -71,20 +71,20 @@ func (Test) Functional() {
 
 func (Test) Coverage() {
 	getProfileOrSetDefault()
-	os.RemoveAll("./test-functional/coverage")
+	os.RemoveAll("./test-integration/coverage")
 
 	mg.Deps(Docker.Up)
 	mg.Deps(Test.Functional)
 	mg.Deps(Docker.Down)
 
-	os.Chdir("./test-functional")
+	os.Chdir("./test-integration")
 	defer os.Chdir("..")
 
 	sh.RunV("go", "tool", "covdata", "percent", "-i", "./coverage")
 }
 
 func (Test) Coveragehtml() {
-	os.Chdir("./test-functional")
+	os.Chdir("./test-integration")
 	defer os.Chdir("..")
 
 	sh.RunV("go", "tool", "covdata", "textfmt", "-i", "./coverage", "-o", "./coverage/coverage.txt")

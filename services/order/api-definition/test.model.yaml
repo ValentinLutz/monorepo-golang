@@ -1,0 +1,4 @@
+package: testintegration
+generate:
+  models: true
+output: model.gen.go
